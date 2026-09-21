@@ -1,1 +1,0 @@
-- [Raw capture safety](raw-capture-safety.md) — imported browser captures may contain reusable credentials; extract shapes only and require explicit session context.

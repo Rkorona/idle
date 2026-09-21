@@ -1,10 +1,2 @@
-# Raw browser captures can contain passwords, cookies, bearer tokens, and
-# signed URLs. Keep local captures out of future commits.
-
-
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pythonlibs/
-uv.lock
-
+.venv
+.git
