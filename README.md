@@ -87,6 +87,10 @@ api = IdleMmoApi(client)
 
 完整的“小号读取缺货清单 → 分配采集 → 会话复用 → 采集 → 队伍交易”实施计划见 [`docs/automation-plan.md`](docs/automation-plan.md)。
 
+本地脱敏响应 fixture 位于 [`data/fixtures/`](data/fixtures/)，可用于不联网验证模型和缺口计算。
+默认计划模板是 [`configs/material_plan.yaml`](configs/material_plan.yaml)。真实授权会话必须由
+外部登录流程提供，不能从 `Bag/` 中的旧抓包恢复。
+
 ## 目录
 
 ```text

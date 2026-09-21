@@ -12,7 +12,7 @@ from http.cookies import SimpleCookie
 import json
 from typing import Any, Mapping
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
 from .errors import ApiConfigurationError, ApiHttpError
@@ -174,10 +174,18 @@ class ApiClient:
                 }
 
             is_absolute_url = path.startswith(("https://", "http://"))
-            query = urlencode(self._request_query(method, path, payload), doseq=True)
-            url = path if is_absolute_url else f"{self.base_url}{path}"
-            if query and not is_absolute_url:
-                url = f"{url}?{query}"
+            path_parts = urlsplit(path)
+            query_values = list(parse_qsl(path_parts.query, keep_blank_values=True))
+            query_values.extend(self._request_query(method, path, payload).items())
+            query = urlencode(query_values, doseq=True)
+            if is_absolute_url:
+                url = urlunsplit(
+                    (path_parts.scheme, path_parts.netloc, path_parts.path, query, path_parts.fragment)
+                )
+            else:
+                url = f"{self.base_url}{path_parts.path}"
+                if query:
+                    url = f"{url}?{query}"
 
             headers = {
                 "Accept": "application/json",

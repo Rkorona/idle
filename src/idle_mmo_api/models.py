@@ -68,6 +68,10 @@ class Action:
     title: str | None
     quantity: int | None
     complete: bool | None
+    cancel_url: str | None = None
+    current_progress: dict[str, Any] | None = None
+    item: dict[str, Any] | None = None
+    raw: dict[str, Any] | None = None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Action":
@@ -77,6 +81,10 @@ class Action:
             title=data.get("title"),
             quantity=int(quantity) if quantity is not None else None,
             complete=data.get("complete"),
+            cancel_url=data.get("cancel_url"),
+            current_progress=data.get("current_progress"),
+            item=data.get("item"),
+            raw=dict(data),
         )
 
 

@@ -85,6 +85,17 @@ class IdleMmoApi:
         """Cancel using the server-provided cancel path for the active action."""
         return self.client.post_json(cancel_path, write_operation=True)
 
+    def cancel_active_action(self, character_id: int) -> dict[str, Any]:
+        """Cancel the current action using its server-provided cancel URL.
+
+        The URL is read from the authorized session's current action response;
+        callers must not copy a signed URL from an old capture.
+        """
+        action = self.active_action(character_id)
+        if action is None or not action.cancel_url:
+            return {"status": "no_active_action"}
+        return self.cancel_action(action.cancel_url)
+
     def party(self) -> Party:
         data = self.client.post_json(ROUTES["party"].path)
         return Party.from_dict(data)

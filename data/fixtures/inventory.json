@@ -1,0 +1,19 @@
+{
+  "inventory_items": [
+    {
+      "id": 1001,
+      "item_id": 23,
+      "quantity": 120,
+      "name": "Wood",
+      "tier": 1
+    },
+    {
+      "id": 1002,
+      "item_id": 24,
+      "quantity": 250,
+      "name": "Stone",
+      "tier": 1
+    }
+  ],
+  "free_inventory_slots": 20
+}

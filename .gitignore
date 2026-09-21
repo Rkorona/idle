@@ -7,3 +7,8 @@ __pycache__/
 *.egg-info/
 .pythonlibs/
 uv.lock
+
+# Runtime state and authorized sessions must never be committed.
+data/sessions/*.json
+data/runtime.sqlite3
+data/runtime.sqlite3-*

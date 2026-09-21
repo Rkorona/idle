@@ -1,0 +1,21 @@
+{
+  "source": "Bag/",
+  "safe_fixture": true,
+  "fixtures": {
+    "active_action.empty.json": "/api/action/active (empty response)",
+    "accept_trade.json": "/api/trades/trade/accept",
+    "activity_graph.json": "/api/character/graph/activity",
+    "add_trade_item.json": "/api/trades/trade/add/item",
+    "cancel_action.json": "/api/action/cancel",
+    "character.json": "/api/character/information",
+    "create_trade.json": "/api/trades/create",
+    "experience_graph.json": "/api/character/graph/experience",
+    "inventory.json": "/api/item-storage/inventory",
+    "nearby_characters.woodcutting.json": "/api/skills/nearby-characters/woodcutting",
+    "party.json": "/api/party/get",
+    "skill_data.woodcutting.json": "/api/skills/data/woodcutting",
+    "start_skill.json": "/api/skills/start",
+    "trade.json": "/api/trades/trade/get",
+    "trades.json": "/api/trades"
+  }
+}

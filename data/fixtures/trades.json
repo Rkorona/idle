@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "current_page": 1,
+  "current_page_url": "/api/trades?page=1",
+  "data": [],
+  "first_page_url": "/api/trades?page=1",
+  "from": null,
+  "next_page_url": null,
+  "path": "/api/trades",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": null
+}

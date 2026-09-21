@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "message": "Trade created",
+  "character_trade": {
+    "id": 2001,
+    "status": "pending",
+    "initiator_id": 100,
+    "trade_partner_id": 101,
+    "initiator_pets": [],
+    "trade_partner_pets": []
+  }
+}
