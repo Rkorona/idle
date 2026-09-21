@@ -9,3 +9,8 @@ Longin/
 __pycache__/
 *.py[cod]
 *.egg-info/
+.pythonlibs/
+uv.lock
+data/*
+!data/sessions/
+!data/sessions/.gitkeep

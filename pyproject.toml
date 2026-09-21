@@ -7,6 +7,12 @@ name = "idle-mmo-api"
 version = "0.1.0"
 description = "Typed, authorization-aware interface definitions extracted from local HTTP captures"
 requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0.3",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.scripts]
+idle-bot = "idle_bot.cli:main"

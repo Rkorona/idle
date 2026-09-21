@@ -115,6 +115,14 @@ configs/
 
 当前已经存在的 `src/idle_mmo_api/` 是底层接口层；计划中的 `src/idle_bot/` 属于上层业务编排，不应把调度逻辑塞进 API 客户端。
 
+第一阶段已实现：
+
+- `idle_bot.config`：读取并校验材料计划 YAML；
+- `idle_bot.session_store`：按账号读取/保存本地会话文件；
+- `idle_bot.accounts`：只读检查角色信息和背包；
+- `idle_bot.planner`：根据大号库存计算缺口；
+- `idle_bot.cli`：提供 `sessions check` 和 `plan` 命令。
+
 ## 5. 阶段一：读取缺货清单并计算实际缺口
 
 1. 加载并校验 YAML。

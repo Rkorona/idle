@@ -1,0 +1,34 @@
+base_url: https://web.idle-mmo.com
+main_account: main
+
+requirements:
+  - material: wood
+    item_id: 23
+    tier: 1
+    quantity: 500
+    priority: 1
+
+  - material: stone
+    item_id: 24
+    tier: 1
+    quantity: 300
+    priority: 2
+
+accounts:
+  - name: main
+    role: main
+    enabled: true
+
+  - name: alt_01
+    role: gatherer
+    enabled: true
+    allowed_skills:
+      - woodcutting
+    max_reserved_slots: 20
+
+runtime:
+  dry_run: true
+  allow_gather: false
+  allow_trade: false
+  require_trade_confirmation: true
+  request_interval_seconds: 2
