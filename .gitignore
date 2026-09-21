@@ -1,14 +1,10 @@
 # Raw browser captures can contain passwords, cookies, bearer tokens, and
 # signed URLs. Keep local captures out of future commits.
 
-*.env
+
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pythonlibs/
 uv.lock
 
-# Runtime state and authorized sessions must never be committed.
-data/sessions/*.json
-data/runtime.sqlite3
-data/runtime.sqlite3-*
