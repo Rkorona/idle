@@ -1,0 +1,79 @@
+"""出售接口的离线协议测试。"""
+import json
+import sys
+import types
+import unittest
+from pathlib import Path
+from unittest.mock import Mock
+
+try:
+    import httpx  # noqa: F401
+except ImportError:
+    stub = types.ModuleType("httpx")
+    stub.Client = object
+    stub.Response = object
+    stub.TransportError = Exception
+    sys.modules["httpx"] = stub
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from idlemmo_bot.api import GameAPIError, IdleMMOClient  # noqa: E402
+
+
+def response(status_code, body):
+    result = Mock()
+    result.status_code = status_code
+    result.text = json.dumps(body, ensure_ascii=False)
+    result.json.return_value = body
+    return result
+
+
+class TestSellItem(unittest.TestCase):
+    def setUp(self):
+        self.client = IdleMMOClient.__new__(IdleMMOClient)
+        self.client.endpoints = {}
+        self.client.runtime_meta = {}
+        self.client.log = Mock()
+        self.client._get_inventory_items = Mock(return_value=[{
+            "item_id": 201,
+            "tier": 1,
+            "quantity": 10,
+            "value": 1,
+            "routes": {"sellable_to_vendor": True},
+        }])
+        self.client._post = Mock(return_value=response(
+            200, {"result": "success", "experience": 1}
+        ))
+        self.client.get_auth_headers = Mock(return_value={"accept": "application/json"})
+
+    def test_posts_captured_payload_and_returns_gold(self):
+        self.assertEqual(self.client.sell_item(201, 3), 3)
+        url, kwargs = self.client._post.call_args.args[0], self.client._post.call_args.kwargs
+        self.assertEqual(url, "https://web.idle-mmo.com/api/item/vendor/sell")
+        self.assertEqual(
+            {key: kwargs["json"][key] for key in (
+                "tier", "quantity", "item_id", "ts2mic5ytx", "qty6bx4peh",
+                "gcem8x71nt", "v",
+            )},
+            {
+                "tier": 1, "quantity": 3, "item_id": 201,
+                "ts2mic5ytx": "UVlZ", "qty6bx4peh": "UlhQ",
+                "gcem8x71nt": "V1ZRSxRUVVtTXF1RWQ==", "v": "1.0.0.1",
+            },
+        )
+
+    def test_rejects_quantity_above_inventory(self):
+        with self.assertRaises(GameAPIError):
+            self.client.sell_item(201, 11)
+        self.client._post.assert_not_called()
+
+    def test_rejects_unsuccessful_business_response(self):
+        self.client._post.return_value = response(
+            200, {"result": "error", "message": "not sellable"}
+        )
+        with self.assertRaises(GameAPIError):
+            self.client.sell_item(201, 1)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

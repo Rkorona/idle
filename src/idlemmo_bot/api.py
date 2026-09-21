@@ -319,13 +319,11 @@ class IdleMMOClient:
         self.log.info("二次确认成功：服务端动作已清空。")
         return True
 
-    def get_inventory_item_count(self, item_id: int) -> int:
-        """获取背包中某个物品的当前数量。
-
-        修复 #6：原先 HTTP 非 200 时静默返回 0，会被上层当成“背包里没有”，
-        触发不必要的采集或让最终核验误判。现在改为抛 GameAPIError。
-        """
+    def _get_inventory_items(self) -> list[Dict[str, Any]]:
+        """读取完整背包列表，供数量查询和出售共用。"""
         res_inv = self._get(INVENTORY_URL)
+        if res_inv.status_code != 200:
+            raise GameAPIError(f"访问背包页面失败 (HTTP {res_inv.status_code}): {res_inv.text}")
         self._parse_page_context(res_inv.text)
 
         inv_endpoint = self.endpoints.get("trade.inventory.endpoint")
@@ -345,7 +343,19 @@ class IdleMMOClient:
         if res.status_code != 200:
             raise GameAPIError(f"查询背包失败 (HTTP {res.status_code}): {res.text}")
 
-        for it in res.json().get("inventory_items", []):
+        data = res.json()
+        items = data.get("inventory_items") if isinstance(data, dict) else None
+        if not isinstance(items, list):
+            raise GameAPIError(f"查询背包返回格式异常: {data}")
+        return items
+
+    def get_inventory_item_count(self, item_id: int) -> int:
+        """获取背包中某个物品的当前数量。
+
+        修复 #6：原先 HTTP 非 200 时静默返回 0，会被上层当成“背包里没有”，
+        触发不必要的采集或让最终核验误判。现在改为抛 GameAPIError。
+        """
+        for it in self._get_inventory_items():
             if it.get("item_id") == item_id:
                 return it.get("quantity", 0)
         return 0
@@ -488,18 +498,79 @@ class IdleMMOClient:
             raise GameAPIError(f"取消交易失败 (HTTP {res.status_code}): {res.text}")
 
     # ==================================================================
-    # 出售（占位）
+    # 出售
     # ==================================================================
-    def sell_item(self, item_id: int, quantity: int) -> int:
-        """将物品出售换取金币，返回获得的金币数。
+    def sell_item(self, item_id: int, quantity: int, tier: int = 1) -> int:
+        """把背包物品卖给 NPC，返回本次获得的金币数。
 
-        ⚠ 现有抓包中没有出售/市场接口，这里不做猜测。
-        请抓取出售请求后，参照上面的 add_item_to_trade 写法填充本方法：
-        找端点 -> 组装 payload -> 校验 status -> 返回金币数。
+        出售接口不会在响应体中返回金币数；抓包中的成功响应只有
+        ``result=success`` 和酒馆经验，因此金币按背包物品的 ``value`` 计算。
+        出售地址优先使用物品/页面返回的短期签名地址，找不到时使用同一路径
+        的未签名地址，让服务端明确返回鉴权错误，而不是使用过期抓包签名。
         """
-        raise NotImplementedError(
-            "sell_item 尚未实现：需要抓包获取出售接口的端点与载荷后在此补全"
+        if not isinstance(item_id, int) or isinstance(item_id, bool) or item_id <= 0:
+            raise ValueError("item_id 必须是正整数")
+        if not isinstance(quantity, int) or isinstance(quantity, bool) or quantity <= 0:
+            raise ValueError("quantity 必须是正整数")
+        if not isinstance(tier, int) or isinstance(tier, bool) or tier <= 0:
+            raise ValueError("tier 必须是正整数")
+
+        item: Optional[Dict[str, Any]] = None
+        for candidate in self._get_inventory_items():
+            if candidate.get("item_id") == item_id and candidate.get("tier", 1) == tier:
+                item = candidate
+                break
+        if item is None:
+            raise GameAPIError(f"背包中不存在物品 item_id={item_id}, tier={tier}")
+
+        available = item.get("quantity")
+        if not isinstance(available, int) or quantity > available:
+            raise GameAPIError(
+                f"出售数量超过背包数量: item_id={item_id}, 请求={quantity}, 当前={available}"
+            )
+        routes = item.get("routes") or {}
+        if routes.get("sellable_to_vendor") is False:
+            raise GameAPIError(f"物品不可出售给 NPC: item_id={item_id}, tier={tier}")
+
+        sell_url = routes.get("sell_to_vendor")
+        if not isinstance(sell_url, str) or not sell_url:
+            sell_url = self.endpoints.get("item.vendor.sell.endpoint")
+        if not isinstance(sell_url, str) or not sell_url:
+            # 抓包确认的固定路径；签名若为必需项，服务端会返回明确的 403。
+            sell_url = f"{BASE_URL}/api/item/vendor/sell"
+        sell_url = self._extract_clean_url(sell_url)
+
+        payload = self._build_post_payload({
+            "tier": tier,
+            "quantity": quantity,
+            "item_id": item_id,
+        })
+        # 出售请求使用与采集/交易不同的一组前端运行时常量（见包/sell/10984）。
+        payload.update({
+            "ts2mic5ytx": "UVlZ",
+            "qty6bx4peh": "UlhQ",
+            "gcem8x71nt": "V1ZRSxRUVVtTXF1RWQ==",
+        })
+        res = self._post(
+            sell_url,
+            json=payload,
+            headers=self.get_auth_headers(referer=INVENTORY_URL),
         )
+        self.log.info("出售物品响应 HTTP %s: %s", res.status_code, res.text[:200])
+
+        if res.status_code != 200:
+            raise GameAPIError(f"出售物品接口异常 (HTTP {res.status_code}): {res.text}")
+        try:
+            data = res.json()
+        except ValueError as e:
+            raise GameAPIError(f"出售物品返回非 JSON: {res.text}") from e
+        if not isinstance(data, dict) or data.get("result") != "success":
+            raise GameAPIError(f"出售物品业务失败: {data}")
+
+        value = item.get("value")
+        if not isinstance(value, (int, float)) or value < 0:
+            raise GameAPIError(f"背包物品缺少有效单价: item_id={item_id}, value={value!r}")
+        return int(value * quantity)
 
     # ------------------------------------------------------------------
     def close(self) -> None:

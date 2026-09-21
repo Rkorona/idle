@@ -1,0 +1,1 @@
+- [Vendor sell API](vendor-sell-api.md) — success responses omit gold; calculate proceeds from the current item value and sold quantity.
