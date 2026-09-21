@@ -63,6 +63,8 @@ client = ApiClient(
 api = IdleMmoApi(client)
 ```
 
+完整的“小号读取缺货清单 → 分配采集 → 会话复用 → 采集 → 队伍交易”实施计划见 [`docs/automation-plan.md`](docs/automation-plan.md)。
+
 ## 目录
 
 ```text
