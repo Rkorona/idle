@@ -155,3 +155,13 @@ class SessionStoreTests(unittest.TestCase):
             )
             self.assertEqual(loaded.query, {})
             self.assertEqual(loaded.protocol_fields, {})
+
+    def test_each_account_has_a_separate_session_file(self):
+        with TemporaryDirectory() as directory:
+            store = SessionStore(directory)
+            main_path = store.import_cookie("main", "session=main")
+            alt_path = store.import_cookie("alt_01", "session=alt")
+            self.assertEqual(main_path.name, "main.json")
+            self.assertEqual(alt_path.name, "alt_01.json")
+            self.assertEqual(store.load("main").headers["Cookie"], "session=main")
+            self.assertEqual(store.load("alt_01").headers["Cookie"], "session=alt")

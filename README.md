@@ -59,8 +59,9 @@ python -m idle_bot sessions check --account main
 ```
 
 之后每次 `sessions check` 或 `plan` 发起成功请求时，客户端都会接收服务端的 `Set-Cookie`，
-并把更新后的会话保存回 `data/sessions/main.json`。Cookie 文件和会话 JSON 都是登录凭证，
-不要放入 Git、`Bag/` 或命令行参数中。
+并把更新后的会话保存回对应账号的文件，例如 `main` 写入
+`data/sessions/main.json`，`alt_01` 写入 `data/sessions/alt_01.json`。Cookie 文件和会话
+JSON 都是登录凭证，不要放入 Git、`Bag/` 或命令行参数中。
 
 签名参数不能从旧抓包中永久复用。需要由授权测试环境提供每次请求的新参数时，传入动态回调：
 
