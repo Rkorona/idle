@@ -17,7 +17,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from idlemmo_bot.api import GameAPIError, IdleMMOClient  # noqa: E402
+from idlemmo_bot.api import GameAPIError, IdleMMOClient, SessionExpiredError  # noqa: E402
 
 
 def response(status_code, body):
@@ -72,6 +72,13 @@ class TestSellItem(unittest.TestCase):
             200, {"result": "error", "message": "not sellable"}
         )
         with self.assertRaises(GameAPIError):
+            self.client.sell_item(201, 1)
+
+    def test_classifies_expired_session_response(self):
+        self.client._post.return_value = response(
+            403, {"message": "Your session has expired. Please restart the app."}
+        )
+        with self.assertRaises(SessionExpiredError):
             self.client.sell_item(201, 1)
 
 

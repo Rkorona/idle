@@ -9,7 +9,12 @@ import threading
 import time
 from typing import Any, Callable, Dict, List, Optional
 
-from .api import GameAPIError, IdleMMOClient, create_authenticated_client
+from .api import (
+    GameAPIError,
+    IdleMMOClient,
+    SessionExpiredError,
+    create_authenticated_client,
+)
 from .config import (
     GATHER_TIMEOUT_MARGIN,
     IDLE_SLEEP,
@@ -242,6 +247,12 @@ class Worker:
                     failures.append((name, e))
                     continue
                 self.log.error("[赚钱] %s —— 已停用赚钱模式，仅保留任务采集。", e)
+                self.sell_plan = []
+                return
+            except SessionExpiredError as e:
+                # 这类错误不能当成“主材料不可用”：继续采集备用材料只会浪费时间，
+                # 而且可能重复向已被服务端拒绝的会话发送请求。
+                self.log.error("[赚钱] %s —— 已停止赚钱模式，请重新启动程序获取新会话。", e)
                 self.sell_plan = []
                 return
             except Exception as e:

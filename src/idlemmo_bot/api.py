@@ -27,6 +27,10 @@ class GameAPIError(Exception):
     """游戏业务接口异常"""
 
 
+class SessionExpiredError(GameAPIError):
+    """服务端将请求判定为会话/鉴权失效。"""
+
+
 class IdleMMOClient:
     def __init__(self, timeout: float = 20.0, name: str = "client"):
         self.client = httpx.Client(
@@ -74,6 +78,25 @@ class IdleMMOClient:
 
     def _post(self, url: str, **kwargs) -> httpx.Response:
         return self._request("POST", url, **kwargs)
+
+    @staticmethod
+    def _looks_like_expired_session(res: httpx.Response) -> bool:
+        """识别站点用来表示鉴权/签名失效的通用 401/403 响应。"""
+        if res.status_code not in (401, 403):
+            return False
+        try:
+            data = res.json()
+        except ValueError:
+            data = None
+        message = data.get("message", "") if isinstance(data, dict) else ""
+        text = f"{message} {res.text}".lower()
+        return "session has expired" in text or "restart the app" in text
+
+    def _raise_if_expired_session(self, res: httpx.Response, action: str) -> None:
+        if self._looks_like_expired_session(res):
+            raise SessionExpiredError(
+                f"{action}被服务端拒绝，返回会话/签名失效提示: {res.text}"
+            )
 
     # ------------------------------------------------------------------
     # 页面解析
@@ -558,6 +581,7 @@ class IdleMMOClient:
         )
         self.log.info("出售物品响应 HTTP %s: %s", res.status_code, res.text[:200])
 
+        self._raise_if_expired_session(res, "出售物品请求")
         if res.status_code != 200:
             raise GameAPIError(f"出售物品接口异常 (HTTP {res.status_code}): {res.text}")
         try:
