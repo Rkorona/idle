@@ -1,0 +1,30 @@
+{
+  "target_character_id": 782924,
+  "tasks": [
+    {
+      "task_id": "gather_oak_01",
+      "skill": "woodcutting",
+      "skill_item_id": 1,
+      "inventory_item_id": 1,
+      "name": "Oak Log",
+      "target_quantity": 10,
+      "batch_size": 10,
+      "delivered_quantity": 10,
+      "status": "COMPLETED",
+      "assigned_to": null
+    },
+    {
+      "task_id": "gather_coal_02",
+      "skill": "mining",
+      "skill_item_id": 10,
+      "inventory_item_id": 201,
+      "name": "Coal Ore",
+      "target_quantity": 10,
+      "batch_size": 10,
+      "delivered_quantity": 10,
+      "status": "COMPLETED",
+      "assigned_to": null,
+      "last_error": "启动采集接口异常 (HTTP 400): {\"message\":\"You do not meet the level requirement.\"}"
+    }
+  ]
+}

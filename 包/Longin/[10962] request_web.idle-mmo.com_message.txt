@@ -1,0 +1,26 @@
+GET / h2
+host: web.idle-mmo.com
+cache-control: max-age=0
+dnt: 1
+upgrade-insecure-requests: 1
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36
+accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+sec-fetch-site: same-origin
+sec-fetch-mode: navigate
+sec-fetch-user: ?1
+sec-fetch-dest: document
+sec-ch-ua: "Google Chrome";v="153", "Not_A Brand";v="8", "Chromium";v="153"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+referer: https://web.idle-mmo.com/login
+accept-encoding: gzip, deflate, br, zstd
+accept-language: zh-CN,zh;q=0.9
+cookie: PALAMEDES_AUTHENTICATED=1
+cookie: gawain_lancelot=0135a4i2he9dd2
+cookie: mordred_excalibur=f4103fde3b48125924ec8805fa713458
+cookie: XSRF-TOKEN=eyJpdiI6IkdwRnlmb1Nqenl1bGp4VWJ6a243aUE9PSIsInZhbHVlIjoiTXpENWRacG1XN1RnOGMxQjQ2M3pmVjI0UytnNkZMUDJJelVndHB1OWF0bnkzOXpMK2hmREtiQUJ5ZlRJMmRtL0xHRHpVTGFWdndLbVd1ZjV5eDl3UnhDWUJSMFNuakxXVDgrbW1pYmpTOVdMVnR5dFBrN202SzVWN2Z3aWdPODgiLCJtYWMiOiIwYThiOTFjNzhkMzA1MjAyNzIxN2E5NjJmY2RjMGI0ODljZjc2NGFkNjlkNGFjZmY4MTM0OWRhNDNjMDdhYWFkIiwidGFnIjoiIn0%3D
+cookie: idlemmo_session=eyJpdiI6InVVZU9KaDdNejB6L0ZYV2hiZUNTOHc9PSIsInZhbHVlIjoiL2RhMU9tU0RGamxqZ3ZrckQxUnc5aUV6WXp2bkRCcnpkODAvMTRidG5vQktEZGtKbkVKZ0ZCUm1XdEFGN3NpUXd6dm9hdUNxZmt6dlVJZjRUZWs2MHExYXNmTU1lL25BWm0zdTd2Zk4veEgwL0dHSm1lVmJrbXprVGY0czRRNDciLCJtYWMiOiJiMzc0ZGU4MzRmYTU2MDUwMGI1NzU0ZjM3OTI3MzBjZGRjYmNjN2E2N2E3YTllNGI2MWMxM2NhMDdhZGNjYWRlIiwidGFnIjoiIn0%3D
+cookie: idle_mmo_locale=eyJpdiI6IjBjekdTOThZeFVab3ZVMGg5K1ZLS3c9PSIsInZhbHVlIjoiOTFKaUh4Wlhpb0dKcUZkVi9xelBlK2d5V0RsNHNWZ01wd3FsN2xPVEdnaUtaNkk2eE9sSFRNQU9xNlVaZnM2UyIsIm1hYyI6IjBmMzcyNzE3YmI0YWY1OTNkYmYxOWRmYmZjZDY1OWNkMWZjZTczYWMwMDUzOTk0ZDM0OWU3ZDQ1MDdkNjgyMWUiLCJ0YWciOiIifQ%3D%3D
+cookie: remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=eyJpdiI6Ik9UZUdaZGdVMEhIYkxvSGF1OWxXdXc9PSIsInZhbHVlIjoiRHBMblMycmJldHNhSXFYT25wMUdyc2M2MFE3OVIrNmFDOW1NWG9nZTF1REJDcGdEZHNDVEQ3YWlzM0ZPZW1LSk5BN3NzUXJubU15UlNULzBZRkJGTkVEaTUyOGQxdVhiTWcreTI3Qi83SW4yWkhmR092T0J6SnlvU09IV2dLaTAzOUJSQTdadktUd2xSWlU1MHFIT2pBaWFCbmdPTHBjVUUzeGpBYzh1SnBxWEUzUmw1YW1UazQ5OVEyN1VITmozRHVESFY1RTBtUWZkSEtndHY1ZStoSTN1YXR3Z3JMeUtiRG1VMVhGZGd6RT0iLCJtYWMiOiJhNDQzZTkxYmY2ODM2ZjU2NmFkYTNhNzgyYmRkMDZlMDFkNTg3ZDlkNmM2MTM3ODFmZTI1NjBjNThhYTkwMGFlIiwidGFnIjoiIn0%3D
+priority: u=0, i
+

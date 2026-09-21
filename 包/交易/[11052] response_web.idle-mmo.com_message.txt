@@ -1,0 +1,25 @@
+h2 200
+date: Mon, 21 Sep 2026 14:29:35 GMT
+content-type: application/json
+content-length: 69
+server: cloudflare
+cache-control: no-cache, private
+x-ratelimit-limit: 60
+x-ratelimit-remaining: 53
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+access-control-allow-origin: *
+content-encoding: gzip
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+cf-cache-status: DYNAMIC
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=bVUYEMpujVWjXlQBpyDnqbCBJchcQdEub3KNdIEAXj%2BVxm%2FVfYw8Ncg3HspS3yVZqNz%2FgmSJoOtkh%2BrsU%2FwzpFhtci%2BlaHe0dwPkup%2Bsw6h%2FE9agnlY5F3xD7ZNeL3s0Tow%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: a3e9c350fbb4e5f3-IAD
+alt-svc: h3=":443"; ma=86400
+
+[{"date":"19 Sep","data":739.6},{"date":"20 Sep","data":858},{"date":"21 Sep","data":24.1}]

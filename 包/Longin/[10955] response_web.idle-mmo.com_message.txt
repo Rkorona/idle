@@ -1,0 +1,328 @@
+h2 200
+date: Mon, 21 Sep 2026 12:28:40 GMT
+content-type: text/html; charset=utf-8
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cache-control: no-cache, private
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+set-cookie: XSRF-TOKEN=eyJpdiI6IjNqVEw0ZmhEd2FQMm5DT2dna28yQnc9PSIsInZhbHVlIjoiY1RKQ2RkOEhNdDduMFFRUnFyRDM3SExGZ3ZOL3dXVGhEV3BpZG1DaUFEVG9GUVFNMnlDc2xwOTVvaDAxZ2pUWTlxSTNmUkJ1Y2o3cnRQTFlpcnU5MFdwU0tKQ1NENHg2Nzk4MjMxYTZraVNUOVM1K3pZZ1V5YW03UU9XK2ZVTGQiLCJtYWMiOiJkNzAzYmJmN2NhMTYwMzY2MjdiOTkzZDhjNTYwNDlkNjYxMWJjM2Y3NWRmMWQwMjUyNDcyOTM1MmYzOGU4OGY0IiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 18:28:40 GMT; Max-Age=21600; path=/; secure; SameSite=lax
+set-cookie: idlemmo_session=eyJpdiI6IkJBclBLMHVyNjdDQnMydWFiZXlNMkE9PSIsInZhbHVlIjoiUllQUE5tT3hqM0Q3YlVkU1ZDZVhheUYrVk94V1FTRjNUSmdMeWZBaTY2L2k0RHMrMzlXekJsemUyTmYranhIRFdvdDhKSEQvTXJZem5GaFQvdW5rK01wTEhoeXg4WnRwRElDMVFhaVlJdnJwdmRNVTQyYm1tOGF1YjZHWDhYMDciLCJtYWMiOiI4MjY0ZDRjMWZlMmU4NDAyNDQ5MDc4NWEwZWYyOGZhZGFiMzUzNGY0NWI1NjA3YmRkY2FjZTRmMzNlZmExNjkwIiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 18:28:40 GMT; Max-Age=21600; path=/; secure; HttpOnly; SameSite=lax
+set-cookie: idle_mmo_locale=eyJpdiI6ImVVaW5SejlKTlhkRjlhSnFKSkhTbmc9PSIsInZhbHVlIjoiNXVCQmF5cWlnSXdxaW9RbEY5aHFucmtRaUFsQ3ZFQXV5Sk1DSjRad01tRUZiNUdwaFl6a1hURG5VYmVUbjhhMyIsIm1hYyI6IjE4YjcyYjFlODgyYTcxOTNlZDY4YTU5MGQxZDM3NmI5OGQ0YTM5ZjQ0NTBkMzM4Nzg3YjljODE2ZGQ4M2Q4MjMiLCJ0YWciOiIifQ%3D%3D; expires=Tue, 26-Oct-2027 12:28:40 GMT; Max-Age=34560000; path=/; secure; HttpOnly; SameSite=lax
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=1tYAXe%2FNeNYcs52p7Z8WcgK5OtacAbN0SOHsj5tITfyc7LsCMezVQ2Qou66flwp0npB2K1OrR%2FUzym1nq9JtFOQCkc%2FdtxtVNCzLC74v0vrmc6p8IAMg6aqd9k0cWcJ%2FuDw%3D"}]}
+cf-cache-status: DYNAMIC
+content-encoding: br
+cf-ray: a3e9122edd856ac7-IAD
+alt-svc: h3=":443"; ma=86400
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="csrf-token" content="PIgXeCNkgvmm6WzvDUXY3YtgVJS4p9Fwx0iWtc4u">
+        <meta name="description" content="Go on an epic adventure, hunt diverse enemies, embark on dungeons expeditions and defeat world bosses even while taking a nap!" />
+        <meta property="og:title" content="IdleMMO">
+        <meta property="og:description" content="Go on an epic adventure, hunt diverse enemies, embark on dungeons expeditions and defeat world bosses even while taking a nap!">
+        <meta property="og:url" content="https://www.idle-mmo.com">
+        <meta property="og:image" content="https://cdn.idle-mmo.com/global/og-image.jpg">
+        <meta name="twitter:title" content="IdleMMO">
+        <meta name="twitter:description" content="Go on an epic adventure, hunt diverse enemies, embark on dungeons expeditions and defeat world bosses even while taking a nap!">
+
+        <title>Login | IdleMMO </title>
+        <!-- Scripts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#111722">
+        <meta name="theme-color" content="#111722">
+        <meta name="color-scheme" content="dark">
+
+        
+        <link rel="preload" as="style" href="https://web.idle-mmo.com/build/assets/app-eCE14lgY.css" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="preload" as="style" href="https://web.idle-mmo.com/build/assets/app-zM9STM4F.css" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/landing-page-BPBRWPK9.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/wiki-BHtRgxQn.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/app-ChmklM08.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/filter-url-BB6MTndm.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" /><link rel="stylesheet" href="https://web.idle-mmo.com/build/assets/app-eCE14lgY.css" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" data-navigate-track="reload" /><link rel="stylesheet" href="https://web.idle-mmo.com/build/assets/app-zM9STM4F.css" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" data-navigate-track="reload" /><script type="c53d418a81f81431f0c707a2-module" src="https://web.idle-mmo.com/build/assets/landing-page-BPBRWPK9.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" data-navigate-track="reload"></script><script type="c53d418a81f81431f0c707a2-module" src="https://web.idle-mmo.com/build/assets/wiki-BHtRgxQn.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" data-navigate-track="reload"></script><script type="c53d418a81f81431f0c707a2-module" src="https://web.idle-mmo.com/build/assets/app-ChmklM08.js" nonce="a23ppSXrrjIAxHWTRfJB3pAFEELcB7RM7eSsAMhE" data-navigate-track="reload"></script>
+        
+        <script src="https://cdn.usefathom.com/script.js" data-site="NDMTESIJ" defer type="c53d418a81f81431f0c707a2-text/javascript"></script>
+
+        <!-- Google tag (gtag.js) -->
+        
+    </head>
+    <body class="font-sans antialiased text-gray-200 bg-[#111722]">
+        <div class="max-w-sm mx-auto">
+                                            </div>
+
+        <div class="mx-auto flex max-w-7xl px-6 pt-4 lg:px-8">
+            <div class="ml-auto">
+                <form method="POST" action="https://web.idle-mmo.com/language" class="relative">
+        <input type="hidden" name="_token" value="PIgXeCNkgvmm6WzvDUXY3YtgVJS4p9Fwx0iWtc4u" autocomplete="off">
+        <label for="language-selector-guest-header" class="sr-only">
+            Language
+        </label>
+
+        <div class="relative inline-flex items-center">
+            <svg class="pointer-events-none absolute left-3 h-4 w-4 text-gray-300" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 12h18M12 3a15.3 15.3 0 0 1 0 18M12 3a15.3 15.3 0 0 0 0 18M4.5 7.5h15M4.5 16.5h15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="1.5"></path>
+            </svg>
+
+            <select id="language-selector-guest-header" name="locale" onchange="if (!window.__cfRLUnblockHandlers) return false; this.form.submit()" class="block max-w-[11rem] appearance-none rounded-md border-0 bg-gray-900/90 py-2 pl-9 pr-8 text-sm font-semibold text-gray-100 shadow-sm ring-1 ring-inset ring-gray-700 hover:bg-gray-800 focus:ring-2 focus:ring-inset focus:ring-yellow-600" data-cf-modified-c53d418a81f81431f0c707a2-="">
+                                    <option value="en" selected>
+                        English
+                    </option>
+                                    <option value="tl" >
+                        Filipino
+                    </option>
+                                    <option value="fr" >
+                        Français
+                    </option>
+                                    <option value="de" >
+                        Deutsch
+                    </option>
+                                    <option value="id" >
+                        Bahasa Indonesia
+                    </option>
+                                    <option value="pt" >
+                        Português
+                    </option>
+                                    <option value="ru" >
+                        Русский
+                    </option>
+                                    <option value="es" >
+                        Español
+                    </option>
+                                    <option value="vi" >
+                        Tiếng Việt
+                    </option>
+                            </select>
+
+            <svg class="pointer-events-none absolute right-3 h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"></path>
+            </svg>
+
+                    </div>
+    </form>
+            </div>
+        </div>
+
+        <div>
+        <div class="relative isolate overflow-hidden" x-data>
+            <svg class="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
+            <defs>
+            <pattern id="983e3e4c-de6d-4c3f-8d64-b9761d1534cc" width="200" height="200" x="50%" y="-1" patternUnits="userSpaceOnUse">
+            <path d="M.5 200V.5H200" fill="none"></path>
+            </pattern>
+            </defs>
+            <svg x="50%" y="-1" class="overflow-visible fill-gray-800/20">
+            <path d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z" stroke-width="0"></path>
+            </svg>
+            <rect width="100%" height="100%" stroke-width="0" fill="url(#983e3e4c-de6d-4c3f-8d64-b9761d1534cc)"></rect>
+        </svg>
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 min-h-screen">
+        <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+          <img class="mx-auto h-52 w-auto" src="https://cdn.idle-mmo.com/global/helmet-solo.png" alt="IdleMMO">
+        </div>
+      
+        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+
+            <div class="max-w-lg mx-auto">
+                <div>
+                    <div>
+    <div class="relative">
+        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-800"></div>
+        </div>
+        <div class="relative flex justify-center">
+        <span class="px-2 text-xs font-bold text-gray-500 uppercase bg-gray-900">Social Account</span>
+        </div>
+    </div>
+</div>    
+                    <div class="mt-4 py-4">
+                        <div x-data="{clicked:false}" 
+
+>
+            <a href="https://web.idle-mmo.com/auth/external/google/redirect">
+            <button type="button" class="rounded bg-white/5 border border-gray-700/40 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-white/10 inline-block flex gap-2 items-center disabled:opacity-40" onclick="if (!window.__cfRLUnblockHandlers) return false; " x-on:click="fathom?.trackEvent('login_google'); clicked=true; setTimeout(() => { clicked=false }, 2000)" x-bind:disabled="clicked" data-cf-modified-c53d418a81f81431f0c707a2-="">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="size-4" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                <path fill="none" d="M0 0h48v48H0z"></path>
+            </svg>
+            Login with Google
+        </button>
+            </a>
+    </div>
+                    </div>
+                </div>
+                
+                
+                <div>
+    <div class="relative mt-4">
+        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-800"></div>
+        </div>
+        <div class="relative flex justify-center">
+        <span class="px-2 text-xs font-bold text-gray-500 uppercase bg-gray-900">Login with your email</span>
+        </div>
+    </div>
+</div>            </div>
+
+            
+            <form class="space-y-6" action="https://web.idle-mmo.com/login"  method="POST"  x-data="{is_processing:false}" x-on:submit="fathom?.trackEvent('login'); is_processing=true">
+            <input id="remember" name="remember" type="hidden" value="true">
+                        <input type="hidden" name="_token" value="PIgXeCNkgvmm6WzvDUXY3YtgVJS4p9Fwx0iWtc4u" autocomplete="off">            <div>
+              <label for="email" class="block text-sm font-medium leading-6 text-white">Email Address</label>
+              <div class="mt-2">
+                <input id="email" name="email" value="" type="email" autocomplete="email" required class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6">
+              </div>
+              <div>
+                              </div>
+            </div>
+      
+            <div>
+              <div class="flex items-center justify-between">
+                <label for="password" class="block text-sm font-medium leading-6 text-white">Password</label>
+                <div class="text-sm">
+                  <a href="https://web.idle-mmo.com/forgot-password" class="font-semibold text-yellow-500 hover:text-yellow-400">Forgot password?</a>
+                </div>
+              </div>
+              <div class="mt-2">
+                <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6">
+              </div>
+            </div>
+      
+            <div>
+                <button type="submit" :disabled="is_processing" :class="{'opacity-40':is_processing}"  class=" w-full font-semibold flex items-center justify-center gap-x-4 whitespace-nowrap hover:opacity-80 transition-all hover:opacity-95 bg-gradient-to-r from-[#c45a19] to-[#eab72b] text-cyan-50 dark:from-cyan-500 dark:to-purple-500 rounded-lg py-3 px-4">
+                    <span x-show="!is_processing">Login</span>
+                    <span x-show="is_processing" x-cloak><svg class="inline-block w-4 h-4 mr-1 text-gray-100 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg></span>
+                </button>
+            </div>
+          </form>
+      
+            <p class="mt-10 text-center text-sm text-gray-400">
+            Don&#039;t have an account?
+                            <a href="https://web.idle-mmo.com?play_now=1" class="font-semibold leading-6 text-yellow-500 hover:text-yellow-400">Press here to start!</a>
+                      </p>
+        </div>
+      </div>
+        </div>
+    </div>
+    <script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="c53d418a81f81431f0c707a2-|49" defer></script></body>
+    <footer class="bg-[#111722] mx-8 ">
+        <div class="flex justify-center">
+          <a href="https://www.galahadcreative.com" target="_blank">
+            <img src="https://www.galahadcreative.com/content/images/size/w2400/format/avif/2025/12/icon-2.png" class="w-16" alt="Galahad Creative Logo">
+          </a>
+        </div>
+        <div class="text-center font-bold">
+            Galahad Creative Ltd.
+        </div>
+        <div class="text-center text-gray-400 flex justify-center text-sm mt-2">
+            <p class="max-w-sm">
+                Publishing deep and extensive digital products under the veneer of an effortless user experience since 2020.
+            </p>
+        </div>
+
+        <nav class="-mx-5 mt-8 flex flex-wrap justify-center" aria-label="Footer">
+
+            <div class="px-5 py-2">
+              <a href="https://web.idle-mmo.com/login" class="text-sm text-gray-300 hover:text-yellow-400 font-bold">
+                Login
+              </a>
+            </div>
+
+            <div class="px-5 py-2">
+              <a href="https://wiki.idle-mmo.com" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                Wiki
+              </a>
+            </div>
+
+            <div class="px-5 py-2">
+              <a href="https://www.galahadcreative.com" target="_blank" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                Company
+              </a>
+            </div>
+
+            <div class="px-5 py-2">
+                <a href="https://web.idle-mmo.com/legal/cookies" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                  Cookie Policy
+                </a>
+            </div>
+
+            <div class="px-5 py-2">
+                <a href="https://web.idle-mmo.com/legal/privacy" target="_blank" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                  Privacy Policy
+                </a>
+             </div>
+
+            <div class="px-5 py-2">
+                <a href="https://web.idle-mmo.com/legal/terms" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                  Terms of Service
+                </a>
+            </div>
+
+            <div class="px-5 py-2">
+                <a href="https://web.idle-mmo.com/legal/code-of-conduct" class="text-sm text-gray-300 hover:text-yellow-400  font-bold">
+                  Code of Conduct
+                </a>
+            </div>
+
+          </nav>
+
+        <div class="mt-8 flex justify-center space-x-6">
+          <a href="https://www.instagram.com/idle.mmo" target="_blank" rel="noopener nofollow" class="text-gray-400 hover:text-gray-500">
+	          <span class="sr-only">Instagram</span>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path>
+          </svg>
+          </a>
+          <a href="https://www.twitter.com/idlemmo" target="_blank" class="text-gray-400 hover:text-gray-500" rel="noopener nofollow">
+	          <span class="sr-only">Twitter</span>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+          </svg>
+          </a>
+          <a href="https://discord.gg/nDGbr7AKkk" target="_blank" class="text-gray-400 hover:text-gray-500" rel="noopener nofollow">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.9143 7.38378L4.93679 14.6174C4.82454 15.448 5.24219 16.2606 5.983 16.6528L8.99995 18.25L9.99995 15.75C9.99995 15.75 10.6562 16.25 11.9999 16.25C13.3437 16.25 13.9999 15.75 13.9999 15.75L14.9999 18.25L18.0169 16.6528C18.7577 16.2606 19.1754 15.448 19.0631 14.6174L18.0856 7.38378C18.0334 6.99739 17.7613 6.67658 17.3887 6.56192L14.7499 5.75003V6.25003C14.7499 6.80232 14.3022 7.25003 13.7499 7.25003H10.2499C9.69766 7.25003 9.24995 6.80232 9.24995 6.25003V5.75003L6.61122 6.56192C6.23855 6.67658 5.96652 6.99739 5.9143 7.38378Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10.5 12C10.5 12.2761 10.2761 12.5 10 12.5C9.72386 12.5 9.5 12.2761 9.5 12C9.5 11.7239 9.72386 11.5 10 11.5C10.2761 11.5 10.5 11.7239 10.5 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.5 12C14.5 12.2761 14.2761 12.5 14 12.5C13.7239 12.5 13.5 12.2761 13.5 12C13.5 11.7239 13.7239 11.5 14 11.5C14.2761 11.5 14.5 11.7239 14.5 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </a>
+
+        </div>
+        <div class="mx-auto max-w-7xl overflow-hidden px-6 pb-8 lg:px-8">
+	          <p class="mt-10 text-center text-xs leading-5 text-gray-500">&copy; 2026 Galahad Creative Ltd. All rights reserved.</p>
+        </div>
+
+        
+        
+        <script type="c53d418a81f81431f0c707a2-text/javascript">
+            window.addEventListener('alpine:init', function() {
+                let game_data = [];
+                            game_data.push({"settings.common.generic_error":"Something went wrong. Please try again in a few moments."});
+                    game_data.forEach((item) => {
+                    Object.entries(item).forEach(([key, value]) => {
+                        setGameData(key, value);
+                    });
+                });
+            });
+        </script>
+
+        
+        
+      </footer>
+
+</html>

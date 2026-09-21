@@ -1,0 +1,25 @@
+h2 200
+date: Mon, 21 Sep 2026 14:29:42 GMT
+content-type: application/json
+content-length: 679
+server: cloudflare
+cache-control: no-cache, private
+x-ratelimit-limit: 60
+x-ratelimit-remaining: 57
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+access-control-allow-origin: *
+content-encoding: gzip
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+cf-cache-status: DYNAMIC
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=HQvjTV0uDiRQL%2BEuzTGGbiACRbm1ZaCloE%2B%2BkVaW4GGabbR%2BQVShvBOg6g3Cum%2FXNZ44bWrcsCenRggH1yp9gRb%2Fnw%2BzX4DTrAE%2BL7lxlMf7Kd%2B5nZkUaCOBz1z8OtKy2Ds%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cf-ray: a3e9c37d389fe5f3-IAD
+alt-svc: h3=":443"; ma=86400
+
+{"status":"success","trade":{"id":1335186,"status":"PENDING","updated_at":"0 seconds ago","effective_profit":0,"requirements":{"is_met":true,"minimum_profit":null,"partner_minimum_profit":null,"additional_value_required":0,"partner_additional_value_required":0,"risk":"None"},"offers":{"you":{"character":{"id":783437,"name":"FoxhopeXV","total_level":"78","formatted_name":"<a href='https:\/\/web.idle-mmo.com\/@FoxhopeXV?same_window=true'><div class='inline-block inline-flex gap-1 items-center'>\n                    <span class='' >FoxhopeXV<\/span>\n                    \n                    \n                <\/div><\/a>","avatar_url":"https:\/\/cdn.idle-mmo.com\/cdn-cgi\/image\/width=150,height=150,format=auto\/uploaded\/skins\/2h65o3Ag4fa8xWGt1n4ik3xbe0nET7-metaRWltaXIgKHJlcGxhY2UgdGhlIG9sZCBvbmUpLnBuZw==-.png","background_url":"https:\/\/cdn.idle-mmo.com\/cdn-cgi\/image\/width=100,height=100,format=auto\/skins\/backgrounds\/default.jpg","max_trade_slots":10},"has_accepted":false,"items":[],"original_items":[],"pets":[],"gold":{"amount":0,"has_enough":true},"cost":"0","value":"0","total_gold_required":"0"},"them":{"character":{"id":782924,"name":"rkoronax","total_level":"181","formatted_name":"<a href='https:\/\/web.idle-mmo.com\/@rkoronax?same_window=true'><div class='inline-block inline-flex gap-1 items-center'>\n                    <span class='' >rkoronax<\/span>\n                    \n                    \n                <\/div><\/a>","avatar_url":"https:\/\/cdn.idle-mmo.com\/cdn-cgi\/image\/width=150,height=150,format=auto\/uploaded\/skins\/2h65o3Ag4fa8xWGt1n4ik3xbe0nET7-metaRWltaXIgKHJlcGxhY2UgdGhlIG9sZCBvbmUpLnBuZw==-.png","background_url":"https:\/\/cdn.idle-mmo.com\/cdn-cgi\/image\/width=100,height=100,format=auto\/skins\/backgrounds\/default.jpg","max_trade_slots":10},"has_accepted":false,"items":[],"original_items":[],"pets":[],"gold":{"amount":0,"has_enough":true},"cost":"0","value":"0","total_gold_required":"0"}}}}

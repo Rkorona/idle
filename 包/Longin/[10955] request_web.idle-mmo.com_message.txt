@@ -1,0 +1,24 @@
+GET /login h2
+host: web.idle-mmo.com
+sec-ch-ua: "Google Chrome";v="153", "Not_A Brand";v="8", "Chromium";v="153"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+dnt: 1
+upgrade-insecure-requests: 1
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36
+accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+sec-fetch-site: same-origin
+sec-fetch-mode: navigate
+sec-fetch-user: ?1
+sec-fetch-dest: document
+referer: https://web.idle-mmo.com/welcome
+accept-encoding: gzip, deflate, br, zstd
+accept-language: zh-CN,zh;q=0.9
+cookie: PALAMEDES_AUTHENTICATED=1
+cookie: gawain_lancelot=0135a4i2he9dd2
+cookie: mordred_excalibur=f4103fde3b48125924ec8805fa713458
+cookie: XSRF-TOKEN=eyJpdiI6IjdhV1RVbk9BMlUwd1oraGo5YUMvSWc9PSIsInZhbHVlIjoiaDlReFp4SGVia2R2eDlwV1RrSXFVQUloSStqU01sVjdwQU12blBjTGZHRVRQSXpQdGlJaE9tRkkvb3Q2YnNsSjhjcGpOMThYamd6ZzQwdkpIeXJiUnpkUTNDbGxNbjhkY0xOai85NUtZSCtSZkkyZGtreTVIeHV6bnROMGZrNnkiLCJtYWMiOiIyODNhY2YwYzIxMmU4ZjE1OTFkYmZmYWY0YjE4N2FkYzQxNjAyZmY4NmU4ZDYxZTQ3OGVkMGMxOWQzYWUzNzgwIiwidGFnIjoiIn0%3D
+cookie: idlemmo_session=eyJpdiI6Im5uM0JudkNkMWpWNzBXMElmS1hlTnc9PSIsInZhbHVlIjoiNWdkdE9zWW95N2tqOEZ3bitFQStTcnRROHltN1BidXg5NXBKWFVEemQwZUJxUEtOUXFsYUxwRHF4RW5IR1dDWkJacVJtT3JVSThiVVhzTGU2OE4wNWwxRjFBb1JSRDQ2WDRaSWZ3WXY5Sy9YU0VPU3ZDaFJ6cXdNK3Q3a0RNaXYiLCJtYWMiOiI5ZmZjYzhjOTAxMDEyYzcwNzM2MjFmMTRjYTFlNjA2ZmQ1NDkzMDE4OTBlNTc0YjZmMjRiNjEzODVlOGE1ZTU1IiwidGFnIjoiIn0%3D
+cookie: idle_mmo_locale=eyJpdiI6IjNxKzJvYzZ0a3hsUmx2cXJ0ZThDQ3c9PSIsInZhbHVlIjoiL1N6MXlzYXVPdGVjeExiL3gvbWo2QVBJUUlpRlEwZ0xhTzd2Tm5wbVIzVlM1N1F4aUNPL3NYOHFlVnhTc3ZLRyIsIm1hYyI6ImU4MWU2Y2U3NDZmNTRjMWZlN2JmNjc0ZjM3MWQyODM3YTZkOTkwNDA4YWEzOTQ3NTMxMGU5MTI0YTdkYzQwZjQiLCJ0YWciOiIifQ%3D%3D
+priority: u=0, i
+

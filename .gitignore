@@ -1,2 +1,11 @@
-.venv
-.git
+# 凭据 —— 绝不能提交
+config/accounts.yml
+config/settings.yml
+
+# 运行产物
+logs/
+data/.tasks-*.tmp
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

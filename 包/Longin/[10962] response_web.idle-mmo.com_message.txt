@@ -1,0 +1,35 @@
+h2 302
+date: Mon, 21 Sep 2026 12:28:43 GMT
+content-type: text/html; charset=utf-8
+location: https://web.idle-mmo.com/@FoxhopeXV
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cache-control: no-cache, private
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+set-cookie: XSRF-TOKEN=eyJpdiI6IlNTbjNlMDQxVnYvbXZHcWhveXR5VkE9PSIsInZhbHVlIjoiVC9PTXdrdmZwUEZUL2NFQ2ZoWnZCZVY3RUVtK3RzWHNSZmwwLzA4QTNlL1UwL3dUQ2xkZlJ3MXdhWHNsTVkrbnVub1RXalBuZFpPK0lCbCtIOUVQWEwyeGFEL3haNWxpQ05QUUgvWlozbitkYTlVekNYVk9qb2daaS9aa3o3WFUiLCJtYWMiOiI5MWE4MTlmNGU5YWQ2YWQyOWZhYTMxYmY5ODFlN2I1MzMzZWVmZmFjODQzYTA1MjAxMDVkZWMxZDgxMDg4OGFkIiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 18:28:43 GMT; Max-Age=21600; path=/; secure; SameSite=lax
+set-cookie: idlemmo_session=eyJpdiI6IlZrS1AwVFVlSzIxZ2Y4eUxVK0FsR1E9PSIsInZhbHVlIjoiS1docjl0Y3NTOUg5emZncTRvbksxWjhvSlFNbHJ3Tyt4dEhKVWMzby9vZy9ROW1ISmJ6SlJvL09BVWZFTjdmWitmM2w5R1ZSKzlrV09IYlFWMVFzY21MMWtFeStzNWlEbGZEdWdaaU9NTTNzU01EZ1d6R0IwTjE2dC93ZVk3QzkiLCJtYWMiOiJkOGFmY2IzZjMyZTAxMjkyN2M3NjEzMGNmMWEwY2M1YzY5ZDc3OGQwYTUyYzU3YjBmOTdkNzAxYjhkNTQyYmFlIiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 18:28:43 GMT; Max-Age=21600; path=/; secure; HttpOnly; SameSite=lax
+set-cookie: idle_mmo_locale=eyJpdiI6Ikw3M2ZzUCtxbmVvNHVhS3h0dXhWTnc9PSIsInZhbHVlIjoiRzllWkxQMEJERVVqbWZpOHZUZWhHblNqZCs4dmd2ektuMm5OVDlxZmgwZjVNdU11Z1RHMC9SQjY3WlpRWVZLWiIsIm1hYyI6IjU1ZGYwNjZkYzQxODA2NzUyMDIxZjNlYWVhM2YzNTBjMzA5NGM3YjI0YWU0YzM0NTI1ZTgyOWEzNTIxNzdiM2IiLCJ0YWciOiIifQ%3D%3D; expires=Tue, 26-Oct-2027 12:28:43 GMT; Max-Age=34560000; path=/; secure; HttpOnly; SameSite=lax
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=6J8PHpcMlB4ah%2FmYi4VQ8PVOaedHILcBUj%2FMOvMmNN0XTJ86OD%2FL6fSLSjpM4R7EQzBKLOhjhPZmToJX89FObrauOJGM%2F7eVzWBwnahO6%2BFv1QHPzQndDFCeW04VyT5sORE%3D"}]}
+cf-cache-status: DYNAMIC
+cf-ray: a3e9124188b06ac7-IAD
+alt-svc: h3=":443"; ma=86400
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='https://web.idle-mmo.com/@FoxhopeXV'" />
+
+        <title>Redirecting to https://web.idle-mmo.com/@FoxhopeXV</title>
+    </head>
+    <body>
+        Redirecting to <a href="https://web.idle-mmo.com/@FoxhopeXV">https://web.idle-mmo.com/@FoxhopeXV</a>.
+    </body>
+</html>

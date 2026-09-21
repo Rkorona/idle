@@ -1,0 +1,29 @@
+POST /login h2
+host: web.idle-mmo.com
+content-length: 113
+cache-control: max-age=0
+sec-ch-ua: "Google Chrome";v="153", "Not_A Brand";v="8", "Chromium";v="153"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+dnt: 1
+upgrade-insecure-requests: 1
+content-type: application/x-www-form-urlencoded
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36
+origin: https://web.idle-mmo.com
+accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+sec-fetch-site: same-origin
+sec-fetch-mode: navigate
+sec-fetch-user: ?1
+sec-fetch-dest: document
+referer: https://web.idle-mmo.com/login
+accept-encoding: gzip, deflate, br, zstd
+accept-language: zh-CN,zh;q=0.9
+cookie: PALAMEDES_AUTHENTICATED=1
+cookie: gawain_lancelot=0135a4i2he9dd2
+cookie: mordred_excalibur=f4103fde3b48125924ec8805fa713458
+cookie: XSRF-TOKEN=eyJpdiI6IjNqVEw0ZmhEd2FQMm5DT2dna28yQnc9PSIsInZhbHVlIjoiY1RKQ2RkOEhNdDduMFFRUnFyRDM3SExGZ3ZOL3dXVGhEV3BpZG1DaUFEVG9GUVFNMnlDc2xwOTVvaDAxZ2pUWTlxSTNmUkJ1Y2o3cnRQTFlpcnU5MFdwU0tKQ1NENHg2Nzk4MjMxYTZraVNUOVM1K3pZZ1V5YW03UU9XK2ZVTGQiLCJtYWMiOiJkNzAzYmJmN2NhMTYwMzY2MjdiOTkzZDhjNTYwNDlkNjYxMWJjM2Y3NWRmMWQwMjUyNDcyOTM1MmYzOGU4OGY0IiwidGFnIjoiIn0%3D
+cookie: idlemmo_session=eyJpdiI6IkJBclBLMHVyNjdDQnMydWFiZXlNMkE9PSIsInZhbHVlIjoiUllQUE5tT3hqM0Q3YlVkU1ZDZVhheUYrVk94V1FTRjNUSmdMeWZBaTY2L2k0RHMrMzlXekJsemUyTmYranhIRFdvdDhKSEQvTXJZem5GaFQvdW5rK01wTEhoeXg4WnRwRElDMVFhaVlJdnJwdmRNVTQyYm1tOGF1YjZHWDhYMDciLCJtYWMiOiI4MjY0ZDRjMWZlMmU4NDAyNDQ5MDc4NWEwZWYyOGZhZGFiMzUzNGY0NWI1NjA3YmRkY2FjZTRmMzNlZmExNjkwIiwidGFnIjoiIn0%3D
+cookie: idle_mmo_locale=eyJpdiI6ImVVaW5SejlKTlhkRjlhSnFKSkhTbmc9PSIsInZhbHVlIjoiNXVCQmF5cWlnSXdxaW9RbEY5aHFucmtRaUFsQ3ZFQXV5Sk1DSjRad01tRUZiNUdwaFl6a1hURG5VYmVUbjhhMyIsIm1hYyI6IjE4YjcyYjFlODgyYTcxOTNlZDY4YTU5MGQxZDM3NmI5OGQ0YTM5ZjQ0NTBkMzM4Nzg3YjljODE2ZGQ4M2Q4MjMiLCJ0YWciOiIifQ%3D%3D
+priority: u=0, i
+
+remember=true&_token=PIgXeCNkgvmm6WzvDUXY3YtgVJS4p9Fwx0iWtc4u&email=rkoronax%40proton.me&password=13185942325yang

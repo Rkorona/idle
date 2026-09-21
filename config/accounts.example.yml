@@ -1,0 +1,23 @@
+# accounts.example.yml  —— 复制为 accounts.yml 后填写真实信息
+# accounts.yml 已加入 .gitignore，请勿提交到仓库或分享给他人。
+
+default_account: "main"
+
+accounts:
+  main:
+    email: "your-main@example.com"
+    password: "CHANGE_ME"
+    remark: "大号（收货方）"
+    role: main          # main = 不参与自动挂机调度
+
+  worker_1:
+    email: "rkoronax@proton.me"   # ⚠ 每个小号必须使用不同邮箱，否则并发会互相顶号
+    password: "13185942325yang"
+    remark: "小号1"
+    role: worker        # worker = 参与调度（省略时默认即为 worker）
+
+  worker_2:
+    email: "worker2@example.com"
+    password: "CHANGE_ME"
+    remark: "小号2"
+    role: worker
