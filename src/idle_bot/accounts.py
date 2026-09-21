@@ -25,11 +25,17 @@ class AccountChecker:
     def check(self, account: AccountConfig) -> AccountCheckResult:
         try:
             session = self.session_store.load(account.name)
-            client = ApiClient(self.plan.base_url, session.request_context())
+            client = ApiClient(
+                self.plan.base_url,
+                session.request_context(),
+                on_context_updated=lambda context: self.session_store.save_context(
+                    account.name,
+                    context,
+                ),
+            )
             api = IdleMmoApi(client)
             character = api.character_information()
             inventory = api.inventory()
-            self.session_store.save_context(account.name, client.context_snapshot())
             return AccountCheckResult(
                 account=account.name,
                 ok=True,

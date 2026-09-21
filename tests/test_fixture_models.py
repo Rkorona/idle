@@ -1,10 +1,12 @@
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import Mock
 
 from idle_mmo_api import ApiClient, IdleMmoApi, RequestContext
 from idle_mmo_api.models import Action, Character, Inventory, SkillData, Trade
+from idle_bot.session_store import SessionStore
 
 
 FIXTURES = Path(__file__).parents[1] / "data" / "fixtures"
@@ -107,3 +109,49 @@ class ClientUrlTests(unittest.TestCase):
             opener.request.full_url,
             "https://example.test/api/action/cancel?expires=current&signature=fresh",
         )
+
+    def test_successful_response_notifies_context_update(self):
+        class Response:
+            headers = {"content-type": "application/json"}
+
+            def read(self):
+                return b"{}"
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        class Opener:
+            def open(self, request, timeout):
+                return Response()
+
+        updates = []
+        client = ApiClient(
+            "https://example.test",
+            RequestContext(headers={"Cookie": "session=initial"}),
+            on_context_updated=updates.append,
+        )
+        client.opener = Opener()
+        client.get("/welcome")
+        self.assertEqual(len(updates), 1)
+        self.assertIn("Cookie", updates[0].headers)
+
+
+class SessionStoreTests(unittest.TestCase):
+    def test_import_cookie_normalizes_and_persists_only_cookie_header(self):
+        with TemporaryDirectory() as directory:
+            store = SessionStore(directory)
+            path = store.import_cookie(
+                "main",
+                "idlemmo_session=fixture-session; XSRF-TOKEN=fixture-token",
+            )
+            loaded = store.load("main")
+            self.assertEqual(path.name, "main.json")
+            self.assertEqual(
+                loaded.headers["Cookie"],
+                "idlemmo_session=fixture-session; XSRF-TOKEN=fixture-token",
+            )
+            self.assertEqual(loaded.query, {})
+            self.assertEqual(loaded.protocol_fields, {})

@@ -7,7 +7,7 @@ from idle_mmo_api.models import Inventory
 from .accounts import AccountChecker
 from .config import ConfigError, load_material_plan
 from .planner import calculate_deficits
-from .session_store import SessionStore
+from .session_store import SessionStore, SessionStoreError
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -20,6 +20,24 @@ def build_parser() -> argparse.ArgumentParser:
     _add_config_arguments(check)
     check.add_argument("--account", help="only check this account")
     check.set_defaults(handler=run_sessions_check)
+
+    import_cookie = session_subparsers.add_parser(
+        "import-cookie",
+        help="bootstrap one account from a current authorized Cookie header",
+    )
+    import_cookie.add_argument("--account", required=True)
+    import_cookie.add_argument(
+        "--cookie-file",
+        type=Path,
+        required=True,
+        help="local file containing one Cookie header; do not place it in the repository",
+    )
+    import_cookie.add_argument(
+        "--session-dir",
+        type=Path,
+        default=Path("data/sessions"),
+    )
+    import_cookie.set_defaults(handler=run_sessions_import_cookie)
 
     plan = subparsers.add_parser("plan", help="calculate the main account material deficit")
     _add_config_arguments(plan)
@@ -65,6 +83,20 @@ def run_sessions_check(args: argparse.Namespace) -> int:
             failed += 1
             print(f"{account.name}: unavailable ({result.error})")
     return 1 if failed else 0
+
+
+def run_sessions_import_cookie(args: argparse.Namespace) -> int:
+    try:
+        cookie_header = args.cookie_file.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ConfigError(f"cannot read cookie file: {args.cookie_file}") from exc
+
+    try:
+        path = SessionStore(args.session_dir).import_cookie(args.account, cookie_header)
+    except SessionStoreError as exc:
+        raise ConfigError(str(exc)) from exc
+    print(f"{args.account}: imported initial session into {path}")
+    return 0
 
 
 def run_plan(args: argparse.Namespace) -> int:

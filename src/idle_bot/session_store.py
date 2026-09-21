@@ -1,6 +1,7 @@
 import json
 import os
 from dataclasses import dataclass, field
+from http.cookies import CookieError, SimpleCookie
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -57,22 +58,25 @@ class SessionStore:
         )
 
     def save(self, session: StoredSession) -> Path:
-        self.directory.mkdir(parents=True, exist_ok=True)
-        path = self._path(session.account)
-        path.write_text(
-            json.dumps(
-                {
-                    "account": session.account,
-                    "headers": dict(session.headers),
-                    "query": dict(session.query),
-                    "protocol_fields": dict(session.protocol_fields),
-                },
-                indent=2,
-                sort_keys=True,
+        try:
+            self.directory.mkdir(parents=True, exist_ok=True)
+            path = self._path(session.account)
+            path.write_text(
+                json.dumps(
+                    {
+                        "account": session.account,
+                        "headers": dict(session.headers),
+                        "query": dict(session.query),
+                        "protocol_fields": dict(session.protocol_fields),
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n",
+                encoding="utf-8",
             )
-            + "\n",
-            encoding="utf-8",
-        )
+        except OSError as exc:
+            raise SessionStoreError(f"cannot save session for {session.account}") from exc
         try:
             os.chmod(path, 0o600)
         except OSError:
@@ -87,6 +91,34 @@ class SessionStore:
                 headers=context.headers,
                 query=context.query,
                 protocol_fields=context.protocol_fields,
+            )
+        )
+
+    def import_cookie(self, account: str, cookie_header: str) -> Path:
+        """Create an initial session from a current authorized Cookie header.
+
+        The cookie is accepted only as an explicit local bootstrap input. It is
+        never read from the repository's capture directory.
+        """
+        value = cookie_header.strip()
+        if not value or "\r" in value or "\n" in value:
+            raise SessionStoreError("cookie file must contain one non-empty header line")
+
+        parsed = SimpleCookie()
+        try:
+            parsed.load(value)
+        except (CookieError, ValueError) as exc:
+            raise SessionStoreError("cookie file does not contain a valid Cookie header") from exc
+        if not parsed:
+            raise SessionStoreError("cookie file does not contain a valid Cookie header")
+
+        normalized = "; ".join(
+            f"{name}={morsel.value}" for name, morsel in parsed.items()
+        )
+        return self.save(
+            StoredSession(
+                account=account,
+                headers={"Cookie": normalized},
             )
         )
 

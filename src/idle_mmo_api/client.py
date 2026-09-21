@@ -21,6 +21,7 @@ from .errors import ApiConfigurationError, ApiHttpError
 QueryProvider = Callable[[str, str, Mapping[str, Any]], Mapping[str, str]]
 ProtocolFieldsProvider = Callable[[str, str, Mapping[str, Any]], Mapping[str, Any]]
 ContextRefreshProvider = Callable[[], "RequestContext | None"]
+ContextUpdateCallback = Callable[["RequestContext"], None]
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,7 @@ class ApiClient:
         user_agent: str = "authorized-test-client/0.1",
         allow_write_operations: bool = False,
         refresh_context: ContextRefreshProvider | None = None,
+        on_context_updated: ContextUpdateCallback | None = None,
     ):
         if not base_url.startswith(("https://", "http://")):
             raise ApiConfigurationError("base_url must use http:// or https://")
@@ -63,6 +65,7 @@ class ApiClient:
         self.user_agent = user_agent
         self.allow_write_operations = allow_write_operations
         self.refresh_context = refresh_context
+        self.on_context_updated = on_context_updated
         self.cookie_jar = CookieJar()
         self._seed_cookie_header(context.headers)
         self.opener = build_opener(HTTPCookieProcessor(self.cookie_jar))
@@ -149,6 +152,10 @@ class ApiClient:
             protocol_fields=dict(self.context.protocol_fields),
         )
 
+    def _notify_context_updated(self) -> None:
+        if self.on_context_updated:
+            self.on_context_updated(self.context_snapshot())
+
     def _request(
         self,
         method: str,
@@ -207,8 +214,11 @@ class ApiClient:
                     raw = response.read()
                     content_type = response.headers.get("content-type", "")
                     if "application/json" in content_type or raw[:1] in (b"{", b"["):
-                        return json.loads(raw.decode("utf-8"))
-                    return raw.decode("utf-8", errors="replace")
+                        result = json.loads(raw.decode("utf-8"))
+                    else:
+                        result = raw.decode("utf-8", errors="replace")
+                    self._notify_context_updated()
+                    return result
             except HTTPError as exc:
                 detail = exc.read(512).decode("utf-8", errors="replace")
                 if exc.code in (401, 419) and attempt == 0 and self.refresh_context:

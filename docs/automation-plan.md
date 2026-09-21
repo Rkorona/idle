@@ -205,7 +205,8 @@ for each material by priority:
 
 - 使用 Cookie Jar 接收响应中的 `Set-Cookie`；
 - 后续请求自动携带当前 Cookie；
-- 通过 `context_snapshot()` 导出更新后的 Cookie；
+- 每次成功请求后通过 `context_snapshot()` 导出并保存更新后的 Cookie；
+- 通过 `sessions import-cookie` 从仓库外的本地文件完成一次初始会话导入；
 - 为每个请求调用动态 query/signature provider；
 - 收到 401/419 时调用一次外部授权刷新回调；
 - 刷新后重新生成 query 和协议字段，仍失败则停止。

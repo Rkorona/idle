@@ -48,6 +48,20 @@ print(character.name, inventory.free_slots)
 
 `ApiClient` 使用标准 Cookie Jar：服务端响应中的 `Set-Cookie` 会在内存中自动保存，并在后续请求中自动发送。只读检查成功后，`AccountChecker` 会把当前 Cookie 快照保存到对应账号的会话文件。
 
+首次导入当前授权会话时，把浏览器开发者工具中当前的 `Cookie` 请求头单独保存到仓库之外的本地文件，
+然后执行：
+
+```bash
+python -m idle_bot sessions import-cookie \
+  --account main \
+  --cookie-file /path/outside/repository/idle-mmo-main.cookie
+python -m idle_bot sessions check --account main
+```
+
+之后每次 `sessions check` 或 `plan` 发起成功请求时，客户端都会接收服务端的 `Set-Cookie`，
+并把更新后的会话保存回 `data/sessions/main.json`。Cookie 文件和会话 JSON 都是登录凭证，
+不要放入 Git、`Bag/` 或命令行参数中。
+
 签名参数不能从旧抓包中永久复用。需要由授权测试环境提供每次请求的新参数时，传入动态回调：
 
 ```python
