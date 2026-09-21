@@ -1,0 +1,144 @@
+h2 200
+date: Mon, 21 Sep 2026 06:52:32 GMT
+content-type: text/html; charset=utf-8
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cache-control: no-cache, private
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+set-cookie: XSRF-TOKEN=eyJpdiI6Im1KNERxNGxvMllKM1VmcDNHSzcxelE9PSIsInZhbHVlIjoicDZEZGUyeDQ0eVp1SDliNWFTU054UEptWjdNQXY4cmdsZHZSejlaTXN2RVVjcVJhRU03dlJWRlJ1T09RRWpWL3p6WHptMVdxSWlUcVVrYS9tWVhtUjBRQkpta1FZZTc2WUpXYTQzZ0k2ZG5WNThkQzk0SmZmRWRqeHJ3ZWxYKzMiLCJtYWMiOiJlNDk3NTExNjkzZTUyNDBlMzAxNDVmMzQ0MjBjOTk3ZTE3Y2U1ZDRjNjg4MzM2ZDVlMzI4ZjBhOGY0Y2QzZWU4IiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 12:52:32 GMT; Max-Age=21600; path=/; secure; SameSite=lax
+set-cookie: idlemmo_session=eyJpdiI6Imhza0FHeW5oVStmZVZkTzd6ZnVzd0E9PSIsInZhbHVlIjoiSDZOMGJzSEhjOG9KWnpNZGlXMnAvWGU3MUVmdHJLUm1hZ3c4OHlkazNzVHlrRE4zQkQvS0lCNkVjRzR4R2dRVU5SWWU1MGZYVzBlSS8xWlJEUnBJMll1ODhuWGdkVzF2VnB0eEkyUGxPQWpoM3U0TG9aSm9kdTAzMWZKbkN4U1ciLCJtYWMiOiI2ZTFlOGFkN2QwZTMyZjljNzRhNDM4YTBmODRkYzIwMDEyYzMzM2VlNzE3YmFlMjU2OGY3YTdkMzE0Y2EzZmVjIiwidGFnIjoiIn0%3D; expires=Mon, 21-Sep-2026 12:52:32 GMT; Max-Age=21600; path=/; secure; HttpOnly; SameSite=lax
+set-cookie: idle_mmo_locale=eyJpdiI6Ik40bjRZYW11L1RLK0JrcTY2SFVvcmc9PSIsInZhbHVlIjoibXBac0duY21TN0ZHb2diRTNRYzhpODl4SURlV2d5TnRnRWdRcDk0anRucmVFcnlycVhGcEJFWkw5cy9pamZVdSIsIm1hYyI6IjA0OTA2YjJmYWNkNDUzODY3NTUwYzcwMGRjNjFiMDBhODQ1MjhlNWQzMDM1YWUzN2M5NWYyYjYzZDIwZTg4OTUiLCJ0YWciOiIifQ%3D%3D; expires=Tue, 26-Oct-2027 06:52:31 GMT; Max-Age=34559999; path=/; secure; HttpOnly; SameSite=lax
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=OXYNHGCSk7GtTNr%2BF2eaUS3UMUJsH3wEsO2x587wvQ8S%2B%2BTETwIZX3b8gf6fjM5haE5mLeMZq2kDuCAaVbezXdkSr%2BC3orF%2BGkW3sq1%2FjO8Y02RgxGzCd2oinWconCHzZQo%3D"}]}
+cf-cache-status: DYNAMIC
+content-encoding: br
+cf-ray: a3e725cac8f2f5ac-PIT
+alt-svc: h3=":443"; ma=86400
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="csrf-token" content="YXcCwYQMyFavnBCGv3cMcjUaqK8GZKSRe0MhYwtn">
+<meta name="api-token" content="ZKlUzNr5Losik6UrgAOO0mCSqz0PkEXRhEZeQ9mgX50QF4EJiEvTxVAcwvTZ" />
+<meta name="api-character-information-endpoint" content="https://web.idle-mmo.com/api/character/information?expires=1790059951&amp;signature=99a5c6f5968f8f88752182300f4209df6491f08cc7c16657553880b6c8da991a">
+<meta name="api-active-action-endpoint" content="https://web.idle-mmo.com/api/action/active?expires=1790059951&amp;signature=080fed645d60ad264d4b912e0b15ec03a03b00b7a5c0478162f9831f58ce08e8">
+<meta name="api-process-active-action-endpoint" content="https://web.idle-mmo.com/api/action/process?expires=1790059951&amp;signature=9457f3a33bd4f15b5eb85fd5385fda361b38dd915a7c054ddda59a459547306d">
+<meta name="api-process-cancel-action-endpoint" content="https://web.idle-mmo.com/api/action/cancel?expires=1790059951&amp;signature=b55122b1c3e0ee63de0b0099859d5474c59888bf61c41ad4069795e7c403c09a">
+<meta name="inactivity-action-refresh-ms" content="60000">
+<meta name="character-id" content="783437" />
+<meta name="58723325487" content="ts2mic5ytx">
+<meta name="35687898542" content="qty6bx4peh">
+<meta name="769f7d2538089f0cfe5a5a5295a67f74" content="gcem8x71nt">
+<meta name="4125b17842e8f0821df3c0b39e2028e6" content="gawain_lancelot">  
+<meta name="97bb8f49b95994a54a3834a6d71f1b1b" content="gawain_arthur">  
+<meta name="acd997a3fd8a0ff68e31eaa469f12803" content="mordred_excalibur">  
+<meta name="aa63850cda378d1ca3714c2d15970ae2" content="91190924839">  
+    <meta data-runtime name="3847d3ac65a98eab431bc41e82204a24" content="eyJmaWVsZCI6Ijc0YzBmYTk0MjkzNTkwOGI1MmY4MjAwZCIsInZhbHVlIjoiODFiNTJjMDEzNDdlYTc2YzVkMzVlZDdmYTU3ZTNhZmIxODU3OTAwY2E5ZDgxZTMyZDlhMTkzZGMxNTZlYjJlMCJ9">
+<meta name="98b10c24a4c41f9e834c612cd4ff513c" content="https://web.idle-mmo.com/api/34523452/235453253245/2134519874231203"> 
+<meta name="01e8e40a2362418bf26fd0e5203dffd0" content="fair-maiden"> 
+<meta name="description" content="Go on an epic adventure, hunt diverse enemies, embark on dungeons expeditions and defeat world bosses even while taking a nap!" />
+<meta property="og:title" content="IdleMMO">
+<meta property="og:description" content="Go on an epic adventure, hunt diverse enemies, embark on dungeons expeditions and defeat world bosses even while taking a nap!">
+<meta property="og:url" content="https://www.idle-mmo.com">
+<meta property="og:image" content="https://cdn.idle-mmo.com/global/og-image.jpg">
+<meta name="color-scheme" content="dark">
+<title>Inventory | IdleMMO </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#111722">
+<meta name="theme-color" content="#111722">
+
+<!-- UI Scale -->
+<script data-cfasync="false">
+    (function() {
+        const preset = localStorage.getItem('ui-scale-preset') || 'default';
+        const rootSizes = {
+            'extra-small': '12px',
+            'small': '14px',
+            'large': '18px',
+            'extra-large': '20px',
+        };
+        
+        if (preset !== 'default') {
+            document.write('<style id="ui-scale-style">');
+            document.write('html { font-size: ' + rootSizes[preset] + '; }');
+            document.write('</style>');
+        } else {
+            document.write('<style id="ui-scale-style"></style>');
+        }
+    })();
+</script>
+<script type="e87bc8db8cb2a50023e458e4-text/javascript">
+    window.updateUIDisplay = function(preset) {
+        const style = document.getElementById('ui-scale-style');
+        const rootSizes = {
+            'extra-small': '12px',
+            'small': '14px',
+            'large': '18px',
+            'extra-large': '20px',
+        };
+        
+        if (style) {
+            if (preset === 'default') {
+                style.textContent = '';
+            } else {
+                style.textContent = 'html { font-size: ' + rootSizes[preset] + '; }';
+            }
+        }
+    };
+</script>
+
+<!-- Display Adjustments -->
+<script data-cfasync="false">
+    (function() {
+        const dimLevel = localStorage.getItem('display-dim-level') || 'off';
+        const dimOpacity = {
+            'low': '0.12',
+            'medium': '0.22',
+            'high': '0.35',
+        };
+
+        document.write('<style id="display-dim-style">');
+        document.write(':root { --display-dim-opacity: ' + (dimOpacity[dimLevel] || '0') + '; }');
+        document.write('</style>');
+    })();
+</script>
+<script type="e87bc8db8cb2a50023e458e4-text/javascript">
+    window.updateDisplayDim = function(dimLevel) {
+        const dimOpacity = {
+            'low': '0.12',
+            'medium': '0.22',
+            'high': '0.35',
+        };
+
+        document.documentElement.style.setProperty('--display-dim-opacity', dimOpacity[dimLevel] || '0');
+    };
+</script>
+
+<!-- Scripts -->
+<link rel="preload" as="style" href="https://web.idle-mmo.com/build/assets/app-eCE14lgY.css" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="preload" as="style" href="https://web.idle-mmo.com/build/assets/app-zM9STM4F.css" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/game-D2RXVzIf.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/wiki-BHtRgxQn.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/filter-url-BB6MTndm.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="modulepreload" as="script" href="https://web.idle-mmo.com/build/assets/app-ChmklM08.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" /><link rel="stylesheet" href="https://web.idle-mmo.com/build/assets/app-eCE14lgY.css" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" data-navigate-track="reload" /><link rel="stylesheet" href="https://web.idle-mmo.com/build/assets/app-zM9STM4F.css" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" data-navigate-track="reload" /><script type="e87bc8db8cb2a50023e458e4-module" src="https://web.idle-mmo.com/build/assets/game-D2RXVzIf.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" data-navigate-track="reload"></script><script type="e87bc8db8cb2a50023e458e4-module" src="https://web.idle-mmo.com/build/assets/app-ChmklM08.js" nonce="E2EyohbeWlp9CSw6bave2YHi1p1AayScbTBEPpvW" data-navigate-track="reload"></script>
+<script type="e87bc8db8cb2a50023e458e4-text/javascript">
+    /*to prevent Firefox FOUC, this must be here*/
+    let FF_FOUC_FIX;
+</script>
+
+    <style>
+        .background-pattern { opacity: 0; transition: opacity .35s ease-out; }
+        .background-pattern.background-pattern--visible { opacity: 1; }
+    </style>
+</head>
