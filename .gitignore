@@ -1,16 +1,9 @@
 # Raw browser captures can contain passwords, cookies, bearer tokens, and
 # signed URLs. Keep local captures out of future commits.
-Longin/
-登陆前的welcome页面/
-背包/
-采集/
-队伍内交易/
+
 *.env
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pythonlibs/
 uv.lock
-data/*
-!data/sessions/
-!data/sessions/.gitkeep
