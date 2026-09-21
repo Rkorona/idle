@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
 
-from idle_mmo_api.client import RequestContext
+from idle_mmo_api.client import ApiClient, RequestContext
 
 
 class SessionStoreError(RuntimeError):
@@ -78,6 +78,17 @@ class SessionStore:
         except OSError:
             pass
         return path
+
+    def save_context(self, account: str, context: RequestContext) -> Path:
+        """Persist a client's current cookies and non-expiring context."""
+        return self.save(
+            StoredSession(
+                account=account,
+                headers=context.headers,
+                query=context.query,
+                protocol_fields=context.protocol_fields,
+            )
+        )
 
 
 def _mapping(value: Any, field_name: str) -> dict[str, Any]:

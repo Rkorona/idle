@@ -52,6 +52,28 @@ print(character.name, inventory.free_slots)
 
 在没有确认签名生成和授权流程前，先只使用响应 fixture 做测试，不要直接重放原始请求。
 
+`ApiClient` 使用标准 Cookie Jar：服务端响应中的 `Set-Cookie` 会在内存中自动保存，并在后续请求中自动发送。只读检查成功后，`AccountChecker` 会把当前 Cookie 快照保存到对应账号的会话文件。
+
+签名参数不能从旧抓包中永久复用。需要由授权测试环境提供每次请求的新参数时，传入动态回调：
+
+```python
+def sign_request(method, path, payload):
+    # 使用测试环境提供的正式签名方式；不要把旧抓包签名写死。
+    return get_authorized_query(method, path, payload)
+
+context = RequestContext(query_provider=sign_request)
+```
+
+如果测试环境提供明确的会话刷新方式，可以传入 `refresh_context`。客户端只会在 401/419 时尝试一次，刷新失败就停止，不会无限重试：
+
+```python
+client = ApiClient(
+    "https://web.idle-mmo.com",
+    context,
+    refresh_context=refresh_authorized_context,
+)
+```
+
 写操作（开始采集、取消行动、创建/修改/接受交易）默认关闭。只有在授权测试会话中明确开启：
 
 ```python

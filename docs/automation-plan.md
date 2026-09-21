@@ -201,6 +201,17 @@ for each material by priority:
 
 会话存储模块只负责保存和读取授权会话，不负责猜测、破解或生成签名。
 
+当前客户端已经支持：
+
+- 使用 Cookie Jar 接收响应中的 `Set-Cookie`；
+- 后续请求自动携带当前 Cookie；
+- 通过 `context_snapshot()` 导出更新后的 Cookie；
+- 为每个请求调用动态 query/signature provider；
+- 收到 401/419 时调用一次外部授权刷新回调；
+- 刷新后重新生成 query 和协议字段，仍失败则停止。
+
+客户端不会自行推断签名算法，也不会把旧抓包中的 `expires`、`signature` 当作长期会话数据。
+
 ## 8. 阶段四：采集任务状态机
 
 每个小号的采集任务建议使用以下状态：
