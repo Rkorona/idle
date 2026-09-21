@@ -114,6 +114,22 @@ class FakeClient:
         pass
 
 
+class PrioritySellClient(FakeClient):
+    """用于验证赚钱材料优先级的客户端。"""
+
+    def __init__(self, alias, fail_sell_items=()):
+        super().__init__(alias)
+        self.fail_sell_items = set(fail_sell_items)
+        self.sold = []
+
+    def sell_item(self, item_id, quantity):
+        if item_id in self.fail_sell_items:
+            raise GameAPIError(f"出售失败(模拟): {item_id}")
+        self.inv[item_id] -= quantity
+        self.sold.append((item_id, quantity))
+        return quantity
+
+
 def account(alias):
     return {"alias": alias, "email": f"{alias}@x.com", "password": "pw", "remark": "", "role": "worker"}
 
@@ -282,6 +298,70 @@ class TestWorkerFlow(unittest.TestCase):
         w.client = FakeClient("w1")
         w._earn_gold_once()
         self.assertEqual(w.sell_plan, [])
+
+    def test_earning_uses_primary_material_before_backup(self):
+        """主材料成功时，不应轮流采集或出售备用材料。"""
+        store = make_store([], self.tmp.name)
+        client = PrioritySellClient("w1")
+        client.inv.update({2: 5, 2018: 5})
+        plans = [
+            {"name": "Yew Log", "skill": "woodcutting", "skill_item_id": 2,
+             "inventory_item_id": 2, "batch_size": 5},
+            {"name": "Limestone", "skill": "mining", "skill_item_id": 561,
+             "inventory_item_id": 2018, "batch_size": 5},
+        ]
+        w = Worker(account("w1"), store, 999, threading.Event(),
+                   sell_plan=plans, client_factory=lambda e, p, n: client, **FAST)
+        w.client = client
+
+        w._earn_gold_once()
+
+        self.assertEqual(client.sold, [(2, 5)])
+
+    def test_earning_falls_back_only_after_primary_failure(self):
+        """主材料失败时才使用备用材料，并且一轮只出售一项。"""
+        store = make_store([], self.tmp.name)
+        client = PrioritySellClient("w1", fail_sell_items={2})
+        client.inv.update({2: 5, 2018: 5})
+        plans = [
+            {"name": "Yew Log", "skill": "woodcutting", "skill_item_id": 2,
+             "inventory_item_id": 2, "batch_size": 5},
+            {"name": "Limestone", "skill": "mining", "skill_item_id": 561,
+             "inventory_item_id": 2018, "batch_size": 5},
+        ]
+        w = Worker(account("w1"), store, 999, threading.Event(),
+                   sell_plan=plans, client_factory=lambda e, p, n: client, **FAST)
+        w.client = client
+
+        w._earn_gold_once()
+
+        self.assertEqual(client.sold, [(2018, 5)])
+
+    def test_sell_plan_uses_material_specific_gather_time(self):
+        """赚钱材料的采集超时应使用计划自己的耗时。"""
+        store = make_store([], self.tmp.name)
+        client = PrioritySellClient("w1")
+        observed = []
+
+        def gather(skill, skill_item_id, inventory_item_id, missing, label,
+                   seconds_per_gather=None):
+            observed.append(seconds_per_gather)
+            client.inv[inventory_item_id] = client.inv.get(inventory_item_id, 0) + missing
+
+        plans = [{"name": "Limestone", "skill": "mining", "skill_item_id": 561,
+                  "inventory_item_id": 2018, "batch_size": 5,
+                  "gather_seconds": 50}]
+        w = Worker(account("w1"), store, 999, threading.Event(),
+                   sell_plan=plans, client_factory=lambda e, p, n: client, **FAST)
+        w.client = client
+        original_gather = w._gather
+        w._gather = gather
+
+        w._earn_gold_once()
+
+        self.assertEqual(observed, [50.0])
+        self.assertEqual(client.sold, [(2018, 5)])
+        w._gather = original_gather
 
     def test_one_worker_crash_does_not_kill_others(self):
         store = make_store([make_task("oak", 10, 10)], self.tmp.name)

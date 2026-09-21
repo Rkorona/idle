@@ -35,6 +35,15 @@ def load_settings(path=SETTINGS_FILE) -> Dict[str, Any]:
         missing = [k for k in _SELL_REQUIRED if k not in item]
         if missing:
             raise SettingsError(f"sell_plan[{i}] 缺少字段: {missing}")
+        try:
+            if int(item.get("batch_size", 50)) <= 0:
+                raise ValueError
+            if float(item.get("gather_seconds", 14)) <= 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            raise SettingsError(
+                f"sell_plan[{i}] 的 batch_size/gather_seconds 必须是正数"
+            )
 
     return {
         "max_concurrent_workers": max_workers,

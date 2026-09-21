@@ -88,6 +88,8 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 
 出售计划现在会读取背包物品的单价和数量，调用抓包确认的 `/api/item/vendor/sell` 接口完成出售；成功后的金币收益按 `value × quantity` 计算。接口签名地址优先使用页面返回值，不会写入抓包中的过期签名。
 
+`sell_plan` 按列表顺序表示优先级：第一项是主材料，只有这一轮采集或出售失败，才会尝试下一项备用材料。当前建议使用 Yew Log（`skill_item_id=2`、`inventory_item_id=2`）作为主材料，Limestone（`skill_item_id=561`、`inventory_item_id=2018`）作为备用材料。每项的 `gather_seconds` 应填写该材料的单轮实际等待时间，避免较慢的备用材料被提前取消。
+
 **1. `cancel_trade()` 的端点名是推测的**
 `trade.cancel.endpoint` 是按 create/get/accept 的命名惯例推测的，未经抓包验证。
 如果页面上没有这个端点，会抛错并**保留 `pending_trade_id`**，不影响主流程，但残留交易需要你手动处理。建议抓包确认。

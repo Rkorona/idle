@@ -1,0 +1,18 @@
+max_concurrent_workers: 10
+stagger_seconds: 5
+
+# 第一项为主材料；只有主材料本轮采集或出售失败，才尝试下一项。
+sell_plan:
+  - name: "Yew Log"
+    skill: "woodcutting"
+    skill_item_id: 2
+    inventory_item_id: 2
+    batch_size: 50
+    gather_seconds: 16.5
+
+  - name: "Limestone"
+    skill: "mining"
+    skill_item_id: 561
+    inventory_item_id: 2018
+    batch_size: 20
+    gather_seconds: 50

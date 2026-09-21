@@ -49,7 +49,6 @@ class Worker:
 
         self.log = get_logger(self.alias)
         self.client: Optional[IdleMMOClient] = None
-        self._sell_index = 0  # 赚钱模式下轮流采集不同材料
         # 已在服务端创建、但尚未确认完成的交易。_hand_over 一创建就登记，
         # 这样它中途抛异常时，外层仍能知道该清理哪一笔（否则清理逻辑拿不到 trade_id）。
         self._open_trade_id: Optional[int] = None
@@ -183,7 +182,8 @@ class Worker:
     # 采集（修复 #5：轮询状态，不再硬等 sleep）
     # ------------------------------------------------------------------
     def _gather(self, skill: str, skill_item_id: int, inventory_item_id: int,
-                missing: int, label: str) -> None:
+                missing: int, label: str,
+                seconds_per_gather: Optional[float] = None) -> None:
         """采集直到背包够数，或超时。结束后保证角色处于空闲。"""
         self.log.info("尚缺 %d 个 [%s]，启动技能 [%s]...", missing, label, skill)
 
@@ -193,7 +193,10 @@ class Worker:
 
         self.client.start_gathering(skill_name=skill, skill_item_id=skill_item_id, loops=missing)
 
-        expected = missing * self.seconds_per_gather
+        gather_seconds = self.seconds_per_gather if seconds_per_gather is None else seconds_per_gather
+        if gather_seconds <= 0:
+            raise ValueError(f"每次采集耗时必须大于 0: {gather_seconds}")
+        expected = missing * gather_seconds
         deadline = time.monotonic() + expected * GATHER_TIMEOUT_MARGIN + self.poll_interval
         self.log.info("挂机已启动，预计 %d 秒，轮询等待自然结束...", expected)
 
@@ -219,35 +222,67 @@ class Worker:
     # 赚钱模式：采集 → 出售
     # ------------------------------------------------------------------
     def _earn_gold_once(self) -> None:
-        """按 sell_plan 轮流采集一批材料并出售。"""
-        plan = self.sell_plan[self._sell_index % len(self.sell_plan)]
-        self._sell_index += 1
+        """按 sell_plan 优先级采集并出售，前一项失败才尝试下一项。
+
+        配置列表的第一项是主材料，后续项是备用材料。一次循环最多成功
+        出售一项材料，避免主材料成功后又额外采集备用材料。
+        """
+        failures = []
+        for index, plan in enumerate(self.sell_plan):
+            name = plan["name"]
+            try:
+                self._earn_from_plan(plan)
+                if index > 0:
+                    self.log.info("[赚钱] 主材料不可用，已使用备用材料 [%s]。", name)
+                return
+            except NotImplementedError as e:
+                # 兼容旧的注入客户端；真实 API 已实现时不会进入这里。
+                if index < len(self.sell_plan) - 1:
+                    self.log.warning("[赚钱] 材料 [%s] 的出售接口未实现，尝试备用材料。", name)
+                    failures.append((name, e))
+                    continue
+                self.log.error("[赚钱] %s —— 已停用赚钱模式，仅保留任务采集。", e)
+                self.sell_plan = []
+                return
+            except Exception as e:
+                failures.append((name, e))
+                if index < len(self.sell_plan) - 1:
+                    self.log.warning(
+                        "[赚钱] 主/当前材料 [%s] 本轮失败: %s；尝试下一项备用材料。",
+                        name, e,
+                    )
+                    continue
+
+        if failures:
+            summary = "; ".join(f"{name}: {error}" for name, error in failures)
+            self.log.error("[赚钱] 所有出售材料本轮均失败: %s", summary)
+            self._sleep(self.idle_sleep)
+
+    def _earn_from_plan(self, plan: Dict[str, Any]) -> None:
+        """执行一项赚钱材料计划；失败由调用方决定是否切换备用材料。"""
         name = plan["name"]
         batch = int(plan.get("batch_size", 50))
+        gather_seconds = float(plan.get("gather_seconds", self.seconds_per_gather))
+        self.log.info("[赚钱] 采集 [%s] x%d 用于出售...", name, batch)
 
-        try:
-            self.log.info("[赚钱] 采集 [%s] x%d 用于出售...", name, batch)
-            have = self.client.get_inventory_item_count(plan["inventory_item_id"])
-            if have < batch:
-                self._gather(plan["skill"], plan["skill_item_id"],
-                             plan["inventory_item_id"], batch - have, name)
+        have = self.client.get_inventory_item_count(plan["inventory_item_id"])
+        if have < batch:
+            self._gather(
+                plan["skill"],
+                plan["skill_item_id"],
+                plan["inventory_item_id"],
+                batch - have,
+                name,
+                seconds_per_gather=gather_seconds,
+            )
 
-            qty = self.client.get_inventory_item_count(plan["inventory_item_id"])
-            sell_qty = min(qty, batch)
-            if sell_qty <= 0:
-                self.log.warning("[赚钱] 背包中没有可出售的 [%s]", name)
-                return
+        qty = self.client.get_inventory_item_count(plan["inventory_item_id"])
+        sell_qty = min(qty, batch)
+        if sell_qty <= 0:
+            raise GameAPIError(f"背包中没有可出售的 [{name}]")
 
-            gold = self.client.sell_item(plan["inventory_item_id"], sell_qty)
-            self.log.info("[赚钱] 出售 %s x%d，获得 %s 金币", name, sell_qty, gold)
-
-        except NotImplementedError as e:
-            # 出售接口尚未填充：停用赚钱模式，退化为等待任务，避免反复采集却卖不掉
-            self.log.error("[赚钱] %s —— 已停用赚钱模式，仅保留任务采集。", e)
-            self.sell_plan = []
-        except Exception as e:
-            self.log.error("[赚钱] 本轮失败: %s", e)
-            self._sleep(self.idle_sleep)
+        gold = self.client.sell_item(plan["inventory_item_id"], sell_qty)
+        self.log.info("[赚钱] 出售 %s x%d，获得 %s 金币", name, sell_qty, gold)
 
     # ------------------------------------------------------------------
     def _sleep(self, seconds: float) -> None:

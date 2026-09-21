@@ -3,13 +3,19 @@
 max_concurrent_workers: 10   # 同 IP 并发小号上限，不允许超过 10
 stagger_seconds: 5           # 各小号启动错峰间隔(秒)
 
-# 没有任务可领时，小号按顺序轮流采集这些材料并出售，攒金币付交易手续费。
-# 注意：出售接口 (api.py 的 sell_item) 需要你抓包后补全；
-#       在补全之前保持本节为空即可，小号会在无任务时空闲等待。
+# 没有任务可领时，小号按顺序尝试这些材料并出售，攒金币付交易手续费。
+# 第一项是优先材料，只有当前一项本轮失败才会尝试下一项备用材料。
 sell_plan: []
 # sell_plan:
-#   - name: "Oak Log"
+#   - name: "Yew Log"
 #     skill: "woodcutting"
-#     skill_item_id: 1
-#     inventory_item_id: 1
+#     skill_item_id: 2
+#     inventory_item_id: 2
 #     batch_size: 50
+#     gather_seconds: 16.5
+#   - name: "Limestone"
+#     skill: "mining"
+#     skill_item_id: 561
+#     inventory_item_id: 2018
+#     batch_size: 20
+#     gather_seconds: 50
