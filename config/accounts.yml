@@ -21,3 +21,9 @@ accounts:
     password: "13185942325"
     remark: "小号2"
     role: worker
+  
+  worker_3:
+    email: "replitb@proton.me"
+    password: "13185942325yang"
+    remark: "小号3"
+    role: worker
