@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, List, Optional
 from .api import (
     GameAPIError,
     IdleMMOClient,
+    SellEndpointError,
     SessionExpiredError,
     create_authenticated_client,
 )
@@ -253,6 +254,12 @@ class Worker:
                 # 这类错误不能当成“主材料不可用”：继续采集备用材料只会浪费时间，
                 # 而且可能重复向已被服务端拒绝的会话发送请求。
                 self.log.error("[赚钱] %s —— 已停止赚钱模式，请重新启动程序获取新会话。", e)
+                self.sell_plan = []
+                return
+            except SellEndpointError as e:
+                # 出售端点缺失是页面协议/解析问题，不是当前材料不可用；
+                # 切换备用材料不会修复它，只会继续消耗采集时间。
+                self.log.error("[赚钱] %s —— 已停止赚钱模式，请检查页面端点解析。", e)
                 self.sell_plan = []
                 return
             except Exception as e:

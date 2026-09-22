@@ -17,7 +17,12 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from idlemmo_bot.api import GameAPIError, IdleMMOClient, SessionExpiredError  # noqa: E402
+from idlemmo_bot.api import (  # noqa: E402
+    GameAPIError,
+    IdleMMOClient,
+    SellEndpointError,
+    SessionExpiredError,
+)
 
 
 def response(status_code, body):
@@ -90,7 +95,7 @@ class TestSellItem(unittest.TestCase):
             self.client.sell_item(201, 1)
 
     def test_rejects_missing_signed_sell_endpoint_before_posting(self):
-        with self.assertRaisesRegex(GameAPIError, "出售签名端点"):
+        with self.assertRaisesRegex(SellEndpointError, "出售签名端点"):
             self.client.sell_item(201, 1)
         self.client._post.assert_not_called()
 
@@ -108,6 +113,18 @@ class TestSellItem(unittest.TestCase):
         self.assertEqual(
             self.client.endpoints["item.vendor.sell.endpoint"],
             "https://web.idle-mmo.com/api/item/vendor/sell?expires=456&signature=def",
+        )
+
+    def test_extracts_signed_sell_url_even_without_game_data_key(self):
+        html = r"""
+        <script>
+          const endpoint = "https:\/\/web.idle-mmo.com\/api\/item\/vendor\/sell?expires=789\u0026signature=ghi";
+        </script>
+        """
+        self.client._parse_page_context(html)
+        self.assertEqual(
+            self.client.endpoints["item.vendor.sell.endpoint"],
+            "https://web.idle-mmo.com/api/item/vendor/sell?expires=789&signature=ghi",
         )
 
 

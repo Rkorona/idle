@@ -31,6 +31,10 @@ class SessionExpiredError(GameAPIError):
     """服务端将请求判定为会话/鉴权失效。"""
 
 
+class SellEndpointError(GameAPIError):
+    """当前页面没有提供可用的 NPC 出售签名端点。"""
+
+
 class IdleMMOClient:
     def __init__(self, timeout: float = 20.0, name: str = "client"):
         self.client = httpx.Client(
@@ -168,6 +172,18 @@ class IdleMMOClient:
         sell_endpoint = self.endpoints.get("item.item_sell_to_vendor.endpoint")
         if isinstance(sell_endpoint, str) and sell_endpoint:
             self.endpoints["item.vendor.sell.endpoint"] = sell_endpoint
+        else:
+            # 某些页面版本不会把 game_data 作为标准对象输出，但 HTML/脚本
+            # 仍会直接包含这条签名 URL。按路径提取，避免依赖具体 JS 序列化格式。
+            direct_match = re.search(
+                r"""https?:[\\/]+web\.idle-mmo\.com[\\/]+api[\\/]+item[\\/]+vendor[\\/]+sell\?[^"'<>\s]+""",
+                html,
+                re.IGNORECASE,
+            )
+            if direct_match:
+                self.endpoints["item.vendor.sell.endpoint"] = self._extract_clean_url(
+                    direct_match.group(0)
+                )
 
     def _runtime_fields(self) -> Dict[str, Any]:
         if "runtime_field" in self.runtime_meta and "runtime_value" in self.runtime_meta:
@@ -573,7 +589,7 @@ class IdleMMOClient:
         if not isinstance(sell_url, str) or not sell_url:
             sell_url = self.endpoints.get("item.vendor.sell.endpoint")
         if not isinstance(sell_url, str) or not sell_url:
-            raise GameAPIError(
+            raise SellEndpointError(
                 "未找到当前页面的出售签名端点 "
                 "(game_data 的 item.item_sell_to_vendor.endpoint)"
             )
