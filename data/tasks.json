@@ -10,8 +10,8 @@
       "target_quantity": 500,
       "batch_size": 200,
       "gather_seconds": 13.8,
-      "delivered_quantity": 0,
-      "status": "PENDING",
+      "delivered_quantity": 500,
+      "status": "COMPLETED",
       "assigned_to": null,
       "active_claims": [],
       "pending_trades": []
