@@ -48,7 +48,7 @@ def main() -> int:
         if args.dry_run:
             for note in store.normalize():
                 log.warning("任务自检修正: %s", note)
-            log.info("目标大号 ID: %s", store.get_target_character_id())
+            log.info("目标大号ID: %s", store.get_target_character_id())
             log.info("将启动的小号: %s", [a["alias"] for a in accounts])
             log.info("赚钱采集计划: %s", [p["name"] for p in settings["sell_plan"]] or "未配置")
             log.info("自检通过 (dry-run，未联网)。")

@@ -45,7 +45,7 @@ class Scheduler:
 
         accounts = self.accounts
         if len(accounts) > self.max_workers:
-            log.warning("配置了 %d 个小号，超过并发上限 %d，仅启动前 %d 个。",
+            log.warning("配置了%d个小号，超过并发上限%d，仅启动前%d个。",
                         len(accounts), self.max_workers, self.max_workers)
             accounts = accounts[: self.max_workers]
 
@@ -53,7 +53,7 @@ class Scheduler:
             log.error("没有可用的小号(role: worker)，退出。")
             return
 
-        log.info("启动 %d 个小号: %s", len(accounts), [a["alias"] for a in accounts])
+        log.info("启动%d个小号: %s", len(accounts), [a["alias"] for a in accounts])
 
         for i, account in enumerate(accounts):
             worker = Worker(

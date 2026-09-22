@@ -7,7 +7,7 @@ sell_plan:
     skill: "woodcutting"
     skill_item_id: 2
     inventory_item_id: 2
-    batch_size: 20
+    batch_size: 100
     gather_seconds: 16.5
 
   - name: "Limestone"

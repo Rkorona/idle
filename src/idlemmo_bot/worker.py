@@ -110,13 +110,13 @@ class Worker:
         tid = task["task_id"]
         name = task["name"]
         need = batch_of(task)
-        self.log.info("领到任务 [%s] %s (本批 %d，已交付 %d/%d)",
+        self.log.info("领到任务[%s]%s (本批 %d，已交付 %d/%d)",
                       tid, name, need, task.get("delivered_quantity", 0), task["target_quantity"])
 
         self._open_trade_id = None
         try:
             have = self.client.get_inventory_item_count(task["inventory_item_id"])
-            self.log.info("背包已有 [%s]: %d/%d", name, have, need)
+            self.log.info("背包已有[%s]: %d/%d", name, have, need)
 
             if have < need:
                 self._gather(task["skill"], task["skill_item_id"], task["inventory_item_id"],
@@ -124,19 +124,19 @@ class Worker:
 
             final_qty = self.client.get_inventory_item_count(task["inventory_item_id"])
             transfer = min(final_qty, need)
-            self.log.info("背包核验: [%s] 共 %d 个，本次移交 %d", name, final_qty, transfer)
+            self.log.info("背包核验: [%s]共%d个，本次移交%d", name, final_qty, transfer)
 
             if transfer <= 0:
-                raise GameAPIError("背包实际数量为 0，交货终止")
+                raise GameAPIError("背包实际数量为0，交货终止")
 
             self._hand_over(task, transfer)
             self._open_trade_id = None  # 已成功确认，不再需要清理
             self.store.deliver(tid, transfer)
             self.store.record_pending_trade(tid, None)
-            self.log.info("任务 [%s] 本批完成，进度已写入。", tid)
+            self.log.info("任务[%s]本批完成，进度已写入。", tid)
 
         except Exception as e:
-            self.log.error("任务 [%s] 执行失败: %s", tid, e)
+            self.log.error("任务[%s]执行失败: %s", tid, e)
             self._cleanup_trade(tid)
             self.store.release(tid, note=str(e))
             self._sleep(self.idle_sleep)  # 出错后冷却，避免疯狂重试打服务器
@@ -146,12 +146,12 @@ class Worker:
         tid = task["task_id"]
         name = task["name"]
 
-        self.log.info("向大号 (%s) 发起交易...", self.target_id)
+        self.log.info("向大号(%s)发起交易...", self.target_id)
         trade_id = self.client.create_trade(target_character_id=self.target_id)
         self._open_trade_id = trade_id
         # 先记下 trade_id：即使后面任何一步失败，也知道服务端挂着哪笔交易（修复 #10）
         self.store.record_pending_trade(tid, trade_id)
-        self.log.info("交易已创建 (ID: %s)", trade_id)
+        self.log.info("交易已创建(ID: %s)", trade_id)
 
         self.client.add_item_to_trade(
             trade_id=trade_id,
@@ -171,7 +171,7 @@ class Worker:
                       [f"{i.get('name')} x{i.get('quantity')}" for i in offered])
 
         self.client.accept_trade(trade_id, target_character_id=self.target_id)
-        self.log.info("已确认交易 #%s，等待大号接收。", trade_id)
+        self.log.info("已确认交易#%s，等待大号接收。", trade_id)
         return trade_id
 
     def _cleanup_trade(self, task_id: str) -> None:
@@ -185,7 +185,7 @@ class Worker:
             self.store.record_pending_trade(task_id, None)
             self.log.info("已取消残留交易 #%s", trade_id)
         except Exception as e:
-            self.log.warning("残留交易 #%s 未能自动取消(%s)，已保留在 tasks.json 的 "
+            self.log.warning("残留交易#%s未能自动取消(%s)，已保留在 tasks.json 的 "
                              "pending_trade_id，请人工检查。", trade_id, e)
 
     # ------------------------------------------------------------------
@@ -195,7 +195,7 @@ class Worker:
                 missing: int, label: str,
                 seconds_per_gather: Optional[float] = None) -> None:
         """采集直到背包够数，或超时。结束后保证角色处于空闲。"""
-        self.log.info("尚缺 %d 个 [%s]，启动技能 [%s]...", missing, label, skill)
+        self.log.info("尚缺%d个[%s]，启动技能[%s]...", missing, label, skill)
 
         # 开始前先确保空闲，避免与上一次遗留动作冲突
         if not self.client.cancel_action():
@@ -208,7 +208,7 @@ class Worker:
             raise ValueError(f"每次采集耗时必须大于 0: {gather_seconds}")
         expected = missing * gather_seconds
         deadline = time.monotonic() + expected * GATHER_TIMEOUT_MARGIN + self.poll_interval
-        self.log.info("挂机已启动，预计 %d 秒，轮询等待自然结束...", expected)
+        self.log.info("挂机已启动，预计%d秒，轮询等待自然结束...", expected)
 
         finished = False
         while time.monotonic() < deadline:
@@ -243,41 +243,41 @@ class Worker:
             try:
                 self._earn_from_plan(plan)
                 if index > 0:
-                    self.log.info("[赚钱] 主材料不可用，已使用备用材料 [%s]。", name)
+                    self.log.info("[赚钱]主材料不可用，已使用备用材料[%s]。", name)
                 return
             except NotImplementedError as e:
                 # 兼容旧的注入客户端；真实 API 已实现时不会进入这里。
                 if index < len(self.sell_plan) - 1:
-                    self.log.warning("[赚钱] 材料 [%s] 的出售接口未实现，尝试备用材料。", name)
+                    self.log.warning("[赚钱]材料[%s]的出售接口未实现，尝试备用材料。", name)
                     failures.append((name, e))
                     continue
-                self.log.error("[赚钱] %s —— 已停用赚钱模式，仅保留任务采集。", e)
+                self.log.error("[赚钱]%s —— 已停用赚钱模式，仅保留任务采集。", e)
                 self.sell_plan = []
                 return
             except SessionExpiredError as e:
                 # 这类错误不能当成“主材料不可用”：继续采集备用材料只会浪费时间，
                 # 而且可能重复向已被服务端拒绝的会话发送请求。
-                self.log.error("[赚钱] %s —— 已停止赚钱模式，请重新启动程序获取新会话。", e)
+                self.log.error("[赚钱]%s —— 已停止赚钱模式，请重新启动程序获取新会话。", e)
                 self.sell_plan = []
                 return
             except SellEndpointError as e:
                 # 出售端点缺失是页面协议/解析问题，不是当前材料不可用；
                 # 切换备用材料不会修复它，只会继续消耗采集时间。
-                self.log.error("[赚钱] %s —— 已停止赚钱模式，请检查页面端点解析。", e)
+                self.log.error("[赚钱]%s —— 已停止赚钱模式，请检查页面端点解析。", e)
                 self.sell_plan = []
                 return
             except Exception as e:
                 failures.append((name, e))
                 if index < len(self.sell_plan) - 1:
                     self.log.warning(
-                        "[赚钱] 主/当前材料 [%s] 本轮失败: %s；尝试下一项备用材料。",
+                        "[赚钱]主/当前材料[%s]本轮失败: %s；尝试下一项备用材料。",
                         name, e,
                     )
                     continue
 
         if failures:
             summary = "; ".join(f"{name}: {error}" for name, error in failures)
-            self.log.error("[赚钱] 所有出售材料本轮均失败: %s", summary)
+            self.log.error("[赚钱]所有出售材料本轮均失败: %s", summary)
             self._sleep(self.idle_sleep)
 
     def _earn_from_plan(self, plan: Dict[str, Any]) -> None:
@@ -285,7 +285,7 @@ class Worker:
         name = plan["name"]
         batch = int(plan.get("batch_size", 50))
         gather_seconds = float(plan.get("gather_seconds", self.seconds_per_gather))
-        self.log.info("[赚钱] 采集 [%s] x%d 用于出售...", name, batch)
+        self.log.info("[赚钱]采集[%s]x%d用于出售...", name, batch)
 
         have = self.client.get_inventory_item_count(plan["inventory_item_id"])
         if have < batch:
@@ -304,7 +304,7 @@ class Worker:
             raise GameAPIError(f"背包中没有可出售的 [{name}]")
 
         gold = self.client.sell_item(plan["inventory_item_id"], sell_qty)
-        self.log.info("[赚钱] 出售 %s x%d，获得 %s 金币", name, sell_qty, gold)
+        self.log.info("[赚钱]出售%sx%d，获得%s金币", name, sell_qty, gold)
 
     # ------------------------------------------------------------------
     def _sleep(self, seconds: float) -> None:

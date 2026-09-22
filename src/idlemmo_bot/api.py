@@ -68,7 +68,7 @@ class IdleMMOClient:
 
             if attempt < HTTP_MAX_RETRIES:
                 delay = HTTP_BACKOFF_BASE ** (attempt + 1)
-                self.log.warning("请求暂时失败，%.0f 秒后重试 (%d/%d)",
+                self.log.warning("请求暂时失败，%.0f秒后重试(%d/%d)",
                                  delay, attempt + 1, HTTP_MAX_RETRIES)
                 time.sleep(delay)
             elif res is not None:
@@ -346,7 +346,7 @@ class IdleMMOClient:
             self.log.info("状态确认：当前角色无任何挂机动作。")
             return True
 
-        self.log.info("动作仍在运行 [%s]，请求终止...", active.get("title"))
+        self.log.info("动作仍在运行[%s]，请求终止...", active.get("title"))
         cancel_url = active.get("cancel_url") or self.endpoints.get("action_cancel")
         if not cancel_url:
             raise GameAPIError("未找到有效的取消动作签名端点！")

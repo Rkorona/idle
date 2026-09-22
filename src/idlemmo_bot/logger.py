@@ -3,7 +3,7 @@ import logging
 import sys
 from pathlib import Path
 
-_FORMAT = "%(asctime)s [%(name)s] %(levelname)s %(message)s"
+_FORMAT = "[%(name)s] %(levelname)s %(message)s"
 _DATEFMT = "%H:%M:%S"
 _configured = False
 
