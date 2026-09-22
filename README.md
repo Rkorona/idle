@@ -42,19 +42,21 @@ python main.py --only worker_1    # 只启动指定小号
 
 ## 任务如何分配
 
-小号**接单式**领取，状态机如下：
+小号**接单式**领取，每个任务允许多个小号同时领取不同批次：
 
 ```
-PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPLETED
-   ▲                    │
-   │                    ├─交付后未够数───────────┐
-   └────────────────────┴─失败/中断(release)─────┘  → 回到 PENDING，进度不丢
+                  ┌─ worker A claim 50 ─交付──┐
+PENDING ──────────┼─ worker B claim 50 ─交付──┼─▶ delivered 累加
+                  └─ worker C claim 50 ─失败──┘       │
+                                                      └─达到目标──▶ COMPLETED
 ```
 
-- 领取是**原子**的：小号 A 领走后立即标记 `IN_PROGRESS`，小号 B 自动顺延到下一个任务。
-- 每个任务会记录 `assigned_to`（谁在做）；失败原因写入 `last_error`。
-- 一个任务分多批交付：每批数量 = `min(batch_size, 剩余需求)`，**不会多交**。
-- 启动时自动自检：`delivered ≥ target` 的任务修正为 `COMPLETED`；上次异常退出遗留的 `IN_PROGRESS` 恢复为 `PENDING`。
+- 领取是**原子**的：每个小号只预留一个批次，同一任务可以被多个小号同时领取。
+- 每次领取会生成唯一 `claim_id`；只有持有该 claim 的小号才能交付或释放它。
+- `active_claims` 记录当前各小号预留的数量；可领取数量 = 总需求 - 已交付 - 已预留。
+- 一个任务分多批交付：每批数量 = `min(batch_size, 未被预留的剩余需求)`，**不会多交**。
+- 同一小号有一个批次未结束时不会再次领取其它任务，避免一个角色同时执行多个采集动作。
+- 启动时自动自检：`delivered ≥ target` 的任务修正为 `COMPLETED`；上次异常退出遗留的 claim/`IN_PROGRESS` 恢复为可领取状态。
 
 ### tasks.json 字段
 
@@ -67,6 +69,8 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 | `gather_seconds` | 该材料单个采集动作的实际耗时（秒） |
 | `target_quantity` / `batch_size` | 总需求量 / 单批交付量 |
 | `delivered_quantity` / `status` | 已交付量 / 状态（程序维护，一般不用手改） |
+| `active_claims` | 当前正在处理的批次（程序维护，包含 `claim_id`、`worker`、`quantity`） |
+| `pending_trades` | 无法自动取消的残留交易记录，需人工检查 |
 
 ## 已修复的问题（对应此前审查的编号）
 
@@ -80,7 +84,7 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 | 7 | `accept_trade` 报错码错误、不校验响应体 | 已修正 |
 | 8 | 各交易请求 Referer 不一致 | 统一由 `_trade_referer` 生成 |
 | 9 | 角色名兜底写死 `FoxhopeXV` | 改为报错 |
-| 10 | 失败后残留交易 | 创建即登记 `trade_id`；失败时尝试取消，取消不了则保留在 `pending_trade_id` |
+| 10 | 失败后残留交易 | 创建即登记到对应 claim；失败时尝试取消，取消不了则保留在 `pending_trades` |
 | 11 | 账号 `test_1` 写死 | 由 `accounts.yml` 的 `role: worker` 决定 |
 | 12 | 两账号邮箱相同 | 启动时检测，重复即报错 |
 | 13 | 无重试/退避 | 429/5xx/超时自动指数退避重试 |
@@ -97,10 +101,10 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 
 **1. `cancel_trade()` 的端点名是推测的**
 `trade.cancel.endpoint` 是按 create/get/accept 的命名惯例推测的，未经抓包验证。
-如果页面上没有这个端点，会抛错并**保留 `pending_trade_id`**，不影响主流程，但残留交易需要你手动处理。建议抓包确认。
+如果页面上没有这个端点，会抛错并**保留 `pending_trades`**，不影响主流程，但残留交易需要你手动处理。建议抓包确认。
 
 **2. 本包没有联网实测**
-开发环境无法访问游戏服务器。我验证了任务领取/并发/状态机/批次计算/失败清理/账号校验及出售协议（19 项离线测试，含 20 线程抢任务的并发压力测试，连续多轮通过）。**没有验证**的是真实的 HTTP 交互——登录、采集、交易和出售都建议先只启动 1 个小号（`--only`）跑一轮，确认无误再放开并发。
+开发环境无法访问游戏服务器。我验证了任务领取/并发 claim/状态机/批次计算/失败清理/账号校验及出售协议（离线测试含多线程 claim 压力测试）。**没有验证**的是真实的 HTTP 交互——登录、采集、交易和出售都建议先只启动 1 个小号（`--only`）跑一轮，确认无误再放开并发。
 
 **3. 关于账号安全**
 - 之前的 `accounts.yml` 里是明文邮箱和密码，本包**没有包含**它，只提供了 `accounts.example.yml`；

@@ -164,50 +164,107 @@ class TestTaskStore(unittest.TestCase):
         self.assertEqual(batch_of(make_task("a", 25, 10, delivered=0)), 10)
         self.assertEqual(batch_of(make_task("a", 25, 10, delivered=25)), 0)
 
-    def test_claim_marks_in_progress_and_skips(self):
-        s = make_store([make_task("a", 10, 10), make_task("b", 10, 10)], self.tmp.name)
+    def test_multiple_workers_claim_same_task(self):
+        s = make_store([make_task("a", 100, 10)], self.tmp.name)
+        first = s.claim_next("w1")
+        second = s.claim_next("w2")
+        self.assertEqual(first["task_id"], "a")
+        self.assertEqual(second["task_id"], "a")
+        self.assertNotEqual(first["claim_id"], second["claim_id"])
+        self.assertEqual(
+            {c["worker"] for c in s.snapshot()[0]["active_claims"]},
+            {"w1", "w2"},
+        )
+
+    def test_worker_cannot_hold_two_claims(self):
+        s = make_store([make_task("a", 100, 10), make_task("b", 100, 10)], self.tmp.name)
+        first = s.claim_next("w1")
+        self.assertIsNone(s.claim_next("w1"))
+        s.release("a", first["claim_id"])
         self.assertEqual(s.claim_next("w1")["task_id"], "a")
-        self.assertEqual(s.claim_next("w2")["task_id"], "b")   # a 已被占用，顺延到 b
-        self.assertIsNone(s.claim_next("w3"))                  # 没有了
 
     def test_deliver_transitions(self):
         s = make_store([make_task("a", 25, 10)], self.tmp.name)
-        s.claim_next("w")
-        self.assertEqual(s.deliver("a", 10)["status"], PENDING)     # 没做完 → 放回队列
-        s.claim_next("w")
-        s.deliver("a", 10)
-        s.claim_next("w")
-        self.assertEqual(s.deliver("a", 5)["status"], COMPLETED)
+        claim = s.claim_next("w")
+        self.assertEqual(s.deliver("a", claim["claim_id"], 10)["status"], PENDING)
+        claim = s.claim_next("w")
+        s.deliver("a", claim["claim_id"], 10)
+        claim = s.claim_next("w")
+        self.assertEqual(s.deliver("a", claim["claim_id"], 5)["status"], COMPLETED)
 
     def test_release_keeps_progress(self):
         s = make_store([make_task("a", 25, 10, delivered=10)], self.tmp.name)
-        s.claim_next("w")
-        s.release("a", note="boom")
+        claim = s.claim_next("w")
+        s.release("a", claim["claim_id"], note="boom")
         t = s.snapshot()[0]
         self.assertEqual((t["status"], t["delivered_quantity"]), (PENDING, 10))
 
     def test_concurrent_claims_are_unique(self):
-        """并发压力：20 个线程抢 8 个任务，每个任务只能被领走一次。"""
-        s = make_store([make_task(f"t{i}", 10, 10) for i in range(8)], self.tmp.name)
+        """并发压力：20 个线程抢 800 个数量，claim 之间不能重复。"""
+        s = make_store([make_task("large", 800, 10)], self.tmp.name)
         got, lock = [], threading.Lock()
 
         def grab(n):
             t = s.claim_next(f"w{n}")
             if t:
                 with lock:
-                    got.append(t["task_id"])
+                    got.append((t["claim_id"], t["claim_quantity"]))
 
         threads = [threading.Thread(target=grab, args=(i,)) for i in range(20)]
         [t.start() for t in threads]
         [t.join() for t in threads]
-        self.assertEqual(len(got), 8)
-        self.assertEqual(len(set(got)), 8, f"出现重复领取: {sorted(got)}")
+        self.assertEqual(len(got), 20)
+        self.assertEqual(len({claim_id for claim_id, _ in got}), 20)
+        self.assertEqual(sum(quantity for _, quantity in got), 200)
+
+    def test_claim_cannot_overdeliver_and_only_own_claim_can_release(self):
+        s = make_store([make_task("a", 20, 10)], self.tmp.name)
+        first = s.claim_next("w1")
+        second = s.claim_next("w2")
+        with self.assertRaises(Exception):
+            s.deliver("a", first["claim_id"], 11)
+        self.assertEqual(len(s.snapshot()[0]["active_claims"]), 2)
+        s.release("a", first["claim_id"], note="boom")
+        self.assertEqual(len(s.snapshot()[0]["active_claims"]), 1)
+        with self.assertRaises(Exception):
+            s.deliver("a", first["claim_id"], 1)
+        s.deliver("a", second["claim_id"], 10)
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
+
+    def test_normalize_releases_stale_claims(self):
+        task = make_task("a", 20, 10)
+        task["active_claims"] = [{
+            "claim_id": "stale",
+            "worker": "w1",
+            "quantity": 10,
+            "pending_trade_id": 123,
+        }]
+        s = make_store([task], self.tmp.name)
+        notes = s.normalize()
+        self.assertTrue(any("active_claims" in note for note in notes))
+        self.assertEqual(s.snapshot()[0]["active_claims"], [])
+        self.assertEqual(
+            s.snapshot()[0]["pending_trades"],
+            [{"claim_id": "stale", "worker": "w1", "trade_id": 123}],
+        )
+
+    def test_release_preserves_uncancelled_trade(self):
+        s = make_store([make_task("a", 20, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 456)
+        s.release("a", claim["claim_id"], note="cancel failed")
+        task = s.snapshot()[0]
+        self.assertEqual(task["active_claims"], [])
+        self.assertEqual(
+            task["pending_trades"],
+            [{"claim_id": claim["claim_id"], "worker": "w1", "trade_id": 456}],
+        )
 
     def test_atomic_write_leaves_valid_json(self):
         s = make_store([make_task("a", 10, 10)], self.tmp.name)
         for _ in range(50):
-            s.claim_next("w")
-            s.release("a")
+            claim = s.claim_next("w")
+            s.release("a", claim["claim_id"])
         json.loads(s.path.read_text(encoding="utf-8"))  # 不抛异常即合法
         self.assertEqual([p.name for p in s.path.parent.glob(".tasks-*")], [])  # 无临时文件残留
 
@@ -245,6 +302,29 @@ class TestWorkerFlow(unittest.TestCase):
             self.assertEqual(t["status"], COMPLETED)
             self.assertEqual(t["delivered_quantity"], t["target_quantity"])
             self.assertNotIn("pending_trade_id", t)
+
+    def test_workers_finish_different_claims_of_same_task(self):
+        """两个 Worker 可以同时完成同一个逻辑任务的不同 claim。"""
+        store = make_store([make_task("oak", 20, 10)], self.tmp.name)
+        first = store.claim_next("w1")
+        second = store.claim_next("w2")
+        w1 = Worker(account("w1"), store, 999, threading.Event(),
+                    client_factory=lambda e, p, n: FakeClient(n), **FAST)
+        w2 = Worker(account("w2"), store, 999, threading.Event(),
+                    client_factory=lambda e, p, n: FakeClient(n), **FAST)
+        w1.client = FakeClient("w1")
+        w2.client = FakeClient("w2")
+
+        w1._do_task(first)
+        w2._do_task(second)
+
+        task = store.snapshot()[0]
+        self.assertEqual(task["status"], COMPLETED)
+        self.assertEqual(task["delivered_quantity"], 20)
+        self.assertEqual(
+            {(alias, quantity) for alias, _, quantity in FakeClient.trades},
+            {("w1", 10), ("w2", 10)},
+        )
 
     def test_uses_existing_inventory_without_gathering(self):
         store = make_store([make_task("oak", 10, 10)], self.tmp.name)

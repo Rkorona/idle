@@ -1,18 +1,25 @@
 """tasks.json 的读写与状态流转。
 
-状态机:  PENDING ──claim──▶ IN_PROGRESS ──deliver(够数)──▶ COMPLETED
-                                 │  └─deliver(不够)──▶ PENDING (可被下一轮领取)
-                                 └─release(失败/中断)──▶ PENDING
+一个任务可以同时拥有多个 claim，每个 claim 只预留一个批次：
+
+    PENDING ──claim──▶ PENDING (active_claims 增加一项)
+       │                         │
+       │                         ├─deliver──▶ delivered_quantity 增加
+       │                         └─release──▶ active_claims 移除
+       └────────────────────────────────────▶ COMPLETED (达到目标)
 
 设计要点:
-  * 所有读写都在同一把锁内完成，保证多个小号线程“原子领取”，不会领到同一个任务。
+  * 所有读写都在同一把锁内完成，保证多个小号原子地预留不同数量。
   * 落盘用“写临时文件 + os.replace”，进程中途崩溃也不会留下写了一半的 JSON。
-  * 每个任务记录 assigned_to(领取者)，便于排查与崩溃恢复。
+  * claim_id 是交付和释放的必需凭据，避免重复交付或释放别的小号的批次。
+  * 旧格式的 IN_PROGRESS/assigned_to 会在 normalize() 时恢复为可领取状态。
 """
 import json
 import os
 import tempfile
 import threading
+import time
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -39,6 +46,22 @@ def batch_of(task: Dict[str, Any]) -> int:
     现在取 min(batch_size, 剩余需求)。
     """
     return min(int(task["batch_size"]), remaining_of(task))
+
+
+def claimed_of(task: Dict[str, Any]) -> int:
+    """当前已经被 claim 预留、但尚未交付的数量。"""
+    total = 0
+    for claim in task.get("active_claims", []) or []:
+        try:
+            total += int(claim["quantity"])
+        except (KeyError, TypeError, ValueError) as e:
+            raise TaskStoreError(f"任务 {task.get('task_id')} 包含无效 active_claim") from e
+    return total
+
+
+def available_of(task: Dict[str, Any]) -> int:
+    """尚未交付且尚未被其它小号预留的数量。"""
+    return max(0, remaining_of(task) - claimed_of(task))
 
 
 class TaskStore:
@@ -110,7 +133,7 @@ class TaskStore:
 
         修复 #3：原先 delivered(35) > target(10) 但状态仍是 PENDING，
         会被当成未完成而继续采集。这里把“已交付 >= 目标”的任务标为 COMPLETED；
-        同时把上次异常退出遗留的 IN_PROGRESS 恢复为 PENDING。
+        同时清理上次异常退出遗留的 active_claims/IN_PROGRESS。
         """
         notes: List[str] = []
         with self._lock:
@@ -118,6 +141,13 @@ class TaskStore:
             changed = False
             for t in data["tasks"]:
                 tid = t.get("task_id")
+                if t.get("active_claims"):
+                    for claim in t["active_claims"]:
+                        self._preserve_pending_trade(t, claim)
+                    t["active_claims"] = []
+                    t["assigned_to"] = None
+                    notes.append(f"{tid}: 上次运行遗留的 active_claims，已释放")
+                    changed = True
                 if t.get("status") != COMPLETED and remaining_of(t) == 0:
                     t["status"] = COMPLETED
                     t["assigned_to"] = None
@@ -133,62 +163,131 @@ class TaskStore:
                 self._save(data)
         return notes
 
-    def claim_next(self, worker_alias: str) -> Optional[Dict[str, Any]]:
-        """原子领取下一个可做的任务，没有则返回 None。
+    @staticmethod
+    def _preserve_pending_trade(task: Dict[str, Any], claim: Dict[str, Any]) -> None:
+        """释放 claim 前保留无法取消的交易，避免并行 claim 丢失追踪信息。"""
+        trade_id = claim.get("pending_trade_id")
+        if trade_id is None:
+            return
+        pending = task.setdefault("pending_trades", [])
+        entry = {
+            "claim_id": claim.get("claim_id"),
+            "worker": claim.get("worker"),
+            "trade_id": trade_id,
+        }
+        if entry not in pending:
+            pending.append(entry)
 
-        “可做” = 状态为 PENDING 且仍有剩余需求。领取后立即标记 IN_PROGRESS 并落盘，
-        其他小号再来领取时就会自动跳过它，从而按顺序接后面的任务。
-        返回的是任务的副本，调用方修改它不会影响存储，进度更新必须走 deliver()。
+    def claim_next(self, worker_alias: str) -> Optional[Dict[str, Any]]:
+        """原子领取一个批次，没有则返回 None。
+
+        同一个任务允许多个小号同时领取，但同一个小号不能持有多个 claim。
+        返回副本中包含 claim_id 和 claim_quantity；后续 deliver/release 必须携带
+        该 claim_id。
         """
         with self._lock:
             data = self._load()
+            # 一个账号只有一个游戏角色动作，不能同时持有多个批次。
+            if any(
+                claim.get("worker") == worker_alias
+                for task in data["tasks"]
+                for claim in (task.get("active_claims") or [])
+            ):
+                return None
+
             for t in data["tasks"]:
-                if t.get("status") == PENDING and remaining_of(t) > 0:
-                    t["status"] = IN_PROGRESS
-                    t["assigned_to"] = worker_alias
+                if t.get("status") == COMPLETED:
+                    continue
+                available = available_of(t)
+                if available > 0:
+                    quantity = min(int(t["batch_size"]), available)
+                    claim = {
+                        "claim_id": uuid.uuid4().hex,
+                        "worker": worker_alias,
+                        "quantity": quantity,
+                        "claimed_at": time.time(),
+                    }
+                    t.setdefault("active_claims", []).append(claim)
                     self._save(data)
-                    return dict(t)
+                    result = dict(t)
+                    result["claim_id"] = claim["claim_id"]
+                    result["claim_quantity"] = quantity
+                    return result
         return None
 
-    def deliver(self, task_id: str, quantity: int) -> Dict[str, Any]:
-        """登记一次成功交付，并推进状态。返回更新后的任务。"""
+    def deliver(self, task_id: str, claim_id: str, quantity: int) -> Dict[str, Any]:
+        """登记某个 claim 的成功交付，并推进任务状态。"""
         if quantity <= 0:
             raise TaskStoreError(f"交付数量必须为正数，收到: {quantity}")
+        if not claim_id:
+            raise TaskStoreError("交付必须提供 claim_id")
         with self._lock:
             data = self._load()
             t = self._find(data, task_id)
+            claims = t.get("active_claims") or []
+            claim = next((c for c in claims if c.get("claim_id") == claim_id), None)
+            if claim is None:
+                raise TaskStoreError(f"任务 {task_id} 不存在 claim: {claim_id}")
+            claim_quantity = int(claim["quantity"])
+            if quantity > claim_quantity:
+                raise TaskStoreError(
+                    f"交付数量 {quantity} 超过 claim {claim_id} 的预留数量 {claim_quantity}"
+                )
+
+            claims.remove(claim)
             t["delivered_quantity"] = int(t.get("delivered_quantity", 0)) + quantity
             if remaining_of(t) == 0:
                 t["status"] = COMPLETED
                 t["assigned_to"] = None
             else:
-                # 还没做完：放回队列，任何空闲小号都可以接着做下一批
+                # 任务保持可领取，剩余数量可被其它小号同时 claim。
                 t["status"] = PENDING
                 t["assigned_to"] = None
+            t["active_claims"] = claims
             self._save(data)
             return dict(t)
 
-    def release(self, task_id: str, note: Optional[str] = None) -> None:
-        """放弃任务(失败/中断)：状态回到 PENDING，进度不变。"""
+    def release(self, task_id: str, claim_id: str, note: Optional[str] = None) -> None:
+        """释放某个 claim(失败/中断)，只影响该 claim 的预留数量。"""
+        if not claim_id:
+            raise TaskStoreError("释放任务必须提供 claim_id")
         with self._lock:
             data = self._load()
             t = self._find(data, task_id)
-            if t.get("status") == IN_PROGRESS:
-                t["status"] = PENDING
-                t["assigned_to"] = None
-                if note:
-                    t["last_error"] = note
-                self._save(data)
+            claims = t.get("active_claims") or []
+            claim = next((c for c in claims if c.get("claim_id") == claim_id), None)
+            if claim is None:
+                # 允许交付成功后清理异常路径再次调用 release，不重复报错。
+                return
+            self._preserve_pending_trade(t, claim)
+            claims.remove(claim)
+            t["active_claims"] = claims
+            t["status"] = PENDING
+            t["assigned_to"] = None
+            if note:
+                t["last_error"] = note
+            self._save(data)
 
-    def record_pending_trade(self, task_id: str, trade_id: Optional[int]) -> None:
-        """记录(或清除)挂起的交易 ID（修复 #10：出错时能追溯残留交易）。"""
+    def record_pending_trade(
+        self, task_id: str, claim_id: str, trade_id: Optional[int]
+    ) -> None:
+        """记录(或清除)某个 claim 的挂起交易 ID。"""
         with self._lock:
             data = self._load()
             t = self._find(data, task_id)
+            claim = next(
+                (c for c in (t.get("active_claims") or []) if c.get("claim_id") == claim_id),
+                None,
+            )
+            if claim is None:
+                # 正常成功交付后 claim 已移除，清理动作可以安全地成为 no-op。
+                if trade_id is None:
+                    return
+                raise TaskStoreError(f"任务 {task_id} 不存在 claim: {claim_id}")
             if trade_id is None:
-                t.pop("pending_trade_id", None)
+                claim.pop("pending_trade_id", None)
             else:
-                t["pending_trade_id"] = trade_id
+                claim["pending_trade_id"] = trade_id
             self._save(data)
 
     def has_open_tasks(self) -> bool:

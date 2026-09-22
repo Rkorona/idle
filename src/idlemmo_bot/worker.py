@@ -106,9 +106,11 @@ class Worker:
     def _do_task(self, task: Dict[str, Any]) -> None:
         tid = task["task_id"]
         name = task["name"]
-        need = batch_of(task)
-        self.log.info("领到任务[%s]%s (本批 %d，已交付 %d/%d)",
-                      tid, name, need, task.get("delivered_quantity", 0), task["target_quantity"])
+        claim_id = task["claim_id"]
+        need = int(task.get("claim_quantity", batch_of(task)))
+        self.log.info("领到任务[%s]%s (claim=%s，本批 %d，已交付 %d/%d)",
+                      tid, name, claim_id[:8], need,
+                      task.get("delivered_quantity", 0), task["target_quantity"])
 
         self._open_trade_id = None
         try:
@@ -134,14 +136,14 @@ class Worker:
 
             self._hand_over(task, transfer)
             self._open_trade_id = None  # 已成功确认，不再需要清理
-            self.store.deliver(tid, transfer)
-            self.store.record_pending_trade(tid, None)
+            self.store.deliver(tid, claim_id, transfer)
+            self.store.record_pending_trade(tid, claim_id, None)
             self.log.info("任务[%s]本批完成，进度已写入。", tid)
 
         except Exception as e:
             self.log.error("任务[%s]执行失败: %s", tid, e)
-            self._cleanup_trade(tid)
-            self.store.release(tid, note=str(e))
+            self._cleanup_trade(tid, claim_id)
+            self.store.release(tid, claim_id, note=str(e))
             self._sleep(self.idle_sleep)  # 出错后冷却，避免疯狂重试打服务器
 
     def _hand_over(self, task: Dict[str, Any], quantity: int) -> int:
@@ -153,7 +155,7 @@ class Worker:
         trade_id = self.client.create_trade(target_character_id=self.target_id)
         self._open_trade_id = trade_id
         # 先记下 trade_id：即使后面任何一步失败，也知道服务端挂着哪笔交易（修复 #10）
-        self.store.record_pending_trade(tid, trade_id)
+        self.store.record_pending_trade(tid, task["claim_id"], trade_id)
         self.log.info("交易已创建(ID: %s)", trade_id)
 
         self.client.add_item_to_trade(
@@ -177,18 +179,18 @@ class Worker:
         self.log.info("已确认交易#%s，等待大号接收。", trade_id)
         return trade_id
 
-    def _cleanup_trade(self, task_id: str) -> None:
-        """失败时尽力取消残留交易；取消不了就保留 trade_id 供人工处理。"""
+    def _cleanup_trade(self, task_id: str, claim_id: str) -> None:
+        """失败时尽力取消残留交易；取消不了就保留在对应 claim 供人工处理。"""
         trade_id = self._open_trade_id
         if trade_id is None:
             return
         self._open_trade_id = None
         try:
             self.client.cancel_trade(trade_id, target_character_id=self.target_id)
-            self.store.record_pending_trade(task_id, None)
+            self.store.record_pending_trade(task_id, claim_id, None)
             self.log.info("已取消残留交易 #%s", trade_id)
         except Exception as e:
-            self.log.warning("残留交易#%s未能自动取消(%s)，已保留在 tasks.json 的 "
+            self.log.warning("残留交易#%s未能自动取消(%s)，已保留在对应 claim 的 "
                              "pending_trade_id，请人工检查。", trade_id, e)
 
     # ------------------------------------------------------------------
