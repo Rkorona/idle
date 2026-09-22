@@ -154,29 +154,20 @@ class IdleMMOClient:
                 self.endpoints[key] = self._extract_clean_url(m.group(1))
 
         # 6. 页面底部动态 game_data 签名链接池
-        for match in re.finditer(r'"([^"]+?\.(?:endpoint|create|delete|get))":"([^"]+)"', html):
+        for match in re.finditer(
+            r"""["']([^"']+?\.(?:endpoint|create|delete|get))["']\s*:\s*["']([^"']+)["']""",
+            html,
+        ):
             ep_key, ep_val = match.groups()
             self.endpoints[ep_key] = self._extract_clean_url(ep_val)
 
-        # 6. 出售端点位于页面 game_data.item.item_sell_to_vendor 中，
-        # 而不是背包 API 返回的 item.routes。它同样是短期签名 URL。
-        # 页面可能是 JSON，也可能是 HTML 内嵌的 JS 对象，故允许单/双引号和空白。
-        sell_match = re.search(
-            r'["\']item_sell_to_vendor["\']\s*:\s*\{'
-            r'(?P<body>[^{}]{0,2000}?)\}',
-            html,
-            re.IGNORECASE | re.DOTALL,
-        )
-        if sell_match:
-            endpoint_match = re.search(
-                r'["\']endpoint["\']\s*:\s*["\']([^"\']+)["\']',
-                sell_match.group("body"),
-                re.IGNORECASE,
-            )
-            if endpoint_match:
-                self.endpoints["item.vendor.sell.endpoint"] = self._extract_clean_url(
-                    endpoint_match.group(1)
-                )
+        # 6. 出售端点在页面 game_data 中以展平路径保存：
+        # {"item.item_sell_to_vendor.endpoint": "..."}。
+        # 统一成业务层使用的键名；背包 API 的 item.routes 只有
+        # sellable_to_vendor 布尔值，不包含这个短期签名 URL。
+        sell_endpoint = self.endpoints.get("item.item_sell_to_vendor.endpoint")
+        if isinstance(sell_endpoint, str) and sell_endpoint:
+            self.endpoints["item.vendor.sell.endpoint"] = sell_endpoint
 
     def _runtime_fields(self) -> Dict[str, Any]:
         if "runtime_field" in self.runtime_meta and "runtime_value" in self.runtime_meta:
@@ -584,7 +575,7 @@ class IdleMMOClient:
         if not isinstance(sell_url, str) or not sell_url:
             raise GameAPIError(
                 "未找到当前页面的出售签名端点 "
-                "(game_data.item.item_sell_to_vendor.endpoint)"
+                "(game_data 的 item.item_sell_to_vendor.endpoint)"
             )
         sell_url = self._extract_clean_url(sell_url)
 

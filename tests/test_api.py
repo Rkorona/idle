@@ -94,22 +94,20 @@ class TestSellItem(unittest.TestCase):
             self.client.sell_item(201, 1)
         self.client._post.assert_not_called()
 
-    def test_extracts_signed_sell_endpoint_from_game_data(self):
+    def test_maps_flattened_game_data_sell_endpoint(self):
         html = r"""
         <script>
-          window.game_data = {
-            "item": {
-              "item_sell_to_vendor": {
-                "endpoint": "https:\/\/web.idle-mmo.com\/api\/item\/vendor\/sell?expires=123&signature=abc"
-              }
-            }
-          };
+          let game_data = [];
+          game_data.push({
+            "item.item_sell_to_vendor.endpoint":
+              "https:\/\/web.idle-mmo.com\/api\/item\/vendor\/sell?expires=456\u0026signature=def"
+          });
         </script>
         """
         self.client._parse_page_context(html)
         self.assertEqual(
             self.client.endpoints["item.vendor.sell.endpoint"],
-            "https://web.idle-mmo.com/api/item/vendor/sell?expires=123&signature=abc",
+            "https://web.idle-mmo.com/api/item/vendor/sell?expires=456&signature=def",
         )
 
 
