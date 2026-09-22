@@ -17,9 +17,9 @@ sell_plan:
     batch_size: 50
     gather_seconds: 47.6
     
-  - name: "Oak Log"
+  - name: "Tin Ore"
     skill: "mining"
-    skill_item_id: 1
-    inventory_item_id: 1
+    skill_item_id: 11
+    inventory_item_id: 23
     batch_size: 100
-    gather_seconds: 10.9
+    gather_seconds: 13.8
