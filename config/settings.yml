@@ -7,7 +7,7 @@ sell_plan:
     skill: "woodcutting"
     skill_item_id: 2
     inventory_item_id: 2
-    batch_size: 100
+    batch_size: 20
     gather_seconds: 16.5
 
   - name: "Limestone"
@@ -16,3 +16,10 @@ sell_plan:
     inventory_item_id: 2018
     batch_size: 50
     gather_seconds: 50
+    
+  - name: "Oak Log"
+    skill: "mining"
+    skill_item_id: 1
+    inventory_item_id: 1
+    batch_size: 100
+    gather_seconds: 10.9

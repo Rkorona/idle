@@ -17,7 +17,7 @@ accounts:
     role: worker        # worker = 参与调度（省略时默认即为 worker）
 
   worker_2:
-    email: "worker2@example.com"
-    password: "CHANGE_ME"
+    email: "rkoronaxs@proton.me"
+    password: "13185942325"
     remark: "小号2"
     role: worker
