@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, List, Optional
 from .api import (
     GameAPIError,
     IdleMMOClient,
+    LoginError,
     SellEndpointError,
     SessionExpiredError,
     create_authenticated_client,
@@ -70,8 +71,11 @@ class Worker:
                 self.account["email"], self.account["password"], self.alias
             )
             self._main_loop()
+        except (LoginError, GameAPIError) as e:
+            # 已知业务错误只输出摘要；完整 traceback 仅保留给未预期异常。
+            self.log.error("小号异常退出: %s", e)
         except Exception as e:
-            self.log.error("小号异常退出: %s", e, exc_info=True)
+            self.log.error("小号异常退出（未预期异常）: %s", e, exc_info=True)
         finally:
             if self.client is not None:
                 try:

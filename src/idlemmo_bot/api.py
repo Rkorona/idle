@@ -68,9 +68,8 @@ class IdleMMOClient:
 
             if attempt < HTTP_MAX_RETRIES:
                 delay = HTTP_BACKOFF_BASE ** (attempt + 1)
-                reason = f"HTTP {res.status_code}" if res is not None else repr(last_exc)
-                self.log.warning("请求 %s %s 失败(%s)，%.0f 秒后重试 (%d/%d)",
-                                 method, url[:80], reason, delay, attempt + 1, HTTP_MAX_RETRIES)
+                self.log.warning("请求暂时失败，%.0f 秒后重试 (%d/%d)",
+                                 delay, attempt + 1, HTTP_MAX_RETRIES)
                 time.sleep(delay)
             elif res is not None:
                 return res  # 重试耗尽，把最后一次响应交给上层判断
@@ -332,7 +331,6 @@ class IdleMMOClient:
         })
 
         res = self._post(start_url, json=payload, headers=self.get_auth_headers(referer=skill_page_url))
-        self.log.info("启动采集响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         if res.status_code == 200:
             data = res.json()
@@ -359,7 +357,6 @@ class IdleMMOClient:
 
         payload = self._build_post_payload({"character_id": str(self.character_id)})
         res = self._post(cancel_url, json=payload, headers=self.get_auth_headers(referer=referer))
-        self.log.info("取消动作响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         time.sleep(2)  # 给服务端落库留出缓冲
         still = self.get_active_action()
@@ -454,7 +451,6 @@ class IdleMMOClient:
         })
         res = self._post(add_url, json=payload,
                          headers=self.get_auth_headers(referer=self._trade_referer(target_character_id)))
-        self.log.info("放入物品响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         if res.status_code != 200:
             raise GameAPIError(f"放入物品接口返回异常 (HTTP {res.status_code}): {res.text}")
@@ -507,11 +503,10 @@ class IdleMMOClient:
         full_payload.update(self._runtime_fields())
 
         res = self._post(accept_url, json=full_payload, headers=headers)
-        self.log.info("确认交易响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         if res.status_code != 200:
             # 第一种混淆载荷被拦截时，退回纯净载荷(去除 ts 和 qty)再试一次
-            self.log.info("尝试使用纯净载荷再次确认交易...")
+            self.log.warning("确认交易未成功，尝试备用请求...")
             clean_payload: Dict[str, Any] = {
                 "character_trade_id": int(trade_id),
                 "v": "1.0.0.1",
@@ -519,7 +514,6 @@ class IdleMMOClient:
             }
             clean_payload.update(self._runtime_fields())
             res = self._post(accept_url, json=clean_payload, headers=headers)
-            self.log.info("纯净载荷确认响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         if res.status_code != 200:
             raise GameAPIError(f"确认交易失败 (HTTP {res.status_code}): {res.text}")
@@ -611,7 +605,6 @@ class IdleMMOClient:
             json=payload,
             headers=self.get_auth_headers(referer=INVENTORY_URL),
         )
-        self.log.info("出售物品响应 HTTP %s: %s", res.status_code, res.text[:200])
 
         self._raise_if_expired_session(res, "出售物品请求")
         if res.status_code != 200:
