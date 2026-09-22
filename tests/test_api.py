@@ -175,6 +175,14 @@ class TestRecipientTrade(unittest.TestCase):
         with self.assertRaises(SessionExpiredError):
             self.client.accept_trade_as_recipient(1335686)
 
+    def test_classifies_login_redirect_as_expired_recipient_session(self):
+        self.client._post.return_value = response(302, {})
+        self.client._post.return_value.headers = {
+            "location": "https://web.idle-mmo.com/login"
+        }
+        with self.assertRaises(SessionExpiredError):
+            self.client.accept_trade_as_recipient(1335686)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

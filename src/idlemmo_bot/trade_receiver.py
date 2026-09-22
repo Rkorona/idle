@@ -39,6 +39,9 @@ class TradeReceiver:
         self._queued = set()
         self._queue_lock = threading.Lock()
         self._thread: Optional[threading.Thread] = None
+        # 一旦旧会话被判定为过期，在重新登录成功前禁止继续使用它。
+        self._reauth_required = False
+        self._reauth_cause: Optional[SessionExpiredError] = None
 
     def start(self) -> None:
         """启动接收线程，并先恢复上次运行留下的挂起交易。"""
@@ -77,8 +80,17 @@ class TradeReceiver:
 
             trade_id = int(record["trade_id"])
             try:
+                if self._reauth_required:
+                    cause = self._reauth_cause or SessionExpiredError(
+                        "大号会话需要重新登录"
+                    )
+                    self._reauthenticate(cause)
+                    self._reauth_required = False
+                    self._reauth_cause = None
                 self._process(record)
             except SessionExpiredError as exc:
+                self._reauth_required = True
+                self._reauth_cause = exc
                 try:
                     self._reauthenticate(exc)
                 except Exception as reauth_exc:
@@ -89,6 +101,8 @@ class TradeReceiver:
                     )
                     self._retry(record, trade_id)
                 else:
+                    self._reauth_required = False
+                    self._reauth_cause = None
                     self._retry(record, trade_id)
                 continue
             except Exception as exc:

@@ -1,1 +1,2 @@
 - [Vendor sell API](vendor-sell-api.md) — success responses omit gold; calculate proceeds from the current item value and sold quantity.
+- [Trade receiver session recovery](trade-receiver-session-recovery.md) — never reuse an expired main-account client while pending trades await reauthentication.

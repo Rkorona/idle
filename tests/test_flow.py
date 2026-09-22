@@ -161,6 +161,18 @@ class AlwaysExpiredMainReceiverClient(FakeMainReceiverClient):
         raise SessionExpiredError("模拟大号会话持续过期")
 
 
+class ExpiringAcceptMainReceiverClient(FakeMainReceiverClient):
+    def __init__(self):
+        super().__init__()
+        self.expire_next_accept = True
+
+    def accept_trade_as_recipient(self, trade_id):
+        if self.expire_next_accept:
+            self.expire_next_accept = False
+            raise SessionExpiredError("模拟大号确认交易时会话过期")
+        super().accept_trade_as_recipient(trade_id)
+
+
 class RecordingReceiver:
     def __init__(self):
         self.records = []
@@ -400,6 +412,44 @@ class TestTaskStore(unittest.TestCase):
         self.assertEqual(factory_calls, [("main@example.com", "main")])
         self.assertIs(receiver.client, replacement)
         self.assertEqual(replacement.accepted, [790])
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
+
+    def test_trade_receiver_reauthenticates_if_accept_request_expires(self):
+        s = make_store([make_task("a", 10, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 792, item_id=2, quantity=10)
+        record = s.move_claim_to_pending_trade(
+            "a", claim["claim_id"], 792, item_id=2, quantity=10
+        )
+        stop = threading.Event()
+        old_client = ExpiringAcceptMainReceiverClient()
+        replacement = FakeMainReceiverClient()
+
+        def factory(email, password, alias):
+            return replacement
+
+        receiver = TradeReceiver(
+            s,
+            old_client,
+            stop,
+            retry_seconds=1,
+            account={"email": "main@example.com", "password": "secret", "alias": "main"},
+            client_factory=factory,
+            expected_character_id=999,
+        )
+        receiver.start()
+        receiver.submit(record)
+
+        deadline = time.time() + 4
+        while time.time() < deadline:
+            if s.snapshot()[0]["status"] == COMPLETED:
+                break
+            time.sleep(0.01)
+        stop.set()
+        receiver.stop_and_wait()
+
+        self.assertIs(receiver.client, replacement)
+        self.assertEqual(replacement.accepted, [792])
         self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
 
     def test_reauth_failure_keeps_pending_trade_and_receiver_alive(self):

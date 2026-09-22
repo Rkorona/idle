@@ -84,16 +84,36 @@ class IdleMMOClient:
 
     @staticmethod
     def _looks_like_expired_session(res: httpx.Response) -> bool:
-        """识别站点用来表示鉴权/签名失效的通用 401/403 响应。"""
-        if res.status_code not in (401, 403):
-            return False
+        """识别鉴权失效、登录重定向和登录页响应。"""
+        status_code = getattr(res, "status_code", None)
         try:
             data = res.json()
         except ValueError:
             data = None
         message = data.get("message", "") if isinstance(data, dict) else ""
-        text = f"{message} {res.text}".lower()
-        return "session has expired" in text or "restart the app" in text
+        text = f"{message} {getattr(res, 'text', '')}".lower()
+        if "session has expired" in text or "restart the app" in text:
+            return True
+        if status_code in (401, 403):
+            return True
+
+        headers = getattr(res, "headers", {}) or {}
+        location = str(headers.get("location", "")).lower()
+        if status_code in (301, 302, 303, 307, 308) and "/login" in location:
+            return True
+
+        # 某些接口在会话失效时返回 HTTP 200 的登录 HTML，而不是 JSON。
+        return IdleMMOClient._looks_like_login_page(res)
+
+    @staticmethod
+    def _looks_like_login_page(res: httpx.Response) -> bool:
+        """识别 API 被重定向/降级成登录页的情况。"""
+        text = str(getattr(res, "text", "") or "").lower()
+        return (
+            "<title>login" in text
+            or 'name="_token"' in text and "/login" in text
+            or 'name="csrf-token"' in text and "/login" in text
+        )
 
     def _raise_if_expired_session(self, res: httpx.Response, action: str) -> None:
         if self._looks_like_expired_session(res):
