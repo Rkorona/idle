@@ -54,6 +54,17 @@ def get_account(alias: Optional[str] = None, path: Path = ACCOUNTS_FILE) -> Dict
     return _normalize(target, accounts[target])
 
 
+def get_main_account(path: Path = ACCOUNTS_FILE) -> Dict[str, str]:
+    """读取收货大号，并拒绝把普通 worker 当成收货方。"""
+    account = get_account(path=path)
+    if account["role"] != "main":
+        raise AccountConfigError(
+            f"default_account '{account['alias']}' 必须配置 role: main，"
+            "大号不能参与小号挂机调度"
+        )
+    return account
+
+
 def get_worker_accounts(path: Path = ACCOUNTS_FILE) -> List[Dict[str, str]]:
     """获取所有参与调度的小号(role == worker)。
 

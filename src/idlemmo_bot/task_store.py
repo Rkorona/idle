@@ -49,7 +49,7 @@ def batch_of(task: Dict[str, Any]) -> int:
 
 
 def claimed_of(task: Dict[str, Any]) -> int:
-    """当前已经被 claim 预留、但尚未交付的数量。"""
+    """当前已被 claim 预留、但尚未进入挂起交易的数量。"""
     total = 0
     for claim in task.get("active_claims", []) or []:
         try:
@@ -59,9 +59,27 @@ def claimed_of(task: Dict[str, Any]) -> int:
     return total
 
 
+def pending_of(task: Dict[str, Any]) -> int:
+    """已经发起交易、等待收货方确认的数量。"""
+    total = 0
+    for trade in task.get("pending_trades", []) or []:
+        quantity = trade.get("quantity")
+        if quantity is None:
+            # 兼容旧版本只记录 trade_id 的残留数据；未知数量不能
+            # 擅自从任务进度中扣除，交由人工/接口核验。
+            continue
+        try:
+            total += int(quantity)
+        except (TypeError, ValueError) as e:
+            raise TaskStoreError(
+                f"任务 {task.get('task_id')} 包含无效 pending_trade 数量"
+            ) from e
+    return total
+
+
 def available_of(task: Dict[str, Any]) -> int:
-    """尚未交付且尚未被其它小号预留的数量。"""
-    return max(0, remaining_of(task) - claimed_of(task))
+    """尚未交付、claim 或挂起交易预留的数量。"""
+    return max(0, remaining_of(task) - claimed_of(task) - pending_of(task))
 
 
 class TaskStore:
@@ -146,7 +164,10 @@ class TaskStore:
                         self._preserve_pending_trade(t, claim)
                     t["active_claims"] = []
                     t["assigned_to"] = None
-                    notes.append(f"{tid}: 上次运行遗留的 active_claims，已释放")
+                    notes.append(
+                        f"{tid}: 上次运行遗留的 active_claims，已释放；"
+                        "其中挂起交易已转为持久记录"
+                    )
                     changed = True
                 if t.get("status") != COMPLETED and remaining_of(t) == 0:
                     t["status"] = COMPLETED
@@ -175,6 +196,9 @@ class TaskStore:
             "worker": claim.get("worker"),
             "trade_id": trade_id,
         }
+        for key in ("item_id", "quantity", "status", "created_at"):
+            if key in claim:
+                entry[key] = claim[key]
         if entry not in pending:
             pending.append(entry)
 
@@ -269,9 +293,14 @@ class TaskStore:
             self._save(data)
 
     def record_pending_trade(
-        self, task_id: str, claim_id: str, trade_id: Optional[int]
+        self,
+        task_id: str,
+        claim_id: str,
+        trade_id: Optional[int],
+        item_id: Optional[int] = None,
+        quantity: Optional[int] = None,
     ) -> None:
-        """记录(或清除)某个 claim 的挂起交易 ID。"""
+        """记录(或清除)某个 claim 的挂起交易及其材料占用。"""
         with self._lock:
             data = self._load()
             t = self._find(data, task_id)
@@ -286,9 +315,145 @@ class TaskStore:
                 raise TaskStoreError(f"任务 {task_id} 不存在 claim: {claim_id}")
             if trade_id is None:
                 claim.pop("pending_trade_id", None)
+                claim.pop("item_id", None)
+                claim.pop("quantity", None)
+                claim.pop("status", None)
+                claim.pop("created_at", None)
             else:
                 claim["pending_trade_id"] = trade_id
+                if item_id is not None:
+                    claim["item_id"] = int(item_id)
+                if quantity is not None:
+                    if int(quantity) <= 0:
+                        raise TaskStoreError("挂起交易数量必须为正数")
+                    claim["quantity"] = int(quantity)
+                if item_id is not None or quantity is not None:
+                    claim.setdefault("status", "CREATED")
+                    claim.setdefault("created_at", time.time())
             self._save(data)
+
+    def move_claim_to_pending_trade(
+        self,
+        task_id: str,
+        claim_id: str,
+        trade_id: int,
+        item_id: int,
+        quantity: int,
+    ) -> Dict[str, Any]:
+        """小号确认后，把 claim 转为可跨进程恢复的挂起交易记录。
+
+        此时交易仍可能只是 PENDING，不能推进 delivered_quantity。
+        """
+        if quantity <= 0:
+            raise TaskStoreError("挂起交易数量必须为正数")
+        with self._lock:
+            data = self._load()
+            task = self._find(data, task_id)
+            claims = task.get("active_claims") or []
+            claim = next((c for c in claims if c.get("claim_id") == claim_id), None)
+            if claim is None:
+                raise TaskStoreError(f"任务 {task_id} 不存在 claim: {claim_id}")
+            if claim.get("pending_trade_id") not in (None, trade_id):
+                raise TaskStoreError(
+                    f"claim {claim_id} 已绑定其它交易: {claim.get('pending_trade_id')}"
+                )
+
+            claims.remove(claim)
+            task["active_claims"] = claims
+            pending = task.setdefault("pending_trades", [])
+            entry = {
+                "claim_id": claim_id,
+                "worker": claim.get("worker"),
+                "trade_id": int(trade_id),
+                "item_id": int(item_id),
+                "quantity": int(quantity),
+                "status": "WAITING_PARTNER",
+                "created_at": claim.get("created_at", time.time()),
+            }
+            pending[:] = [
+                item for item in pending if item.get("trade_id") != int(trade_id)
+            ]
+            pending.append(entry)
+            task["status"] = PENDING
+            task["assigned_to"] = None
+            self._save(data)
+            return dict(entry)
+
+    def pending_trade_records(self) -> List[Dict[str, Any]]:
+        """返回带 task_id 的挂起交易快照，供大号接收线程恢复。"""
+        with self._lock:
+            records: List[Dict[str, Any]] = []
+            for task in self._load()["tasks"]:
+                for trade in task.get("pending_trades", []) or []:
+                    record = dict(trade)
+                    record["task_id"] = task.get("task_id")
+                    records.append(record)
+            return records
+
+    def pending_quantity_for_worker(self, worker: str, item_id: int) -> int:
+        """某小号仍锁定在服务端挂起交易中的材料数量。"""
+        with self._lock:
+            total = 0
+            for task in self._load()["tasks"]:
+                for trade in task.get("pending_trades", []) or []:
+                    if (
+                        trade.get("worker") == worker
+                        and trade.get("item_id") == item_id
+                    ):
+                        total += int(trade.get("quantity", 0))
+            return total
+
+    def complete_pending_trade(self, trade_id: int) -> Optional[Dict[str, Any]]:
+        """交易状态确认 PROCESSED 后，幂等地推进任务进度。"""
+        with self._lock:
+            data = self._load()
+            for task in data["tasks"]:
+                pending = task.get("pending_trades") or []
+                trade = next(
+                    (item for item in pending if item.get("trade_id") == int(trade_id)),
+                    None,
+                )
+                if trade is None:
+                    continue
+                quantity = trade.get("quantity")
+                if quantity is None:
+                    raise TaskStoreError(
+                        f"交易 {trade_id} 缺少数量，拒绝自动结算"
+                    )
+                pending.remove(trade)
+                task["delivered_quantity"] = (
+                    int(task.get("delivered_quantity", 0)) + int(quantity)
+                )
+                task["status"] = (
+                    COMPLETED if remaining_of(task) == 0 else PENDING
+                )
+                task["assigned_to"] = None
+                self._save(data)
+                return dict(task)
+            return None
+
+    def fail_pending_trade(
+        self, trade_id: int, note: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        """交易取消/明确失败后释放其预留数量，不增加已交付量。"""
+        with self._lock:
+            data = self._load()
+            for task in data["tasks"]:
+                pending = task.get("pending_trades") or []
+                trade = next(
+                    (item for item in pending if item.get("trade_id") == int(trade_id)),
+                    None,
+                )
+                if trade is None:
+                    continue
+                pending.remove(trade)
+                task["status"] = PENDING
+                task["assigned_to"] = None
+                if note:
+                    task["last_error"] = note
+                self._save(data)
+                return dict(task)
+            return None
 
     def has_open_tasks(self) -> bool:
         """是否还有未完成的任务(包含正在被别的小号处理的)。"""

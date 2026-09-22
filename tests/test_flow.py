@@ -30,6 +30,7 @@ from idlemmo_bot.task_store import (  # noqa: E402
     COMPLETED, IN_PROGRESS, PENDING, TaskStore, batch_of,
 )
 from idlemmo_bot.worker import Worker  # noqa: E402
+from idlemmo_bot.trade_receiver import TradeReceiver  # noqa: E402
 
 
 # ----------------------------------------------------------------------
@@ -113,6 +114,41 @@ class FakeClient:
 
     def close(self):
         pass
+
+
+class FakeMainReceiverClient:
+    """模拟大号：第一次查看为 PENDING，确认后变为 PROCESSED。"""
+
+    def __init__(self):
+        self.character_name = "main"
+        self.accepted = []
+
+    def _trade_page_url(self, trade_id):
+        return f"https://web.idle-mmo.com/@main?character_trade_id={trade_id}"
+
+    def get_trade_details(self, trade_id, trade_page_url=None):
+        status = "PROCESSED" if trade_id in self.accepted else "PENDING"
+        return {
+            "trade": {
+                "status": status,
+                "offers": {
+                    "them": {
+                        "items": [{"id": 2, "quantity": 10}],
+                    },
+                },
+            },
+        }
+
+    def accept_trade_as_recipient(self, trade_id):
+        self.accepted.append(trade_id)
+
+
+class RecordingReceiver:
+    def __init__(self):
+        self.records = []
+
+    def submit(self, record):
+        self.records.append(record)
 
 
 class PrioritySellClient(FakeClient):
@@ -245,7 +281,7 @@ class TestTaskStore(unittest.TestCase):
         self.assertEqual(s.snapshot()[0]["active_claims"], [])
         self.assertEqual(
             s.snapshot()[0]["pending_trades"],
-            [{"claim_id": "stale", "worker": "w1", "trade_id": 123}],
+            [{"claim_id": "stale", "worker": "w1", "trade_id": 123, "quantity": 10}],
         )
 
     def test_release_preserves_uncancelled_trade(self):
@@ -257,8 +293,55 @@ class TestTaskStore(unittest.TestCase):
         self.assertEqual(task["active_claims"], [])
         self.assertEqual(
             task["pending_trades"],
-            [{"claim_id": claim["claim_id"], "worker": "w1", "trade_id": 456}],
+            [{
+                "claim_id": claim["claim_id"],
+                "worker": "w1",
+                "trade_id": 456,
+                "quantity": 10,
+            }],
         )
+
+    def test_pending_trade_reserves_quantity_until_processed(self):
+        s = make_store([make_task("a", 10, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 456, item_id=2, quantity=10)
+        pending = s.move_claim_to_pending_trade(
+            "a", claim["claim_id"], 456, item_id=2, quantity=10
+        )
+
+        self.assertEqual(pending["status"], "WAITING_PARTNER")
+        self.assertIsNone(s.claim_next("w2"))
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 0)
+
+        s.complete_pending_trade(456)
+        task = s.snapshot()[0]
+        self.assertEqual(task["status"], COMPLETED)
+        self.assertEqual(task["delivered_quantity"], 10)
+        self.assertEqual(task["pending_trades"], [])
+
+    def test_trade_receiver_only_completes_after_main_accepts(self):
+        s = make_store([make_task("a", 10, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 789, item_id=2, quantity=10)
+        record = s.move_claim_to_pending_trade(
+            "a", claim["claim_id"], 789, item_id=2, quantity=10
+        )
+        stop = threading.Event()
+        client = FakeMainReceiverClient()
+        receiver = TradeReceiver(s, client, stop, retry_seconds=0.01)
+        receiver.start()
+        receiver.submit(record)
+
+        deadline = time.time() + 2
+        while time.time() < deadline:
+            if s.snapshot()[0]["status"] == COMPLETED:
+                break
+            time.sleep(0.01)
+        stop.set()
+        receiver.stop_and_wait()
+
+        self.assertEqual(client.accepted, [789])
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
 
     def test_atomic_write_leaves_valid_json(self):
         s = make_store([make_task("a", 10, 10)], self.tmp.name)
@@ -368,6 +451,28 @@ class TestWorkerFlow(unittest.TestCase):
 
         self.assertEqual(observed, [30.0])
         self.assertEqual(FakeClient.trades, [("w1", 301, 10)])
+
+    def test_worker_with_receiver_keeps_delivery_pending(self):
+        store = make_store([make_task("oak", 10, 10)], self.tmp.name)
+        receiver = RecordingReceiver()
+        client = FakeClient("w1")
+        w = Worker(
+            account("w1"),
+            store,
+            999,
+            threading.Event(),
+            client_factory=lambda e, p, n: client,
+            trade_receiver=receiver,
+            **FAST,
+        )
+        w.client = client
+        w._do_task(store.claim_next("w1"))
+
+        task = store.snapshot()[0]
+        self.assertEqual(task["delivered_quantity"], 0)
+        self.assertEqual(task["status"], PENDING)
+        self.assertEqual(len(task["pending_trades"]), 1)
+        self.assertEqual(len(receiver.records), 1)
 
     def test_failure_releases_task_and_cleans_trade(self):
         """#10：放物品失败 → 任务放回队列、残留交易被取消、不产生假进度。"""

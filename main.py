@@ -12,7 +12,11 @@ from pathlib import Path
 # 让 `python main.py` 无需安装即可导入 src/ 下的包
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
-from idlemmo_bot.account_manager import AccountConfigError, get_worker_accounts  # noqa: E402
+from idlemmo_bot.account_manager import (  # noqa: E402
+    AccountConfigError,
+    get_main_account,
+    get_worker_accounts,
+)
 from idlemmo_bot.api import GameAPIError, LoginError  # noqa: E402
 from idlemmo_bot.config import PROJECT_ROOT  # noqa: E402
 from idlemmo_bot.logger import get_logger, setup_logging  # noqa: E402
@@ -35,6 +39,7 @@ def main() -> int:
 
     try:
         settings = load_settings()
+        main_account = get_main_account()
         accounts = get_worker_accounts()
         if args.only:
             wanted = set(args.only)
@@ -60,6 +65,7 @@ def main() -> int:
             sell_plan=settings["sell_plan"],
             max_workers=settings["max_concurrent_workers"],
             stagger_seconds=settings["stagger_seconds"],
+            main_account=main_account,
         ).run()
         return 0
 

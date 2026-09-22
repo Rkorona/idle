@@ -128,5 +128,46 @@ class TestSellItem(unittest.TestCase):
         )
 
 
+class TestRecipientTrade(unittest.TestCase):
+    def setUp(self):
+        self.client = IdleMMOClient.__new__(IdleMMOClient)
+        self.client.endpoints = {
+            "trade.accept.endpoint": (
+                "https://web.idle-mmo.com/api/trades/trade/accept"
+                "?expires=1790148679&signature=current"
+            ),
+        }
+        self.client.runtime_meta = {}
+        self.client.character_name = "rkoronax"
+        self.client.log = Mock()
+        self.client._post = Mock(return_value=response(
+            200, {"status": "success", "message": "You have accepted the trade."}
+        ))
+        self.client.get_auth_headers = Mock(
+            side_effect=lambda referer=None: {"referer": referer}
+        )
+
+    def test_uses_recipient_payload_and_trade_page_referer(self):
+        self.client.accept_trade_as_recipient(1335686)
+        url = self.client._post.call_args.args[0]
+        kwargs = self.client._post.call_args.kwargs
+        self.assertEqual(url, self.client.endpoints["trade.accept.endpoint"])
+        self.assertEqual(
+            kwargs["json"],
+            {
+                "character_trade_id": 1335686,
+                "ts2mic5ytx": "UVJd",
+                "qty6bx4peh": "UlZe",
+                "gcem8x71nt": "V1ZQQh1bU1tcXFtXVA==",
+                "v": "1.0.0.1",
+            },
+        )
+        self.assertEqual(
+            kwargs["headers"]["referer"],
+            "https://web.idle-mmo.com/@rkoronax"
+            "?same_window=true&character_trade_id=1335686",
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

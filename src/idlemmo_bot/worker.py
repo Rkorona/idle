@@ -24,6 +24,7 @@ from .config import (
 )
 from .logger import get_logger
 from .task_store import TaskStore, batch_of
+from .trade_receiver import TradeReceiver
 
 # 客户端工厂：默认真实登录，测试时可以注入 mock，做到不联网也能验证流程
 ClientFactory = Callable[[str, str, str], IdleMMOClient]
@@ -38,6 +39,7 @@ class Worker:
         stop_event: threading.Event,
         sell_plan: Optional[List[Dict[str, Any]]] = None,
         client_factory: ClientFactory = create_authenticated_client,
+        trade_receiver: Optional[TradeReceiver] = None,
         poll_interval: float = POLL_INTERVAL,
         idle_sleep: float = IDLE_SLEEP,
     ):
@@ -48,6 +50,7 @@ class Worker:
         self.stop = stop_event
         self.sell_plan = sell_plan or []
         self.client_factory = client_factory
+        self.trade_receiver = trade_receiver
         self.poll_interval = poll_interval
         self.idle_sleep = idle_sleep
 
@@ -114,8 +117,14 @@ class Worker:
 
         self._open_trade_id = None
         try:
-            have = self.client.get_inventory_item_count(task["inventory_item_id"])
-            self.log.info("背包已有[%s]: %d/%d", name, have, need)
+            item_id = task["inventory_item_id"]
+            reserved = self.store.pending_quantity_for_worker(self.alias, item_id)
+            raw_have = self.client.get_inventory_item_count(item_id)
+            have = max(0, raw_have - reserved)
+            self.log.info(
+                "背包已有[%s]: %d，可用%d/%d（挂起交易占用%d）",
+                name, raw_have, have, need, reserved,
+            )
 
             if have < need:
                 self._gather(
@@ -127,18 +136,41 @@ class Worker:
                     gather_seconds=float(task["gather_seconds"]),
                 )
 
-            final_qty = self.client.get_inventory_item_count(task["inventory_item_id"])
+            final_raw_qty = self.client.get_inventory_item_count(item_id)
+            reserved = self.store.pending_quantity_for_worker(self.alias, item_id)
+            final_qty = max(0, final_raw_qty - reserved)
             transfer = min(final_qty, need)
-            self.log.info("背包核验: [%s]共%d个，本次移交%d", name, final_qty, transfer)
+            self.log.info(
+                "背包核验: [%s]实际%d、可用%d，本次移交%d",
+                name, final_raw_qty, final_qty, transfer,
+            )
 
             if transfer <= 0:
                 raise GameAPIError("背包实际数量为0，交货终止")
 
-            self._hand_over(task, transfer)
-            self._open_trade_id = None  # 已成功确认，不再需要清理
-            self.store.deliver(tid, claim_id, transfer)
-            self.store.record_pending_trade(tid, claim_id, None)
-            self.log.info("任务[%s]本批完成，进度已写入。", tid)
+            trade_id = self._hand_over(task, transfer)
+            if self.trade_receiver is None:
+                # 兼容直接注入 FakeClient 的旧调用方；生产入口始终提供
+                # 大号接收线程，不能走这个提前结算分支。
+                self._open_trade_id = None
+                self.store.deliver(tid, claim_id, transfer)
+                self.store.record_pending_trade(tid, claim_id, None)
+                self.log.info("任务[%s]本批完成，进度已写入。", tid)
+                return
+
+            pending = self.store.move_claim_to_pending_trade(
+                tid,
+                claim_id,
+                trade_id,
+                item_id,
+                transfer,
+            )
+            self._open_trade_id = None
+            self.trade_receiver.submit(pending)
+            self.log.info(
+                "交易#%s 已进入等待大号确认，数量暂不计入已交付。",
+                trade_id,
+            )
 
         except Exception as e:
             self.log.error("任务[%s]执行失败: %s", tid, e)
@@ -291,7 +323,10 @@ class Worker:
         gather_seconds = float(plan["gather_seconds"])
         self.log.info("[赚钱]采集[%s]x%d用于出售...", name, batch)
 
-        have = self.client.get_inventory_item_count(plan["inventory_item_id"])
+        item_id = plan["inventory_item_id"]
+        reserved = self.store.pending_quantity_for_worker(self.alias, item_id)
+        raw_have = self.client.get_inventory_item_count(item_id)
+        have = max(0, raw_have - reserved)
         if have < batch:
             self._gather(
                 plan["skill"],
@@ -302,7 +337,9 @@ class Worker:
                 gather_seconds=gather_seconds,
             )
 
-        qty = self.client.get_inventory_item_count(plan["inventory_item_id"])
+        raw_qty = self.client.get_inventory_item_count(item_id)
+        reserved = self.store.pending_quantity_for_worker(self.alias, item_id)
+        qty = max(0, raw_qty - reserved)
         sell_qty = min(qty, batch)
         if sell_qty <= 0:
             raise GameAPIError(f"背包中没有可出售的 [{name}]")

@@ -70,7 +70,35 @@ PENDING ──────────┼─ worker B claim 50 ─交付──�
 | `target_quantity` / `batch_size` | 总需求量 / 单批交付量 |
 | `delivered_quantity` / `status` | 已交付量 / 状态（程序维护，一般不用手改） |
 | `active_claims` | 当前正在处理的批次（程序维护，包含 `claim_id`、`worker`、`quantity`） |
-| `pending_trades` | 无法自动取消的残留交易记录，需人工检查 |
+| `pending_trades` | 小号已确认、等待大号确认的交易（包含 `trade_id`、`item_id`、`quantity`、`status`） |
+
+### 交易接收流程
+
+程序启动后会让 `default_account` 对应的 `role: main` 账号常驻登录，作为收货方处理小号交易：
+
+1. 小号创建交易、放入材料并确认；
+2. 交易写入 `pending_trades`，此时**不会**增加 `delivered_quantity`；
+3. 大号接收线程打开带 `character_trade_id` 的交易页，核验材料和数量后确认；
+4. 只有 `trade/get` 返回 `PROCESSED`，任务才增加已交付量；
+5. 如果程序重启，会先恢复 `pending_trades`，不会因为材料仍显示在小号背包而重复发起交易。
+
+任务可领取数量会同时扣除 `active_claims` 和带数量的 `pending_trades`。因此同一任务需要
+5000 个材料时，多个小号可以安全地分批提交；已经处于 `PENDING` 的批次不会被再次分配。
+
+`config/accounts.yml` 至少应包含：
+
+```yaml
+default_account: "main"
+accounts:
+  main:
+    email: "your-main@example.com"
+    password: "..."
+    role: main
+  worker_1:
+    email: "worker@example.com"
+    password: "..."
+    role: worker
+```
 
 ## 已修复的问题（对应此前审查的编号）
 
@@ -85,6 +113,7 @@ PENDING ──────────┼─ worker B claim 50 ─交付──�
 | 8 | 各交易请求 Referer 不一致 | 统一由 `_trade_referer` 生成 |
 | 9 | 角色名兜底写死 `FoxhopeXV` | 改为报错 |
 | 10 | 失败后残留交易 | 创建即登记到对应 claim；失败时尝试取消，取消不了则保留在 `pending_trades` |
+| 14 | 小号确认后材料未扣除导致重复交易 | 大号常驻接收；仅 `PROCESSED` 结算，挂起交易数量持久化并参与任务分配 |
 | 11 | 账号 `test_1` 写死 | 由 `accounts.yml` 的 `role: worker` 决定 |
 | 12 | 两账号邮箱相同 | 启动时检测，重复即报错 |
 | 13 | 无重试/退避 | 429/5xx/超时自动指数退避重试 |
@@ -105,6 +134,8 @@ PENDING ──────────┼─ worker B claim 50 ─交付──�
 
 **2. 本包没有联网实测**
 开发环境无法访问游戏服务器。我验证了任务领取/并发 claim/状态机/批次计算/失败清理/账号校验及出售协议（离线测试含多线程 claim 压力测试）。**没有验证**的是真实的 HTTP 交互——登录、采集、交易和出售都建议先只启动 1 个小号（`--only`）跑一轮，确认无误再放开并发。
+大号接收协议已按 `包/大号接受交易` 中的抓包实现，但首次运行仍建议先使用 1 个小号确认：
+大号交易页 Referer、材料核验、确认后的 `PROCESSED` 状态和背包变化都正常后，再扩大并发。
 
 **3. 关于账号安全**
 - 之前的 `accounts.yml` 里是明文邮箱和密码，本包**没有包含**它，只提供了 `accounts.example.yml`；

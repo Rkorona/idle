@@ -213,6 +213,15 @@ class IdleMMOClient:
             return f"{BASE_URL}/@{target_character_id}?same_window=true"
         return self.get_profile_url()
 
+    def _trade_page_url(self, trade_id: int) -> str:
+        """当前角色查看指定交易时使用的页面地址。"""
+        if not self.character_name:
+            raise GameAPIError("角色名未知，无法构造交易页面地址")
+        return (
+            f"{BASE_URL}/@{self.character_name}"
+            f"?same_window=true&character_trade_id={int(trade_id)}"
+        )
+
     def get_auth_headers(self, referer: Optional[str] = None) -> Dict[str, str]:
         headers = {
             "authorization": f"Bearer {self.api_token}",
@@ -458,7 +467,12 @@ class IdleMMOClient:
         if data.get("status") != "success":
             raise GameAPIError(f"放入物品业务失败: {data}")
 
-    def get_trade_details(self, trade_id: int, target_character_id: Optional[int] = None) -> Dict[str, Any]:
+    def get_trade_details(
+        self,
+        trade_id: int,
+        target_character_id: Optional[int] = None,
+        trade_page_url: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """核验交易栏中的实际物品数据。
 
         注意：trade/get 属于只读查询，严禁携带 qty 和 ts 字段！
@@ -473,9 +487,10 @@ class IdleMMOClient:
             "gcem8x71nt": "V1ZQQh1dUVBcVllQUg==",
         }
         payload.update(self._runtime_fields())
+        referer = trade_page_url or self._trade_referer(target_character_id)
 
         res = self._post(get_url, json=payload,
-                         headers=self.get_auth_headers(referer=self._trade_referer(target_character_id)))
+                         headers=self.get_auth_headers(referer=referer))
         if res.status_code != 200:
             raise GameAPIError(f"核验交易状态失败 (HTTP {res.status_code}): {res.text}")
         return res.json()
@@ -525,6 +540,39 @@ class IdleMMOClient:
             return
         if isinstance(data, dict) and data.get("status") not in (None, "success"):
             raise GameAPIError(f"确认交易业务失败: {data}")
+
+    def accept_trade_as_recipient(self, trade_id: int) -> None:
+        """由收货方确认一笔已由对方提交的交易。
+
+        大号抓包显示：收货方必须使用带 character_trade_id 的交易页
+        Referer，且确认请求使用与小号确认不同的一组运行时字段。
+        """
+        accept_url = self.endpoints.get("trade.accept.endpoint")
+        if not accept_url:
+            raise GameAPIError("未找到 trade.accept.endpoint 签名链接")
+
+        trade_page_url = self._trade_page_url(trade_id)
+        payload: Dict[str, Any] = {
+            "character_trade_id": int(trade_id),
+            "ts2mic5ytx": "UVJd",
+            "qty6bx4peh": "UlZe",
+            "gcem8x71nt": "V1ZQQh1bU1tcXFtXVA==",
+            "v": "1.0.0.1",
+        }
+        payload.update(self._runtime_fields())
+        res = self._post(
+            accept_url,
+            json=payload,
+            headers=self.get_auth_headers(referer=trade_page_url),
+        )
+        if res.status_code != 200:
+            raise GameAPIError(f"大号确认交易失败 (HTTP {res.status_code}): {res.text}")
+        try:
+            data = res.json()
+        except ValueError as e:
+            raise GameAPIError(f"大号确认交易返回非 JSON: {res.text}") from e
+        if not isinstance(data, dict) or data.get("status") != "success":
+            raise GameAPIError(f"大号确认交易业务失败: {data}")
 
     def cancel_trade(self, trade_id: int, target_character_id: Optional[int] = None) -> None:
         """取消一笔挂起的交易（修复 #10：失败时用于清理，避免残留交易）。
