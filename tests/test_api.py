@@ -47,9 +47,13 @@ class TestSellItem(unittest.TestCase):
         self.client.get_auth_headers = Mock(return_value={"accept": "application/json"})
 
     def test_posts_captured_payload_and_returns_gold(self):
+        self.client.endpoints["item.vendor.sell.endpoint"] = (
+            "https://web.idle-mmo.com/api/item/vendor/sell"
+            "?expires=1790080669&signature=current"
+        )
         self.assertEqual(self.client.sell_item(201, 3), 3)
         url, kwargs = self.client._post.call_args.args[0], self.client._post.call_args.kwargs
-        self.assertEqual(url, "https://web.idle-mmo.com/api/item/vendor/sell")
+        self.assertEqual(url, self.client.endpoints["item.vendor.sell.endpoint"])
         self.assertEqual(
             {key: kwargs["json"][key] for key in (
                 "tier", "quantity", "item_id", "ts2mic5ytx", "qty6bx4peh",
@@ -78,8 +82,35 @@ class TestSellItem(unittest.TestCase):
         self.client._post.return_value = response(
             403, {"message": "Your session has expired. Please restart the app."}
         )
+        self.client.endpoints["item.vendor.sell.endpoint"] = (
+            "https://web.idle-mmo.com/api/item/vendor/sell"
+            "?expires=1790080669&signature=current"
+        )
         with self.assertRaises(SessionExpiredError):
             self.client.sell_item(201, 1)
+
+    def test_rejects_missing_signed_sell_endpoint_before_posting(self):
+        with self.assertRaisesRegex(GameAPIError, "出售签名端点"):
+            self.client.sell_item(201, 1)
+        self.client._post.assert_not_called()
+
+    def test_extracts_signed_sell_endpoint_from_game_data(self):
+        html = r"""
+        <script>
+          window.game_data = {
+            "item": {
+              "item_sell_to_vendor": {
+                "endpoint": "https:\/\/web.idle-mmo.com\/api\/item\/vendor\/sell?expires=123&signature=abc"
+              }
+            }
+          };
+        </script>
+        """
+        self.client._parse_page_context(html)
+        self.assertEqual(
+            self.client.endpoints["item.vendor.sell.endpoint"],
+            "https://web.idle-mmo.com/api/item/vendor/sell?expires=123&signature=abc",
+        )
 
 
 if __name__ == "__main__":

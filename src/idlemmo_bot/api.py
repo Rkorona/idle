@@ -158,6 +158,26 @@ class IdleMMOClient:
             ep_key, ep_val = match.groups()
             self.endpoints[ep_key] = self._extract_clean_url(ep_val)
 
+        # 6. 出售端点位于页面 game_data.item.item_sell_to_vendor 中，
+        # 而不是背包 API 返回的 item.routes。它同样是短期签名 URL。
+        # 页面可能是 JSON，也可能是 HTML 内嵌的 JS 对象，故允许单/双引号和空白。
+        sell_match = re.search(
+            r'["\']item_sell_to_vendor["\']\s*:\s*\{'
+            r'(?P<body>[^{}]{0,2000}?)\}',
+            html,
+            re.IGNORECASE | re.DOTALL,
+        )
+        if sell_match:
+            endpoint_match = re.search(
+                r'["\']endpoint["\']\s*:\s*["\']([^"\']+)["\']',
+                sell_match.group("body"),
+                re.IGNORECASE,
+            )
+            if endpoint_match:
+                self.endpoints["item.vendor.sell.endpoint"] = self._extract_clean_url(
+                    endpoint_match.group(1)
+                )
+
     def _runtime_fields(self) -> Dict[str, Any]:
         if "runtime_field" in self.runtime_meta and "runtime_value" in self.runtime_meta:
             return {self.runtime_meta["runtime_field"]: self.runtime_meta["runtime_value"]}
@@ -347,6 +367,9 @@ class IdleMMOClient:
         res_inv = self._get(INVENTORY_URL)
         if res_inv.status_code != 200:
             raise GameAPIError(f"访问背包页面失败 (HTTP {res_inv.status_code}): {res_inv.text}")
+        # game_data 中的签名端点寿命很短。不要在本次页面没有提供新端点时
+        # 继续复用上一次页面留下的出售 URL。
+        self.endpoints.pop("item.vendor.sell.endpoint", None)
         self._parse_page_context(res_inv.text)
 
         inv_endpoint = self.endpoints.get("trade.inventory.endpoint")
@@ -528,8 +551,8 @@ class IdleMMOClient:
 
         出售接口不会在响应体中返回金币数；抓包中的成功响应只有
         ``result=success`` 和酒馆经验，因此金币按背包物品的 ``value`` 计算。
-        出售地址优先使用物品/页面返回的短期签名地址，找不到时使用同一路径
-        的未签名地址，让服务端明确返回鉴权错误，而不是使用过期抓包签名。
+        出售地址必须使用当前页面返回的短期签名地址；无签名地址时直接报错，
+        不向服务端发送必然会被伪装成 session expired 的无签名请求。
         """
         if not isinstance(item_id, int) or isinstance(item_id, bool) or item_id <= 0:
             raise ValueError("item_id 必须是正整数")
@@ -559,8 +582,10 @@ class IdleMMOClient:
         if not isinstance(sell_url, str) or not sell_url:
             sell_url = self.endpoints.get("item.vendor.sell.endpoint")
         if not isinstance(sell_url, str) or not sell_url:
-            # 抓包确认的固定路径；签名若为必需项，服务端会返回明确的 403。
-            sell_url = f"{BASE_URL}/api/item/vendor/sell"
+            raise GameAPIError(
+                "未找到当前页面的出售签名端点 "
+                "(game_data.item.item_sell_to_vendor.endpoint)"
+            )
         sell_url = self._extract_clean_url(sell_url)
 
         payload = self._build_post_payload({
