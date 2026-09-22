@@ -64,6 +64,7 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 | `task_id` | 任务唯一标识（必须唯一） |
 | `skill` / `skill_item_id` | 采集技能与技能内物品 ID |
 | `inventory_item_id` | 该物品在背包中的 ID |
+| `gather_seconds` | 该材料单个采集动作的实际耗时（秒） |
 | `target_quantity` / `batch_size` | 总需求量 / 单批交付量 |
 | `delivered_quantity` / `status` | 已交付量 / 状态（程序维护，一般不用手改） |
 
@@ -87,6 +88,8 @@ PENDING ──claim──▶ IN_PROGRESS ──交付后已够数──▶ COMPL
 ## ⚠ 需要你处理的事项
 
 出售计划现在会读取背包物品的单价和数量，调用抓包确认的 `/api/item/vendor/sell` 接口完成出售；成功后的金币收益按 `value × quantity` 计算。接口签名地址优先使用页面返回值，不会写入抓包中的过期签名。
+
+任务和 `sell_plan` 都必须填写材料自己的 `gather_seconds`。它用于计算本批预计耗时和超时上限，不再使用统一的全局采集耗时。请填写游戏中该材料单个采集动作的实际耗时。
 
 `sell_plan` 按列表顺序表示优先级：第一项是主材料，只有这一轮采集或出售失败，才会尝试下一项备用材料。当前建议使用 Yew Log（`skill_item_id=2`、`inventory_item_id=2`）作为主材料，Limestone（`skill_item_id=561`、`inventory_item_id=2018`）作为备用材料。每项的 `gather_seconds` 应填写该材料的单轮实际等待时间，避免较慢的备用材料被提前取消。
 

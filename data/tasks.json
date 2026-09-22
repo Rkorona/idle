@@ -9,6 +9,7 @@
       "name": "Oak Log",
       "target_quantity": 100,
       "batch_size": 100,
+      "gather_seconds": 10,
       "delivered_quantity": 100,
       "status": "COMPLETED",
       "assigned_to": null
@@ -21,6 +22,7 @@
       "name": "Coal Ore",
       "target_quantity": 100,
       "batch_size": 100,
+      "gather_seconds": 14,
       "delivered_quantity": 100,
       "status": "COMPLETED",
       "assigned_to": null,

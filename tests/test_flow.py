@@ -38,7 +38,8 @@ from idlemmo_bot.worker import Worker  # noqa: E402
 def make_task(tid, target, batch, delivered=0, status=PENDING, item=1):
     return {"task_id": tid, "skill": "woodcutting", "skill_item_id": item,
             "inventory_item_id": item, "name": tid, "target_quantity": target,
-            "batch_size": batch, "delivered_quantity": delivered, "status": status}
+            "batch_size": batch, "gather_seconds": 10,
+            "delivered_quantity": delivered, "status": status}
 
 
 def make_store(tasks, tmpdir):
@@ -134,7 +135,7 @@ def account(alias):
     return {"alias": alias, "email": f"{alias}@x.com", "password": "pw", "remark": "", "role": "worker"}
 
 
-FAST = dict(poll_interval=0.01, idle_sleep=0.05, seconds_per_gather=0.001)
+FAST = dict(poll_interval=0.01, idle_sleep=0.05)
 
 
 # ----------------------------------------------------------------------
@@ -259,6 +260,35 @@ class TestWorkerFlow(unittest.TestCase):
         self.assertEqual(clients["w1"].actions_started, 0)
         self.assertEqual(FakeClient.trades, [("w1", 1, 10)])
 
+    def test_task_uses_material_specific_gather_time(self):
+        store = make_store([{
+            **make_task("slow_material", 10, 10, item=301),
+            "gather_seconds": 30,
+        }], self.tmp.name)
+        client = FakeClient("w1")
+        observed = []
+
+        def gather(skill, skill_item_id, inventory_item_id, missing, label,
+                   gather_seconds):
+            observed.append(gather_seconds)
+            client.inv[inventory_item_id] = client.inv.get(inventory_item_id, 0) + missing
+
+        w = Worker(
+            account("w1"),
+            store,
+            999,
+            threading.Event(),
+            client_factory=lambda e, p, n: client,
+            **FAST,
+        )
+        w.client = client
+        w._gather = gather
+
+        w._do_task(store.claim_next("w1"))
+
+        self.assertEqual(observed, [30.0])
+        self.assertEqual(FakeClient.trades, [("w1", 301, 10)])
+
     def test_failure_releases_task_and_cleans_trade(self):
         """#10：放物品失败 → 任务放回队列、残留交易被取消、不产生假进度。"""
         store = make_store([make_task("oak", 10, 10)], self.tmp.name)
@@ -280,7 +310,7 @@ class TestWorkerFlow(unittest.TestCase):
         store = make_store([], self.tmp.name)  # 没任务 → 小号会空闲等待
         stop = threading.Event()
         w = Worker(account("w1"), store, 999, stop, idle_sleep=30, poll_interval=0.01,
-                   seconds_per_gather=0.001, client_factory=lambda e, p, n: FakeClient(n))
+                   client_factory=lambda e, p, n: FakeClient(n))
         th = threading.Thread(target=w.run)
         th.start()
         time.sleep(0.2)
@@ -293,7 +323,8 @@ class TestWorkerFlow(unittest.TestCase):
         store = make_store([], self.tmp.name)
         w = Worker(account("w1"), store, 999, threading.Event(),
                    sell_plan=[{"name": "Oak", "skill": "woodcutting", "skill_item_id": 1,
-                               "inventory_item_id": 1, "batch_size": 5}],
+                               "inventory_item_id": 1, "batch_size": 5,
+                               "gather_seconds": 10}],
                    client_factory=lambda e, p, n: FakeClient(n), **FAST)
         w.client = FakeClient("w1")
         w._earn_gold_once()
@@ -306,9 +337,9 @@ class TestWorkerFlow(unittest.TestCase):
         client.inv.update({2: 5, 2018: 5})
         plans = [
             {"name": "Yew Log", "skill": "woodcutting", "skill_item_id": 2,
-             "inventory_item_id": 2, "batch_size": 5},
+             "inventory_item_id": 2, "batch_size": 5, "gather_seconds": 16.5},
             {"name": "Limestone", "skill": "mining", "skill_item_id": 561,
-             "inventory_item_id": 2018, "batch_size": 5},
+             "inventory_item_id": 2018, "batch_size": 5, "gather_seconds": 50},
         ]
         w = Worker(account("w1"), store, 999, threading.Event(),
                    sell_plan=plans, client_factory=lambda e, p, n: client, **FAST)
@@ -325,9 +356,9 @@ class TestWorkerFlow(unittest.TestCase):
         client.inv.update({2: 5, 2018: 5})
         plans = [
             {"name": "Yew Log", "skill": "woodcutting", "skill_item_id": 2,
-             "inventory_item_id": 2, "batch_size": 5},
+             "inventory_item_id": 2, "batch_size": 5, "gather_seconds": 16.5},
             {"name": "Limestone", "skill": "mining", "skill_item_id": 561,
-             "inventory_item_id": 2018, "batch_size": 5},
+             "inventory_item_id": 2018, "batch_size": 5, "gather_seconds": 50},
         ]
         w = Worker(account("w1"), store, 999, threading.Event(),
                    sell_plan=plans, client_factory=lambda e, p, n: client, **FAST)
@@ -344,8 +375,8 @@ class TestWorkerFlow(unittest.TestCase):
         observed = []
 
         def gather(skill, skill_item_id, inventory_item_id, missing, label,
-                   seconds_per_gather=None):
-            observed.append(seconds_per_gather)
+                   gather_seconds):
+            observed.append(gather_seconds)
             client.inv[inventory_item_id] = client.inv.get(inventory_item_id, 0) + missing
 
         plans = [{"name": "Limestone", "skill": "mining", "skill_item_id": 561,

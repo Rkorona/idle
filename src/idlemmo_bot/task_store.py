@@ -59,6 +59,19 @@ class TaskStore:
                 raise TaskStoreError(f"tasks.json 不是合法 JSON: {e}")
         if "tasks" not in data or not isinstance(data["tasks"], list):
             raise TaskStoreError("tasks.json 缺少 tasks 列表")
+        for index, task in enumerate(data["tasks"]):
+            if not isinstance(task, dict):
+                raise TaskStoreError(f"tasks[{index}] 必须是对象")
+            if "gather_seconds" not in task:
+                raise TaskStoreError(f"tasks[{index}] 缺少 gather_seconds")
+            try:
+                gather_seconds = float(task["gather_seconds"])
+            except (TypeError, ValueError) as e:
+                raise TaskStoreError(
+                    f"tasks[{index}].gather_seconds 必须是正数"
+                ) from e
+            if gather_seconds <= 0:
+                raise TaskStoreError(f"tasks[{index}].gather_seconds 必须是正数")
         return data
 
     def _save(self, data: Dict[str, Any]) -> None:

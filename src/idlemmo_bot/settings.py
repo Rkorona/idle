@@ -7,7 +7,13 @@ from .config import MAX_CONCURRENT_WORKERS, PROJECT_ROOT, STAGGER_SECONDS
 
 SETTINGS_FILE = PROJECT_ROOT / "config" / "settings.yml"
 
-_SELL_REQUIRED = ("name", "skill", "skill_item_id", "inventory_item_id")
+_SELL_REQUIRED = (
+    "name",
+    "skill",
+    "skill_item_id",
+    "inventory_item_id",
+    "gather_seconds",
+)
 
 
 class SettingsError(Exception):
@@ -38,7 +44,7 @@ def load_settings(path=SETTINGS_FILE) -> Dict[str, Any]:
         try:
             if int(item.get("batch_size", 50)) <= 0:
                 raise ValueError
-            if float(item.get("gather_seconds", 14)) <= 0:
+            if float(item["gather_seconds"]) <= 0:
                 raise ValueError
         except (TypeError, ValueError):
             raise SettingsError(

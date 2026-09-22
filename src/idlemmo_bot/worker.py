@@ -21,7 +21,6 @@ from .config import (
     GATHER_TIMEOUT_MARGIN,
     IDLE_SLEEP,
     POLL_INTERVAL,
-    SECONDS_PER_GATHER,
 )
 from .logger import get_logger
 from .task_store import TaskStore, batch_of
@@ -41,7 +40,6 @@ class Worker:
         client_factory: ClientFactory = create_authenticated_client,
         poll_interval: float = POLL_INTERVAL,
         idle_sleep: float = IDLE_SLEEP,
-        seconds_per_gather: float = SECONDS_PER_GATHER,
     ):
         self.account = account
         self.alias = account["alias"]
@@ -52,7 +50,6 @@ class Worker:
         self.client_factory = client_factory
         self.poll_interval = poll_interval
         self.idle_sleep = idle_sleep
-        self.seconds_per_gather = seconds_per_gather
 
         self.log = get_logger(self.alias)
         self.client: Optional[IdleMMOClient] = None
@@ -119,8 +116,14 @@ class Worker:
             self.log.info("背包已有[%s]: %d/%d", name, have, need)
 
             if have < need:
-                self._gather(task["skill"], task["skill_item_id"], task["inventory_item_id"],
-                             need - have, name)
+                self._gather(
+                    task["skill"],
+                    task["skill_item_id"],
+                    task["inventory_item_id"],
+                    need - have,
+                    name,
+                    gather_seconds=float(task["gather_seconds"]),
+                )
 
             final_qty = self.client.get_inventory_item_count(task["inventory_item_id"])
             transfer = min(final_qty, need)
@@ -193,7 +196,7 @@ class Worker:
     # ------------------------------------------------------------------
     def _gather(self, skill: str, skill_item_id: int, inventory_item_id: int,
                 missing: int, label: str,
-                seconds_per_gather: Optional[float] = None) -> None:
+                gather_seconds: float) -> None:
         """采集直到背包够数，或超时。结束后保证角色处于空闲。"""
         self.log.info("尚缺%d个[%s]，启动技能[%s]...", missing, label, skill)
 
@@ -203,7 +206,6 @@ class Worker:
 
         self.client.start_gathering(skill_name=skill, skill_item_id=skill_item_id, loops=missing)
 
-        gather_seconds = self.seconds_per_gather if seconds_per_gather is None else seconds_per_gather
         if gather_seconds <= 0:
             raise ValueError(f"每次采集耗时必须大于 0: {gather_seconds}")
         expected = missing * gather_seconds
@@ -284,7 +286,7 @@ class Worker:
         """执行一项赚钱材料计划；失败由调用方决定是否切换备用材料。"""
         name = plan["name"]
         batch = int(plan.get("batch_size", 50))
-        gather_seconds = float(plan.get("gather_seconds", self.seconds_per_gather))
+        gather_seconds = float(plan["gather_seconds"])
         self.log.info("[赚钱]采集[%s]x%d用于出售...", name, batch)
 
         have = self.client.get_inventory_item_count(plan["inventory_item_id"])
@@ -295,7 +297,7 @@ class Worker:
                 plan["inventory_item_id"],
                 batch - have,
                 name,
-                seconds_per_gather=gather_seconds,
+                gather_seconds=gather_seconds,
             )
 
         qty = self.client.get_inventory_item_count(plan["inventory_item_id"])
