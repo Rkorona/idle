@@ -4,16 +4,17 @@
     {
       "task_id": "gather_oak_01",
       "skill": "woodcutting",
-      "skill_item_id": 1,
-      "inventory_item_id": 1,
-      "name": "Oak Log",
-      "target_quantity": 20,
-      "batch_size": 10,
-      "gather_seconds": 10.9,
-      "delivered_quantity": 20,
-      "status": "COMPLETED",
+      "skill_item_id": 11,
+      "inventory_item_id": 23,
+      "name": "Tin Ore",
+      "target_quantity": 500,
+      "batch_size": 2,
+      "gather_seconds": 13.8,
+      "delivered_quantity": 0,
+      "status": "PENDING",
       "assigned_to": null,
-      "active_claims": []
+      "active_claims": [],
+      "pending_trades": []
     },
     {
       "task_id": "gather_coal_02",
@@ -21,11 +22,11 @@
       "skill_item_id": 10,
       "inventory_item_id": 201,
       "name": "Coal Ore",
-      "target_quantity": 100,
-      "batch_size": 100,
+      "target_quantity": 500,
+      "batch_size": 2,
       "gather_seconds": 13.8,
-      "delivered_quantity": 100,
-      "status": "COMPLETED",
+      "delivered_quantity": 0,
+      "status": "PENDING",
       "assigned_to": null,
       "last_error": "启动采集接口异常 (HTTP 400): {\"message\":\"You do not meet the level requirement.\"}"
     }

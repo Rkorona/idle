@@ -5,8 +5,8 @@ default_account: "main"
 
 accounts:
   main:
-    email: "your-main@example.com"
-    password: "CHANGE_ME"
+    email: "kulael3@gmail.com"
+    password: "13185942325yang"
     remark: "大号（收货方）"
     role: main          # main = 不参与自动挂机调度
 
