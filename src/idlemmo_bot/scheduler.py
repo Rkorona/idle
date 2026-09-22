@@ -70,6 +70,9 @@ class Scheduler:
                 store=self.store,
                 client=self.main_client,
                 stop_event=self.stop_event,
+                account=self.main_account,
+                client_factory=self.main_client_factory,
+                expected_character_id=target_id,
             )
             self.trade_receiver.start()
 
@@ -115,6 +118,8 @@ class Scheduler:
         if self.trade_receiver is not None:
             self.stop_event.set()
             self.trade_receiver.stop_and_wait()
+            # 接收线程可能在运行期间替换了过期的大号会话。
+            self.main_client = self.trade_receiver.client
             self.trade_receiver = None
         if self.main_client is not None:
             try:

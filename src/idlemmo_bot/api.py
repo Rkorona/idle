@@ -491,6 +491,7 @@ class IdleMMOClient:
 
         res = self._post(get_url, json=payload,
                          headers=self.get_auth_headers(referer=referer))
+        self._raise_if_expired_session(res, "核验交易状态请求")
         if res.status_code != 200:
             raise GameAPIError(f"核验交易状态失败 (HTTP {res.status_code}): {res.text}")
         return res.json()
@@ -565,6 +566,7 @@ class IdleMMOClient:
             json=payload,
             headers=self.get_auth_headers(referer=trade_page_url),
         )
+        self._raise_if_expired_session(res, "大号确认交易请求")
         if res.status_code != 200:
             raise GameAPIError(f"大号确认交易失败 (HTTP {res.status_code}): {res.text}")
         try:

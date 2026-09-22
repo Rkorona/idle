@@ -168,6 +168,13 @@ class TestRecipientTrade(unittest.TestCase):
             "?same_window=true&character_trade_id=1335686",
         )
 
+    def test_classifies_expired_recipient_session(self):
+        self.client._post.return_value = response(
+            403, {"message": "Your session has expired. Please restart the app."}
+        )
+        with self.assertRaises(SessionExpiredError):
+            self.client.accept_trade_as_recipient(1335686)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

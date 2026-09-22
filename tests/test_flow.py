@@ -24,7 +24,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from idlemmo_bot.account_manager import AccountConfigError, get_worker_accounts  # noqa: E402
-from idlemmo_bot.api import GameAPIError  # noqa: E402
+from idlemmo_bot.api import GameAPIError, SessionExpiredError  # noqa: E402
 from idlemmo_bot.scheduler import Scheduler  # noqa: E402
 from idlemmo_bot.task_store import (  # noqa: E402
     COMPLETED, IN_PROGRESS, PENDING, TaskStore, batch_of,
@@ -121,6 +121,7 @@ class FakeMainReceiverClient:
 
     def __init__(self):
         self.character_name = "main"
+        self.character_id = "999"
         self.accepted = []
 
     def _trade_page_url(self, trade_id):
@@ -141,6 +142,23 @@ class FakeMainReceiverClient:
 
     def accept_trade_as_recipient(self, trade_id):
         self.accepted.append(trade_id)
+
+
+class ExpiringMainReceiverClient(FakeMainReceiverClient):
+    def __init__(self):
+        super().__init__()
+        self.expire_next_read = True
+
+    def get_trade_details(self, trade_id, trade_page_url=None):
+        if self.expire_next_read:
+            self.expire_next_read = False
+            raise SessionExpiredError("模拟大号会话过期")
+        return super().get_trade_details(trade_id, trade_page_url)
+
+
+class AlwaysExpiredMainReceiverClient(FakeMainReceiverClient):
+    def get_trade_details(self, trade_id, trade_page_url=None):
+        raise SessionExpiredError("模拟大号会话持续过期")
 
 
 class RecordingReceiver:
@@ -342,6 +360,81 @@ class TestTaskStore(unittest.TestCase):
 
         self.assertEqual(client.accepted, [789])
         self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
+
+    def test_trade_receiver_reauthenticates_after_session_expiry(self):
+        s = make_store([make_task("a", 10, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 790, item_id=2, quantity=10)
+        record = s.move_claim_to_pending_trade(
+            "a", claim["claim_id"], 790, item_id=2, quantity=10
+        )
+        stop = threading.Event()
+        old_client = AlwaysExpiredMainReceiverClient()
+        replacement = FakeMainReceiverClient()
+        factory_calls = []
+
+        def factory(email, password, alias):
+            factory_calls.append((email, alias))
+            return replacement
+
+        receiver = TradeReceiver(
+            s,
+            old_client,
+            stop,
+            retry_seconds=1,
+            account={"email": "main@example.com", "password": "secret", "alias": "main"},
+            client_factory=factory,
+            expected_character_id=999,
+        )
+        receiver.start()
+        receiver.submit(record)
+
+        deadline = time.time() + 4
+        while time.time() < deadline:
+            if s.snapshot()[0]["status"] == COMPLETED:
+                break
+            time.sleep(0.01)
+        stop.set()
+        receiver.stop_and_wait()
+
+        self.assertEqual(factory_calls, [("main@example.com", "main")])
+        self.assertIs(receiver.client, replacement)
+        self.assertEqual(replacement.accepted, [790])
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 10)
+
+    def test_reauth_failure_keeps_pending_trade_and_receiver_alive(self):
+        s = make_store([make_task("a", 10, 10)], self.tmp.name)
+        claim = s.claim_next("w1")
+        s.record_pending_trade("a", claim["claim_id"], 791, item_id=2, quantity=10)
+        record = s.move_claim_to_pending_trade(
+            "a", claim["claim_id"], 791, item_id=2, quantity=10
+        )
+        stop = threading.Event()
+        old_client = ExpiringMainReceiverClient()
+        attempts = []
+
+        def failing_factory(email, password, alias):
+            attempts.append(alias)
+            raise GameAPIError("模拟登录失败")
+
+        receiver = TradeReceiver(
+            s,
+            old_client,
+            stop,
+            retry_seconds=1,
+            account={"email": "main@example.com", "password": "secret", "alias": "main"},
+            client_factory=failing_factory,
+            expected_character_id=999,
+        )
+        receiver.start()
+        receiver.submit(record)
+        time.sleep(1.2)
+        stop.set()
+        receiver.stop_and_wait()
+
+        self.assertTrue(attempts)
+        self.assertEqual(s.snapshot()[0]["delivered_quantity"], 0)
+        self.assertEqual(len(s.pending_trade_records()), 1)
 
     def test_atomic_write_leaves_valid_json(self):
         s = make_store([make_task("a", 10, 10)], self.tmp.name)

@@ -5,9 +5,9 @@
 """
 import queue
 import threading
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
-from .api import GameAPIError, IdleMMOClient
+from .api import GameAPIError, IdleMMOClient, LoginError, SessionExpiredError
 from .logger import get_logger
 from .task_store import TaskStore
 
@@ -21,11 +21,19 @@ class TradeReceiver:
         client: IdleMMOClient,
         stop_event: threading.Event,
         retry_seconds: float = 5.0,
+        account: Optional[Dict[str, str]] = None,
+        client_factory: Optional[
+            Callable[[str, str, str], IdleMMOClient]
+        ] = None,
+        expected_character_id: Optional[int] = None,
     ):
         self.store = store
         self.client = client
         self.stop = stop_event
         self.retry_seconds = max(1.0, float(retry_seconds))
+        self.account = account
+        self.client_factory = client_factory
+        self.expected_character_id = expected_character_id
         self.log = get_logger("main-receiver")
         self._queue: "queue.Queue[Dict[str, Any]]" = queue.Queue()
         self._queued = set()
@@ -70,19 +78,77 @@ class TradeReceiver:
             trade_id = int(record["trade_id"])
             try:
                 self._process(record)
+            except SessionExpiredError as exc:
+                try:
+                    self._reauthenticate(exc)
+                except Exception as reauth_exc:
+                    self.log.warning(
+                        "大号自动重新登录失败: %s；挂起交易仍保留，%.0f 秒后重试。",
+                        reauth_exc,
+                        self.retry_seconds,
+                    )
+                    self._retry(record, trade_id)
+                else:
+                    self._retry(record, trade_id)
+                continue
             except Exception as exc:
-                self.log.warning(
-                    "大号接收交易 #%s 暂未完成: %s；%.0f 秒后重试。",
-                    trade_id, exc, self.retry_seconds,
-                )
-                if not self.stop.wait(self.retry_seconds):
-                    self._queue.put(record)
+                self._retry(record, trade_id, exc)
                 continue
             finally:
                 self._queue.task_done()
 
             with self._queue_lock:
                 self._queued.discard(trade_id)
+
+    def _retry(
+        self,
+        record: Dict[str, Any],
+        trade_id: int,
+        error: Optional[Exception] = None,
+    ) -> None:
+        if error is not None:
+            self.log.warning(
+                "大号接收交易 #%s 暂未完成: %s；%.0f 秒后重试。",
+                trade_id, error, self.retry_seconds,
+            )
+        if not self.stop.wait(self.retry_seconds):
+            self._queue.put(record)
+
+    def _reauthenticate(self, cause: SessionExpiredError) -> None:
+        """更换过期会话；登录失败时保留旧交易记录并由外层继续重试。"""
+        if self.account is None or self.client_factory is None:
+            raise LoginError(
+                "大号会话已过期，但未配置自动重新登录信息；"
+                "请重启程序恢复挂起交易"
+            ) from cause
+
+        self.log.warning("大号会话已过期，正在重新登录收货账号...")
+        replacement = self.client_factory(
+            self.account["email"],
+            self.account["password"],
+            self.account["alias"],
+        )
+        character_id = getattr(replacement, "character_id", None)
+        if (
+            self.expected_character_id is not None
+            and character_id is not None
+            and str(character_id) != str(self.expected_character_id)
+        ):
+            try:
+                replacement.close()
+            finally:
+                raise LoginError(
+                    "重新登录的大号角色与任务目标不一致: "
+                    f"登录角色={character_id}, 任务目标={self.expected_character_id}"
+                ) from cause
+
+        old_client = self.client
+        self.client = replacement
+        try:
+            old_client.close()
+        except Exception as exc:
+            self.log.debug("关闭过期大号会话失败（已替换）: %s", exc)
+        self.log.info("大号会话已恢复，继续处理挂起交易。")
 
     def _process(self, record: Dict[str, Any]) -> None:
         trade_id = int(record["trade_id"])
