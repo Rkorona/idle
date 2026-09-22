@@ -25,8 +25,8 @@
       "target_quantity": 500,
       "batch_size": 2,
       "gather_seconds": 13.8,
-      "delivered_quantity": 0,
-      "status": "PENDING",
+      "delivered_quantity": 500,
+      "status": "COMPLETED",
       "assigned_to": null,
       "last_error": "启动采集接口异常 (HTTP 400): {\"message\":\"You do not meet the level requirement.\"}"
     }
