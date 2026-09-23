@@ -140,10 +140,43 @@ class Worker:
         if callable(recover_action) and callable(cancel_action):
             active = recover_action()
             if active is not None:
-                self.log.warning("发现重启后残留动作，正在取消: %s", active)
+                self.log.warning(
+                    "发现重启后残留动作，正在取消（%s）。",
+                    self._summarize_active_action(active),
+                )
                 if not cancel_action():
                     raise GameAPIError("启动恢复无法取消残留挂机动作")
         self._set_state(WorkerState.READY, detail="session ready")
+
+    @staticmethod
+    def _summarize_active_action(active: Any) -> str:
+        """只提取残留动作的关键信息，避免把完整前端响应写进日志。"""
+        if not isinstance(active, dict):
+            return f"动作={active!r}"
+
+        action_type = active.get("type") or "未知"
+        item = active.get("item")
+        if isinstance(item, dict):
+            item_name = item.get("name") or item.get("title")
+        else:
+            item_name = item
+        item_name = item_name or active.get("title") or "未知材料"
+
+        summary = [f"类型={action_type}", f"材料={item_name}"]
+        quantity = active.get("quantity")
+        max_quantity = active.get("max_quantity")
+        if quantity is not None:
+            quantity_text = str(quantity)
+            if max_quantity is not None:
+                quantity_text += f"/{max_quantity}"
+            summary.append(f"数量={quantity_text}")
+
+        progress = active.get("current_progress")
+        if isinstance(progress, dict):
+            remaining = progress.get("time_remaining_until_next_loop")
+            if remaining is not None:
+                summary.append(f"本轮剩余={remaining}ms")
+        return "，".join(summary)
 
     def _reauthenticate(self, cause: SessionExpiredError) -> None:
         """替换过期会话；失败时让外层冷却后再尝试。"""
