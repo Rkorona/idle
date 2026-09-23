@@ -60,9 +60,9 @@ accounts:
     role: worker 
     
   worker_9:
-    email: "rainyhushkun@gmail"
+    email: "rkoronaxss@outlook.com"
     password_env: "IDLEMMO_WORKER_9_PASSWORD"
-    remark: "rkorona"
+    remark: "Dawnwing"
     role: worker 
   
   worker_10:

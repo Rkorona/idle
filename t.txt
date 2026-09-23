@@ -1,0 +1,23 @@
+[idlemmo.scheduler] INFO 登录大号收货账号 (kulael3@gmail.com)...
+[idlemmo.scheduler] INFO 启动恢复完成: {'checked': 0, 'completed': 0, 'failed': 0, 'waiting': 0, 'orphans': 0, 'errors': 0, 'intent_recovered': 0, 'intent_manual_review': 0}
+[idlemmo.main-receiver] INFO 大号交易接收线程已启动，恢复 0 笔挂起交易。
+[idlemmo.scheduler] INFO 准备启动1个小号，运行时并发上限=10: ['worker_9']
+[idlemmo.worker_9] INFO 启动鉴权 (rkoronaxss@outlook.com)...
+[idlemmo.worker_9] INFO 鉴权成功，角色=Dawnwing(id=784388)
+[idlemmo.worker_9] WARNING 发现重启后残留动作，正在取消（类型=woodcutting，材料=Oak Log，数量=13/1800，本轮剩余=8801ms）。
+[idlemmo.worker_9] INFO 动作仍在运行[Oak Log]，请求终止...
+[idlemmo.worker_9] INFO 二次确认成功：服务端动作已清空。
+[idlemmo.worker_9] INFO 动态目录解析[Coal Ore]: skill_item_id=10 inventory_item_id=201 wait=12.00s
+[idlemmo.worker_9] INFO 领到任务[task_1]Coal Ore (claim=6356948e，本批 200，已交付 0/1000)
+[idlemmo.worker_9] INFO 背包已有[Coal Ore]: 0，可用0/200（挂起交易占用0）
+[idlemmo.worker_9] INFO 尚缺200个[Coal Ore]，启动技能[mining]...
+[idlemmo.worker_9] INFO 状态确认：当前角色无任何挂机动作。
+[idlemmo.worker_9] INFO 挂机已启动，预计2400.0秒，轮询等待自然结束...
+[idlemmo.scheduler] INFO 收到 Ctrl+C，正在通知各小号安全退出...
+[idlemmo.worker_9] INFO 收到停止信号，中断采集。
+[idlemmo.worker_9] INFO 采集被停止信号中断，正在强制终止挂机。
+[idlemmo.worker_9] INFO 动作仍在运行[Coal Ore]，请求终止...
+[idlemmo.worker_9] INFO 二次确认成功：服务端动作已清空。
+[idlemmo.worker_9] INFO 角色已恢复空闲。
+[idlemmo.worker_9] ERROR 任务[task_1]执行失败: 请求收到停止信号，取消后续网络操作
+[idlemmo.worker_9] INFO 已退出。

@@ -82,13 +82,14 @@ sell_plan:
     auto_discover: true
     batch_size: 100
     value: 2
+
   - name: "Limestone"
     skill: "mining"
     auto_discover: true
     batch_size: 100
     value: 4
   
-  - name: "Coal Ore"
+  - name: "Oak Log"
     skill: "mining"
     auto_discover: true
     batch_size: 100
