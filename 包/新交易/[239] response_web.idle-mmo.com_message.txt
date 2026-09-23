@@ -1,0 +1,25 @@
+h2 200
+date: Wed, 23 Sep 2026 10:57:11 GMT
+content-type: application/json
+content-length: 211
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cache-control: no-cache, private
+x-ratelimit-limit: 60
+x-ratelimit-remaining: 48
+content-security-policy: base-uri 'self';connect-src 'self' https://ams3.digitaloceanspaces.com cdn.idle-mmo.com cloudflareinsights.com wss: api.idle-mmo.com;media-src cdn.idle-mmo.com 'self' data:;default-src 'self' *.idle-mmo.com;form-action *;img-src 'self' cdn.idle-mmo.com cdn.usefathom.com www.galahadcreative.com storage.ghost.io web.simple-mmo.com data: blob: deifkwefumgah.cloudfront.net;object-src 'none';script-src 'self' 'unsafe-inline' 'unsafe-eval' data: cdn.usefathom.com static.cloudflareinsights.com cloudflareinsights.com web.idle-mmo.com;style-src 'self' 'unsafe-inline' fonts.googleapis.com;frame-src https://wiki.idle-mmo.com https://web.idle-mmo.com;worker-src 'self' blob:;font-src fonts.gstatic.com data:
+access-control-allow-origin: *
+content-encoding: gzip
+x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-content-type-options: nosniff
+vary: accept-encoding
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=vZpKoTN085dbBmG4xY%2F8uJLW2JHEVPf5cunaa7%2BQGQ4dTzg3XFhnO5saxsed9GqqBrKeNhdk4bVOTbvyik5gvRIg9ety%2BYVeQzUCqZoGw%2FZF9vLyqoo85oZATvYcu6Cl8B8%3D"}]}
+cf-cache-status: DYNAMIC
+cf-ray: a3f906ec2ea6844d-ORD
+alt-svc: h3=":443"; ma=86400
+
+{"labels":{"value":"Their Experience","value_to_compare":"Your Experience"},"plot_points":{"data":[{"date":"Thu","data":0},{"date":"Fri","data":0},{"date":"Sat","data":14357},{"date":"Sun","data":28869},{"date":"Mon","data":29614},{"date":"Tue","data":19563},{"date":"Wed","data":11604}],"data_to_compare":[{"date":"Thu","data":0},{"date":"Fri","data":0},{"date":"Sat","data":0},{"date":"Sun","data":7598},{"date":"Mon","data":11233},{"date":"Tue","data":40919},{"date":"Wed","data":6816}]}}
