@@ -572,11 +572,15 @@ class Worker:
     # 赚钱模式：采集 → 出售
     # ------------------------------------------------------------------
     def _resolve_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """在真正执行任务前，用当前角色的动态技能目录补齐 ID/等待时间。"""
-        if not bool(task.get("auto_discover", False)):
-            return task
+        """在真正执行任务前，用当前角色的动态技能目录解析材料。
+
+        真实 API 客户端始终以游戏技能目录为准；保留静态分支只为兼容不带
+        ``get_skill_catalog`` 的离线注入客户端和旧数据。
+        """
         if not hasattr(self.client, "get_skill_catalog"):
-            raise GameAPIError("任务启用了 auto_discover，但客户端不支持动态技能目录")
+            if bool(task.get("auto_discover", False)):
+                raise GameAPIError("任务启用了 auto_discover，但客户端不支持动态技能目录")
+            return task
         skill = str(task["skill"]).strip().lower()
         items = self.catalog_cache.get(skill)
         if items is None:
@@ -661,10 +665,11 @@ class Worker:
             self._sleep(self.idle_sleep)
 
     def _resolve_sell_plan(self, plan: Dict[str, Any]) -> Dict[str, Any]:
-        if not bool(plan.get("auto_discover", False)):
-            return plan
+        """用游戏技能目录解析赚钱计划，静态分支仅兼容离线注入客户端。"""
         if not hasattr(self.client, "get_skill_catalog"):
-            raise GameAPIError("赚钱材料启用了 auto_discover，但客户端不支持动态技能目录")
+            if bool(plan.get("auto_discover", False)):
+                raise GameAPIError("赚钱材料启用了 auto_discover，但客户端不支持动态技能目录")
+            return plan
         skill = str(plan["skill"]).strip().lower()
         items = self.catalog_cache.get(skill)
         if items is None:
@@ -763,7 +768,7 @@ class Worker:
                     )
                 )
 
-                # 动态选材阶段只使用显式配置值或技能目录提供的 item.value。
+                # 动态选材阶段只使用显式配置值或技能目录提供的单位价值。
                 # 当前背包里是否有该材料与“选择采什么”无关。
                 override_value = candidate_cfg.get("value")
                 if override_value is None:

@@ -288,7 +288,7 @@ POST /api/skills/data/{skill}
   batch_size: 100
 ```
 
-启用 `auto_discover` 后不需要手工填写 `skill_item_id`、`inventory_item_id` 和 `gather_seconds`；Worker 会按名称从当前角色动态目录解析，使用服务器当前 `wait_length`。
+任务材料默认从当前角色的游戏技能目录解析，不需要手工维护 `skill_item_id`、`inventory_item_id` 和 `gather_seconds`；Worker 会按名称读取服务器当前的 `wait_length`。`auto_discover: true` 仍可显式写出，`false` 只用于兼容没有动态目录能力的离线客户端或旧静态数据。
 
 赚钱 `sell_plan` 同样支持 `auto_discover: true`。当前 `config/settings.yml` 已使用这种方式，避免旧的技能 ID/等待时间失效。
 
@@ -324,7 +324,7 @@ gold_mode:
   candidates: []
 ```
 
-`profit_per_minute` 使用“单位金币价值 × 60 ÷ 采集等待秒数”计算。物品出售单价优先从当前背包数据读取；若配置候选显式提供 `value`，则使用配置覆盖值。只有可售物品进入有效排序。
+`profit_per_minute` 使用“技能目录中的单位价值 × 60 ÷ 采集等待秒数”计算。当前游戏抓包把价格放在 `item.latest_market_value.market_value`，旧响应也可能直接提供 `item.value`；解析过程只使用技能目录响应，不从背包推断材料或价格。背包查询仅用于实际采集前后的数量核验和出售请求。
 
 `configured_order` 则按 `gold_mode.candidates` 中的配置顺序尝试，适合仍希望手工决定材料顺序的情况。
 

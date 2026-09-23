@@ -66,7 +66,12 @@ def build_parser() -> argparse.ArgumentParser:
     add.add_argument("--priority", type=int, default=0)
     add.add_argument("--max-failures", type=int, default=0)
     add.add_argument("--depends-on", nargs="*", default=[])
-    add.add_argument("--auto-discover", action="store_true")
+    add.add_argument(
+        "--auto-discover",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="从游戏技能目录解析材料 ID/采集时间（默认启用；可用 --no-auto-discover 兼容旧静态数据）",
+    )
     add.add_argument("--skill-item-id", type=int)
     add.add_argument("--inventory-item-id", type=int)
     add.add_argument("--gather-seconds", type=float)

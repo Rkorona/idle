@@ -87,6 +87,28 @@ class TestCatalog(unittest.TestCase):
         self.assertAlmostEqual(items[0].profit_per_minute, 60 / 13.8)
         self.assertEqual(find_item(items, name="tin ore").inventory_item_id, 23)
 
+    def test_parse_captured_market_value_without_inventory_data(self):
+        body = {
+            "items": [{
+                "id": 10,
+                "skill": "mining",
+                "name": "Coal Ore",
+                "wait_length": 12,
+                "level_required": 1,
+                "item": {
+                    "id": 201,
+                    "name": "Coal Ore",
+                    "latest_market_value": {
+                        "item_id": 201,
+                        "market_value": 4,
+                    },
+                },
+            }]
+        }
+        items = parse_skill_catalog(body, "mining")
+        self.assertEqual(items[0].value, 4.0)
+        self.assertAlmostEqual(items[0].profit_per_minute, 20.0)
+
     def test_invalid_catalog_is_rejected(self):
         with self.assertRaises(CatalogError):
             parse_skill_catalog({"items": []}, "mining")
@@ -150,6 +172,62 @@ class TestDynamicWorkerResolution(unittest.TestCase):
             c = DynamicClient(); w.client = c
             claimed = store.claim_next("w")
             resolved = w._resolve_task(claimed)
+            self.assertEqual(resolved["skill_item_id"], 11)
+            self.assertEqual(resolved["inventory_item_id"], 23)
+            self.assertEqual(resolved["gather_seconds"], 1.5)
+            self.assertEqual(c.calls, 1)
+
+    def test_api_client_resolves_legacy_static_task_from_catalog_too(self):
+        from idlemmo_bot.worker import Worker
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tasks.json"
+            p.write_text(
+                json.dumps({
+                    "target_character_id": 999,
+                    "tasks": [task("a", auto=False)],
+                }).replace("Oak Log", "Tin Ore"),
+                encoding="utf-8",
+            )
+            store = TaskStore(p)
+            w = Worker(
+                {"alias": "w", "email": "e", "password": "p", "role": "worker"},
+                store,
+                999,
+                threading.Event(),
+                sell_plan=[],
+            )
+            c = DynamicClient()
+            w.client = c
+            claimed = store.claim_next("w")
+            resolved = w._resolve_task(claimed)
+            self.assertEqual(resolved["skill_item_id"], 11)
+            self.assertEqual(resolved["inventory_item_id"], 23)
+            self.assertEqual(resolved["gather_seconds"], 1.5)
+            self.assertEqual(c.calls, 1)
+
+    def test_api_client_resolves_static_sell_plan_from_catalog(self):
+        from idlemmo_bot.worker import Worker
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tasks.json"
+            p.write_text(json.dumps({"target_character_id": 999, "tasks": []}), encoding="utf-8")
+            store = TaskStore(p)
+            w = Worker(
+                {"alias": "w", "email": "e", "password": "p", "role": "worker"},
+                store,
+                999,
+                threading.Event(),
+                sell_plan=[],
+            )
+            c = DynamicClient()
+            w.client = c
+            resolved = w._resolve_sell_plan({
+                "name": "Tin Ore",
+                "skill": "mining",
+                "skill_item_id": 999,
+                "inventory_item_id": 999,
+                "gather_seconds": 99,
+                "batch_size": 5,
+            })
             self.assertEqual(resolved["skill_item_id"], 11)
             self.assertEqual(resolved["inventory_item_id"], 23)
             self.assertEqual(resolved["gather_seconds"], 1.5)

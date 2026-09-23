@@ -33,6 +33,27 @@ class CatalogError(ValueError):
     """动态目录无法解析或找不到目标物品。"""
 
 
+def _catalog_value(item: Dict[str, Any]) -> Optional[float]:
+    """从技能目录提取物品单价，不依赖角色背包。
+
+    当前游戏的技能目录抓包把价格放在
+    ``item.latest_market_value.market_value``；旧版本/部分响应则直接提供
+    ``item.value``。两种字段都属于技能目录响应，不能用背包快照补齐。
+    """
+    latest_market_value = item.get("latest_market_value")
+    candidates = [
+        item.get("value"),
+        latest_market_value.get("market_value")
+        if isinstance(latest_market_value, dict)
+        else None,
+        item.get("market_value"),
+    ]
+    for value in candidates:
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return float(value)
+    return None
+
+
 def parse_skill_catalog(data: Dict[str, Any], skill: str) -> list[SkillItem]:
     if not isinstance(data, dict):
         raise CatalogError("技能目录响应必须是 JSON 对象")
@@ -56,9 +77,7 @@ def parse_skill_catalog(data: Dict[str, Any], skill: str) -> list[SkillItem]:
             raise CatalogError(f"技能目录第 {index} 项格式异常: {raw!r}") from exc
         if not name or wait_seconds <= 0:
             raise CatalogError(f"技能目录第 {index} 项缺少有效名称/等待时间")
-        value = nested_item.get("value")
-        if not isinstance(value, (int, float)):
-            value = None
+        value = _catalog_value(nested_item)
         result.append(
             SkillItem(
                 skill=str(raw.get("skill") or skill),
