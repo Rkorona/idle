@@ -80,12 +80,12 @@ sell_plan:
   - name: "Yew Log"
     skill: "woodcutting"
     auto_discover: true
-    batch_size: 200
+    batch_size: 100
     value: 2
   - name: "Limestone"
     skill: "mining"
     auto_discover: true
-    batch_size: 200
+    batch_size: 100
     value: 4
 
 # gold_mode.candidates 也支持相同的 {name, skill} 动态解析。
