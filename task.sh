@@ -1,7 +1,7 @@
 python -m idlemmo_bot tasks add \
-  --id task_1 \
+  --id task_3 \
   --name "Coal Ore" \
   --skill mining \
-  --target 1000 \
-  --batch 200 \
+  --target 5000 \
+  --batch 500 \
   --auto-discover
