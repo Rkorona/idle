@@ -87,6 +87,12 @@ sell_plan:
     auto_discover: true
     batch_size: 100
     value: 4
+  
+  - name: "Coal Ore"
+    skill: "mining"
+    auto_discover: true
+    batch_size: 100
+    value: 1
 
 # gold_mode.candidates 也支持相同的 {name, skill} 动态解析。
 

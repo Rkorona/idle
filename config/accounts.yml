@@ -40,3 +40,33 @@ accounts:
     password_env: "IDLEMMO_WORKER_5_PASSWORD"
     remark: "Barkblade"
     role: worker 
+ 
+  worker_6:
+    email: "rkoronax@gmail.com"
+    password_env: "IDLEMMO_WORKER_6_PASSWORD"
+    remark: "Lnxs"
+    role: worker 
+  
+  worker_7:
+    email: "rkoronaxs@gmail.com"
+    password_env: "IDLEMMO_WORKER_7_PASSWORD"
+    remark: "Runeh"
+    role: worker 
+  
+  worker_8:
+    email: "rkoronax@outlook.com"
+    password_env: "IDLEMMO_WORKER_8_PASSWORD"
+    remark: "Keeng"
+    role: worker 
+    
+  worker_9:
+    email: "rainyhushkun@gmail"
+    password_env: "IDLEMMO_WORKER_9_PASSWORD"
+    remark: "rkorona"
+    role: worker 
+  
+  worker_10:
+    email: "rkoronaxs@outlook.com"
+    password_env: "IDLEMMO_WORKER_10_PASSWORD"
+    remark: "Ashenw"
+    role: worker 
