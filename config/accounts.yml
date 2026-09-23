@@ -12,9 +12,31 @@ accounts:
     role: main          # main = 不参与自动挂机调度
 
   worker_1:
-    email: "rkoronax@proton.me"   # ⚠ 每个小号必须使用不同邮箱，否则并发会互相顶号
+    email: "rkoronax@proton.me"
     password_env: "IDLEMMO_WORKER_1_PASSWORD"
-    remark: "小号1"
-    role: worker        # worker = 参与调度（省略时默认即为 worker）
+    remark: "FoxhopeXV"
+    role: worker        
 
-  
+  worker_2:
+    email: "rkoronaxs@proton.me"  
+    password_env: "IDLEMMO_WORKER_2_PASSWORD"
+    remark: "Eternalcursed"
+    role: worker
+
+  worker_3:
+    email: "replitb@proton.me"
+    password_env: "IDLEMMO_WORKER_3_PASSWORD"
+    remark: "Vineward"
+    role: worker
+
+  worker_4:
+    email: "yang1999325@gmail.com"
+    password_env: "IDLEMMO_WORKER_4_PASSWORD"
+    remark: "Cursedglint"
+    role: worker
+
+  worker_5:
+    email: "rainyhush7@gmail.com"
+    password_env: "IDLEMMO_WORKER_5_PASSWORD"
+    remark: "Barkblade"
+    role: worker 
