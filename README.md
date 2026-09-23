@@ -324,7 +324,7 @@ gold_mode:
   candidates: []
 ```
 
-`profit_per_minute` 使用“技能目录中的单位价值 × 60 ÷ 采集等待秒数”计算。当前游戏抓包把价格放在 `item.latest_market_value.market_value`，旧响应也可能直接提供 `item.value`；解析过程只使用技能目录响应，不从背包推断材料或价格。背包查询仅用于实际采集前后的数量核验和出售请求。
+`profit_per_minute` 只有在拿到 NPC 出售单价时才计算。技能目录中的 `item.latest_market_value.market_value` 是玩家市场价，不能用于 NPC 收益率；当前抓包没有提供独立的 NPC 单价。因此没有 NPC 价格时，程序不估算收益率，按采集时间选择。背包查询仅用于实际采集前后的数量核验和出售请求。
 
 `configured_order` 则按 `gold_mode.candidates` 中的配置顺序尝试，适合仍希望手工决定材料顺序的情况。
 

@@ -87,7 +87,7 @@ class TestCatalog(unittest.TestCase):
         self.assertAlmostEqual(items[0].profit_per_minute, 60 / 13.8)
         self.assertEqual(find_item(items, name="tin ore").inventory_item_id, 23)
 
-    def test_parse_captured_market_value_without_inventory_data(self):
+    def test_does_not_treat_market_value_as_vendor_price(self):
         body = {
             "items": [{
                 "id": 10,
@@ -106,8 +106,8 @@ class TestCatalog(unittest.TestCase):
             }]
         }
         items = parse_skill_catalog(body, "mining")
-        self.assertEqual(items[0].value, 4.0)
-        self.assertAlmostEqual(items[0].profit_per_minute, 20.0)
+        self.assertIsNone(items[0].value)
+        self.assertIsNone(items[0].profit_per_minute)
 
     def test_invalid_catalog_is_rejected(self):
         with self.assertRaises(CatalogError):

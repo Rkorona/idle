@@ -768,7 +768,8 @@ class Worker:
                     )
                 )
 
-                # 动态选材阶段只使用显式配置值或技能目录提供的单位价值。
+                # 动态选材阶段只使用显式配置值或目录直接提供的 NPC 单价。
+                # latest_market_value 是玩家市场价，不能拿来估算 NPC 出售收益。
                 # 当前背包里是否有该材料与“选择采什么”无关。
                 override_value = candidate_cfg.get("value")
                 if override_value is None:
@@ -819,11 +820,10 @@ class Worker:
                 minimum,
             )
         else:
-            self.log.warning(
-                "[赚钱]没有找到满足收益率门槛的材料 "
-                "(候选=%d，门槛=%.2f 金币/分钟)，降级为按采集时间选择。",
+            self.log.info(
+                "[赚钱]技能目录没有提供 NPC 出售单价，"
+                "不使用玩家市场价；候选=%d，按采集时间选择。",
                 len(candidates),
-                minimum,
             )
             ranked = sorted(
                 candidates,
