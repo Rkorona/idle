@@ -1,0 +1,28 @@
+POST /api/skills/data/mining?expires=1790236114&signature=8734376b2b073da3cf43cbd2b22eacc5f49b3729bc698312fd992f8fc3e7f288 h2
+host: web.idle-mmo.com
+content-length: 220
+sec-ch-ua-platform: "Windows"
+authorization: Bearer ZKlUzNr5Losik6UrgAOO0mCSqz0PkEXRhEZeQ9mgX50QF4EJiEvTxVAcwvTZ
+sec-ch-ua: "Google Chrome";v="153", "Not_A Brand";v="8", "Chromium";v="153"
+sec-ch-ua-mobile: ?0
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36
+accept: application/json
+dnt: 1
+content-type: application/json
+origin: https://web.idle-mmo.com
+sec-fetch-site: same-origin
+sec-fetch-mode: cors
+sec-fetch-dest: empty
+referer: https://web.idle-mmo.com/skills/view/mining
+accept-encoding: gzip, deflate, br, zstd
+accept-language: zh-CN,zh;q=0.9
+cookie: PALAMEDES_AUTHENTICATED=1
+cookie: gawain_lancelot=0135a4i2he9dd2
+cookie: mordred_excalibur=be79fccba81d4b0534ad857216447a8f
+cookie: remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d=eyJpdiI6ImQvME9uZk5MZmFnOUNrWDNIUVlDNkE9PSIsInZhbHVlIjoiTHNTWlN4WEI0czdaQlYrRncvaDJGYlAvZmhudjBxWUtvR2xJdEdGbGUrNWVTbVlKbWdnMEFyT0J4alk0aGlxTWdqRXNjSWhIWWd2ZmdiRFBETWdJVVBESTBIVFNyUE1xbDh2SnhUcmptR0tlZTlaRUYyWEJrV1BCRTdiQjhGanFnaElIUGdzK0VMME1ZSjFUN296TEJIUHJmM29Odityc0FMMUh6NXlsaHFONklrOGdQbHd0Z0ZQd3NrR05acEFaWW0vaWdDOGlUZGhic0Y1MS9rWEZqV2FOMWtCTjVyNU1HbnczcHJPMk9IST0iLCJtYWMiOiJiMTE4NTJlMTFmZjdiMTI2YmUwMWFjNWIwOTA4YmVjZTM4M2Y3ZmVmMzcxZjNiM2U0YTI0NjczOGRlZDFkYjhiIiwidGFnIjoiIn0%3D
+cookie: XSRF-TOKEN=eyJpdiI6Ilk0RVZYMHRuVHF4QnE0cXVHT3I3eEE9PSIsInZhbHVlIjoiekdPSnhMK2lCNFdtcFoxL2R0QnpNV2RhQVg1TXo5RGRzcEZBQThwOHN3Q0hLd1FyMkFnQkU5NERBcVVPcEx1NUwvaFMrQUdrbXhiMFdFcnhpOFRRNzFoRGtvdi9YMktYRGRNc2xNc1krKzVaSFFJb1JTbjI0eVdCWHVtRnF2QnIiLCJtYWMiOiJkMGQ1NTMzYjg4NzlmYjc2ZmQ5NGMwZTFjMDZkOGQyZDdjOTNmZGEzYTQ3YTU3NDI1Zjc5YzQ0ZDU4OWJhNTRlIiwidGFnIjoiIn0%3D
+cookie: idlemmo_session=eyJpdiI6ImlpUWNQZnpSQlZpL1NuZmp4cjBMMHc9PSIsInZhbHVlIjoiODkxTFh6d3krcjB3QWlVNkVMUzFKdllTbnNCTENwQzdqTjhZS0FqYmNmNldQZXhRTVVYenNSQVIvN0FyR2F0elNhRmVZeWE0bksvUWhkWWFPaUcyMk9mMDJ2UW14VkhFOUl4dkNaNi9BbTdXeXUvYkxIUFZkLzZ1eUp4Z3dkc3oiLCJtYWMiOiJkYWUxNzIxOGI2ZDlkNWQ0MjY2MmMyN2VkZGRhOGQzOTE4MWI1MTZlZDY0NDVhNDU2Zjk1YTM3NTY3M2YzNGEwIiwidGFnIjoiIn0%3D
+cookie: idle_mmo_locale=eyJpdiI6Im41a1VWWDhodEpSNXdqUStUVStZNHc9PSIsInZhbHVlIjoiSUVhTnEwV2JMU2taV043ZC9uMXRBUUJ6MkdRTHVlaGhveXpUbTlVdGtkalR0ZmVRMjRqd2xuTGIzMitKTWY2SyIsIm1hYyI6ImI0NzdjMWU5OGVlZGM4YzI5YWY3Njg3MWNhZDVhZDI5ZTkzNzY3Y2QyYmZlOWVlZDEyNTA5MDI5MWY4YTNlYzEiLCJ0YWciOiIifQ%3D%3D
+priority: u=1, i
+
+{"filter":{"availability":"ALL","order_by":"LEVEL","order_direction":"ASC"},"gcem8x71nt":"V1ZQQhxZWF5VUFZRUQ==","74c0fa942935908b52f8200d":"81b52c01347ea76c5d35ed7fa57e3afb1857900ca9d81e32d9a193dc156eb2e0","v":"1.0.0.1"}
