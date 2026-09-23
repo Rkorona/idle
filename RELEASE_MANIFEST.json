@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "project": "idlemmo-bot",
+  "version": "16.0.0",
+  "python_requires": ">=3.10",
+  "files": [
+    {
+      "name": "dist/idlemmo_bot-16.0.0-py3-none-any.whl",
+      "size": 124628,
+      "sha256": "5ba1c08a53dc226188ca5e38b11f14425e10d8eee47f368fb81ea381bb3089b9"
+    }
+  ],
+  "build": {
+    "python": "3.13.5",
+    "command": "tools/release.py build"
+  }
+}

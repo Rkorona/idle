@@ -8,7 +8,7 @@
       "inventory_item_id": 23,
       "name": "Tin Ore",
       "target_quantity": 500,
-      "batch_size": 200,
+      "batch_size": 100,
       "gather_seconds": 13.8,
       "delivered_quantity": 500,
       "status": "COMPLETED",
@@ -23,11 +23,13 @@
       "inventory_item_id": 201,
       "name": "Coal Ore",
       "target_quantity": 500,
-      "batch_size": 200,
+      "batch_size": 100,
       "gather_seconds": 13.8,
       "delivered_quantity": 500,
       "status": "COMPLETED",
-      "assigned_to": null
+      "assigned_to": null,
+      "active_claims": [],
+      "pending_trades": []
     }
   ]
 }

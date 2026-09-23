@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "trade": {
+    "id": 1335686,
+    "status": "PROCESSED",
+    "sender": {"id": 301, "name": "WorkerOne"},
+    "recipient": {"id": 201, "name": "TargetCharacter"},
+    "items": [
+      {"item_id": 23, "tier": 1, "quantity": 50}
+    ],
+    "gold": 0
+  }
+}

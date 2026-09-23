@@ -1,4 +1,5 @@
 """全局常量与运行参数。"""
+import os
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -29,11 +30,13 @@ DEFAULT_HEADERS = {
 }
 
 # ---------------------------------------------------------------------------
-# 项目路径（相对项目根目录，与当前工作目录无关）
+# 项目路径：标准安装后不再依赖 site-packages 的目录结构。
+# 可通过 IDLEMMO_PROJECT_ROOT 指定固定项目目录，否则使用启动时工作目录。
 # ---------------------------------------------------------------------------
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(os.environ.get("IDLEMMO_PROJECT_ROOT", Path.cwd())).expanduser().resolve()
 ACCOUNTS_FILE = PROJECT_ROOT / "config" / "accounts.yml"
 TASKS_FILE = PROJECT_ROOT / "data" / "tasks.json"
+STATE_DB_FILE = PROJECT_ROOT / "data" / "state.db"
 
 # ---------------------------------------------------------------------------
 # 采集 / 调度参数
@@ -43,6 +46,9 @@ GATHER_TIMEOUT_MARGIN = 1.5    # 超时 = 预计时长 * 该系数
 MAX_CONCURRENT_WORKERS = 10    # 同 IP 下并发小号数上限
 IDLE_SLEEP = 60                # 没有任务可领时的等待(秒)
 STAGGER_SECONDS = 5            # 各小号启动错峰间隔(秒)，避免同一时刻集中请求
+SQLITE_EVENT_RETENTION_DAYS = 30  # SQLite 事件日志保留天数
+SQLITE_MAINTENANCE_INTERVAL_SECONDS = 3600  # 低频数据库维护间隔
+METRICS_PERSIST_INTERVAL_SECONDS = 60  # 运行指标持久化间隔
 
 # ---------------------------------------------------------------------------
 # HTTP 重试 / 退避

@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 import yaml
 
 from .config import ACCOUNTS_FILE
+from .security import resolve_secret
 
 
 class AccountConfigError(Exception):
@@ -27,15 +28,26 @@ def load_accounts_config(path: Path = ACCOUNTS_FILE) -> dict:
 
 
 def _normalize(alias: str, data: dict) -> Dict[str, str]:
-    if not isinstance(data, dict) or "email" not in data or "password" not in data:
-        raise AccountConfigError(f"账号 '{alias}' 缺少 email 或 password 字段")
+    if not isinstance(data, dict) or "email" not in data:
+        raise AccountConfigError(f"账号 '{alias}' 缺少 email 字段")
+    if "password" not in data and "password_env" not in data:
+        raise AccountConfigError(f"账号 '{alias}' 缺少 password 或 password_env 字段")
+    role = str(data.get("role", "worker")).strip().lower()
+    if role not in {"main", "worker"}:
+        raise AccountConfigError(f"账号 '{alias}' 的 role 必须是 main 或 worker，当前: {role!r}")
+    email = str(data["email"]).strip()
+    if not email:
+        raise AccountConfigError(f"账号 '{alias}' 的 email 不能为空")
+    try:
+        password = resolve_secret(data.get("password"), env_name=data.get("password_env"))
+    except ValueError as exc:
+        raise AccountConfigError(f"账号 '{alias}' 的密码凭据无效: {exc}") from exc
     return {
         "alias": alias,
-        "email": str(data["email"]),
-        "password": str(data["password"]),
+        "email": email,
+        "password": password,
         "remark": str(data.get("remark", "")),
-        # 是否参与自动化调度：主号配置了也不应被当成小号去挂机
-        "role": str(data.get("role", "worker")),
+        "role": role,
     }
 
 
@@ -77,13 +89,30 @@ def get_worker_accounts(path: Path = ACCOUNTS_FILE) -> List[Dict[str, str]]:
     workers = [_normalize(alias, data) for alias, data in accounts.items()]
     workers = [w for w in workers if w["role"] == "worker"]
 
-    seen: Dict[str, str] = {}
-    for w in workers:
-        email = w["email"].strip().lower()
-        if email in seen:
-            raise AccountConfigError(
-                f"账号 '{w['alias']}' 与 '{seen[email]}' 使用了相同邮箱 ({w['email']})，"
-                "并发运行会互相顶号，请修改配置或把其中一个 role 设为 main。"
-            )
-        seen[email] = w["alias"]
+    validate_accounts_config(config)
     return workers
+
+
+def validate_accounts_config(config: dict, *, require_default_main: bool = False) -> None:
+    """校验整个账号集合，尤其防止 main 与 worker 使用同一游戏账号。"""
+    accounts = config.get("accounts") or {}
+    if not isinstance(accounts, dict) or not accounts:
+        raise AccountConfigError("accounts.yml 的 accounts 必须是非空对象")
+    seen_email: Dict[str, str] = {}
+    for alias, data in accounts.items():
+        account = _normalize(str(alias), data)
+        email = account["email"].lower()
+        if email in seen_email:
+            raise AccountConfigError(
+                f"账号 '{account['alias']}' 与 '{seen_email[email]}' 使用了相同邮箱 ({email})，"
+                "不能同时作为不同角色运行。"
+            )
+        seen_email[email] = account["alias"]
+
+    if require_default_main:
+        default_alias = config.get("default_account")
+        if not default_alias or default_alias not in accounts:
+            raise AccountConfigError("default_account 必须指向 accounts 中存在的账号")
+        default = _normalize(str(default_alias), accounts[default_alias])
+        if default["role"] != "main":
+            raise AccountConfigError("default_account 对应账号必须配置 role: main")

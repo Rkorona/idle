@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1335686,
+      "status": "PENDING",
+      "trade_partner_id": 201
+    }
+  ],
+  "meta": {"current_page": 1}
+}

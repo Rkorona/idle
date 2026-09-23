@@ -1,0 +1,1 @@
+5ba1c08a53dc226188ca5e38b11f14425e10d8eee47f368fb81ea381bb3089b9  dist/idlemmo_bot-16.0.0-py3-none-any.whl

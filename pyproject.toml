@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idlemmo-bot"
+version = "16.0.0"
+description = "IdleMMO 多账号采集与交易调度器"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "IdleMMO Bot Contributors"}]
+dependencies = [
+  "httpx[http2]>=0.27,<1",
+  "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.13,<1",
+  "mypy>=1.18,<2",
+  "build>=1.3,<2",
+]
+
+[project.scripts]
+idle-farm = "idlemmo_bot.cli:main_cli"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+src = ["src", "tests"]
+exclude = [".venv", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B017", "E402"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/idlemmo_bot"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = false
+disable_error_code = ["attr-defined"]
+no_implicit_optional = true
+pretty = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

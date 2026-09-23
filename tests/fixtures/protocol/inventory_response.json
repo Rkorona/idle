@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "inventory_items": [
+    {
+      "item_id": 23,
+      "tier": 1,
+      "quantity": 50,
+      "value": 2,
+      "routes": {"sellable_to_vendor": true}
+    }
+  ]
+}

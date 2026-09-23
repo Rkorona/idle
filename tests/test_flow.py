@@ -3,11 +3,11 @@
 运行:  python -m unittest discover -s tests -v
 """
 import json
-import sys
 import tempfile
 import threading
 import time
 import types
+import sys
 import unittest
 from pathlib import Path
 
@@ -21,7 +21,6 @@ except ImportError:
     stub.TransportError = Exception
     sys.modules["httpx"] = stub
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from idlemmo_bot.account_manager import AccountConfigError, get_worker_accounts  # noqa: E402
 from idlemmo_bot.api import GameAPIError, SessionExpiredError  # noqa: E402
@@ -63,6 +62,9 @@ class FakeClient:
         self._busy = False
         self._trade_seq = 0
         self.actions_started = 0
+        self.character_id = str(abs(hash(alias)) % 100000 + 1000)
+        self.character_name = alias
+        self.trade_target_name = "main"
 
     def get_inventory_item_count(self, item_id):
         return self.inv.get(item_id, 0)
@@ -97,7 +99,21 @@ class FakeClient:
 
     def get_trade_details(self, trade_id, target_character_id=None):
         item_id, qty = self._pending
-        return {"trade": {"offers": {"you": {"items": [{"name": str(item_id), "quantity": qty}]}}}}
+        return {
+            "trade": {
+                "id": trade_id,
+                "offers": {
+                    "you": {
+                        "character": {"id": int(self.character_id), "name": self.character_name},
+                        "items": [{"id": item_id, "name": str(item_id), "tier": 1, "quantity": qty}],
+                    },
+                    "them": {
+                        "character": {"id": 999, "name": "main"},
+                        "items": [],
+                    },
+                },
+            }
+        }
 
     def accept_trade(self, trade_id, target_character_id=None):
         item_id, qty = self._pending
@@ -123,6 +139,7 @@ class FakeMainReceiverClient:
         self.character_name = "main"
         self.character_id = "999"
         self.accepted = []
+        self.sender_character_id = 123456
 
     def _trade_page_url(self, trade_id):
         return f"https://web.idle-mmo.com/@main?character_trade_id={trade_id}"
@@ -131,10 +148,14 @@ class FakeMainReceiverClient:
         status = "PROCESSED" if trade_id in self.accepted else "PENDING"
         return {
             "trade": {
+                "id": trade_id,
                 "status": status,
                 "offers": {
+                    "you": {"character": {"id": 999, "name": "main"}, "items": []},
                     "them": {
-                        "items": [{"id": 2, "quantity": 10}],
+                        "character": {"id": self.sender_character_id, "name": "worker"},
+                        "items": [{"id": 2, "tier": 1, "quantity": 10}],
+                        "gold": {"amount": 0},
                     },
                 },
             },
@@ -209,6 +230,29 @@ class TestTaskStore(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
+
+    def test_invalid_task_schema_is_rejected(self):
+        task = make_task("a", 10, 10)
+        task["batch_size"] = 0
+        p = Path(self.tmp.name) / "bad.json"
+        p.write_text(json.dumps({"target_character_id": 999, "tasks": [task]}), encoding="utf-8")
+        with self.assertRaises(Exception):
+            TaskStore(p).snapshot()
+
+    def test_nan_gather_seconds_is_rejected(self):
+        task = make_task("a", 10, 10)
+        task["gather_seconds"] = "NaN"
+        p = Path(self.tmp.name) / "bad.json"
+        p.write_text(json.dumps({"target_character_id": 999, "tasks": [task]}), encoding="utf-8")
+        with self.assertRaises(Exception):
+            TaskStore(p).snapshot()
+
+    def test_duplicate_task_id_is_rejected(self):
+        task = make_task("same", 10, 10)
+        p = Path(self.tmp.name) / "bad.json"
+        p.write_text(json.dumps({"target_character_id": 999, "tasks": [task, dict(task)]}), encoding="utf-8")
+        with self.assertRaises(Exception):
+            TaskStore(p).snapshot()
 
     def test_normalize_fixes_dirty_data(self):
         """#3：delivered(35) > target(10) 却是 PENDING → 应修正为 COMPLETED，不再被领取。"""
@@ -354,7 +398,9 @@ class TestTaskStore(unittest.TestCase):
         claim = s.claim_next("w1")
         s.record_pending_trade("a", claim["claim_id"], 789, item_id=2, quantity=10)
         record = s.move_claim_to_pending_trade(
-            "a", claim["claim_id"], 789, item_id=2, quantity=10
+            "a", claim["claim_id"], 789, item_id=2, quantity=10,
+            sender_character_id=123456, sender_character_name="worker",
+            target_character_id=999, target_character_name="main", tier=1,
         )
         stop = threading.Event()
         client = FakeMainReceiverClient()
@@ -378,7 +424,9 @@ class TestTaskStore(unittest.TestCase):
         claim = s.claim_next("w1")
         s.record_pending_trade("a", claim["claim_id"], 790, item_id=2, quantity=10)
         record = s.move_claim_to_pending_trade(
-            "a", claim["claim_id"], 790, item_id=2, quantity=10
+            "a", claim["claim_id"], 790, item_id=2, quantity=10,
+            sender_character_id=123456, sender_character_name="worker",
+            target_character_id=999, target_character_name="main", tier=1,
         )
         stop = threading.Event()
         old_client = AlwaysExpiredMainReceiverClient()
@@ -419,7 +467,9 @@ class TestTaskStore(unittest.TestCase):
         claim = s.claim_next("w1")
         s.record_pending_trade("a", claim["claim_id"], 792, item_id=2, quantity=10)
         record = s.move_claim_to_pending_trade(
-            "a", claim["claim_id"], 792, item_id=2, quantity=10
+            "a", claim["claim_id"], 792, item_id=2, quantity=10,
+            sender_character_id=123456, sender_character_name="worker",
+            target_character_id=999, target_character_name="main", tier=1,
         )
         stop = threading.Event()
         old_client = ExpiringAcceptMainReceiverClient()
@@ -457,7 +507,9 @@ class TestTaskStore(unittest.TestCase):
         claim = s.claim_next("w1")
         s.record_pending_trade("a", claim["claim_id"], 791, item_id=2, quantity=10)
         record = s.move_claim_to_pending_trade(
-            "a", claim["claim_id"], 791, item_id=2, quantity=10
+            "a", claim["claim_id"], 791, item_id=2, quantity=10,
+            sender_character_id=123456, sender_character_name="worker",
+            target_character_id=999, target_character_name="main", tier=1,
         )
         stop = threading.Event()
         old_client = ExpiringMainReceiverClient()
@@ -646,6 +698,26 @@ class TestWorkerFlow(unittest.TestCase):
         th.join(3)
         self.assertFalse(th.is_alive(), "停止信号后小号应立即退出，而不是睡满 30 秒")
 
+    def test_stop_during_earning_client_close_is_graceful(self):
+        """停止期间 client 被并行关闭导致 GameAPIError 时，不应报告为小号异常。"""
+        store = make_store([], self.tmp.name)
+        stop = threading.Event()
+        w = Worker(
+            account("w1"), store, 999, stop,
+            profit_mode={"enabled": True, "strategy": "profit_per_minute"},
+            client_factory=lambda e, p, n: FakeClient(n),
+            **FAST,
+        )
+        def interrupted_earning():
+            stop.set()
+            raise GameAPIError("Cannot send a request, as the client has been closed")
+
+        w._earn_gold_once = interrupted_earning
+        w.run()
+
+        self.assertEqual(w.state.state.value, "STOPPING")
+
+
     def test_sell_not_implemented_disables_earning_mode(self):
         """sell_item 未实现时应停用赚钱模式，而不是无限循环采集。"""
         store = make_store([], self.tmp.name)
@@ -722,6 +794,31 @@ class TestWorkerFlow(unittest.TestCase):
         self.assertEqual(client.sold, [(2018, 5)])
         w._gather = original_gather
 
+
+    def test_accounts_beyond_concurrency_limit_are_queued_not_discarded(self):
+        store = make_store([], self.tmp.name)
+        started = []
+        lock = threading.Lock()
+
+        class QuietClient(FakeClient):
+            pass
+
+        def factory(e, p, n):
+            with lock:
+                started.append(n)
+            return QuietClient(n)
+
+        sched = Scheduler(
+            store=store,
+            accounts=[account("w1"), account("w2"), account("w3")],
+            stagger_seconds=0,
+            client_factory=factory,
+            max_workers=1,
+            worker_kwargs=FAST,
+        )
+        sched.run()
+        self.assertEqual(set(started), {"w1", "w2", "w3"})
+
     def test_one_worker_crash_does_not_kill_others(self):
         store = make_store([make_task("oak", 10, 10)], self.tmp.name)
 
@@ -745,6 +842,11 @@ class TestAccounts(unittest.TestCase):
     def test_duplicate_email_is_rejected(self):
         """#12：两个 worker 邮箱相同 → 报错，而不是悄悄并发顶号。"""
         p = self._write("accounts:\n  a: {email: X@y.com, password: 1}\n  b: {email: x@Y.com, password: 2}\n")
+        with self.assertRaises(AccountConfigError):
+            get_worker_accounts(p)
+
+    def test_invalid_role_is_rejected(self):
+        p = self._write("accounts:\n  w: {email: w@y.com, password: 2, role: mian}\n")
         with self.assertRaises(AccountConfigError):
             get_worker_accounts(p)
 

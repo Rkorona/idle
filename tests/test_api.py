@@ -1,7 +1,7 @@
 """出售接口的离线协议测试。"""
 import json
-import sys
 import types
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import Mock
@@ -15,7 +15,6 @@ except ImportError:
     stub.TransportError = Exception
     sys.modules["httpx"] = stub
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from idlemmo_bot.api import (  # noqa: E402
     GameAPIError,
@@ -54,7 +53,7 @@ class TestSellItem(unittest.TestCase):
     def test_posts_captured_payload_and_returns_gold(self):
         self.client.endpoints["item.vendor.sell.endpoint"] = (
             "https://web.idle-mmo.com/api/item/vendor/sell"
-            "?expires=1790080669&signature=current"
+            "?expires=2099999999&signature=current"
         )
         self.assertEqual(self.client.sell_item(201, 3), 3)
         url, kwargs = self.client._post.call_args.args[0], self.client._post.call_args.kwargs
@@ -89,7 +88,7 @@ class TestSellItem(unittest.TestCase):
         )
         self.client.endpoints["item.vendor.sell.endpoint"] = (
             "https://web.idle-mmo.com/api/item/vendor/sell"
-            "?expires=1790080669&signature=current"
+            "?expires=2099999999&signature=current"
         )
         with self.assertRaises(SessionExpiredError):
             self.client.sell_item(201, 1)
@@ -182,6 +181,93 @@ class TestRecipientTrade(unittest.TestCase):
         }
         with self.assertRaises(SessionExpiredError):
             self.client.accept_trade_as_recipient(1335686)
+
+
+
+class TestPageContext(unittest.TestCase):
+    def test_skill_page_does_not_overwrite_logged_in_character_name(self):
+        client = IdleMMOClient.__new__(IdleMMOClient)
+        client.character_name = "MyCharacter"
+        client.character_id = "999"
+        client.api_token = "token"
+        client.runtime_meta = {}
+        client.endpoints = {}
+        client.log = Mock()
+        html = "<html><head><title>Mining | IdleMMO</title></head></html>"
+        client._parse_page_context(html)
+        self.assertEqual(client.character_name, "MyCharacter")
+
+class TestTradeValidation(unittest.TestCase):
+    def setUp(self):
+        self.client = IdleMMOClient.__new__(IdleMMOClient)
+        self.client.character_name = "main"
+        self.client.character_id = "999"
+        self.client.log = Mock()
+
+    def test_rejects_extra_item_and_wrong_sender(self):
+        from idlemmo_bot.trade_receiver import TradeReceiver
+        from idlemmo_bot.task_store import TaskStore
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "tasks.json"
+            p.write_text(json.dumps({"target_character_id": 999, "tasks": [{
+                "task_id": "a", "skill": "mining", "skill_item_id": 2,
+                "inventory_item_id": 2, "name": "x", "target_quantity": 10,
+                "batch_size": 10, "gather_seconds": 1, "delivered_quantity": 0,
+                "status": "PENDING", "active_claims": [], "pending_trades": []
+            }]}), encoding="utf-8")
+            receiver = TradeReceiver(TaskStore(p), self.client, __import__('threading').Event())
+            record = {
+                "trade_id": 1, "item_id": 2, "quantity": 10, "tier": 1,
+                "sender_character_id": 123, "target_character_id": 999,
+            }
+            bad_trade = {
+                "offers": {
+                    "you": {"character": {"id": 999}},
+                    "them": {
+                        "character": {"id": 123},
+                        "items": [
+                            {"id": 2, "tier": 1, "quantity": 10},
+                            {"id": 3, "tier": 1, "quantity": 1},
+                        ],
+                        "gold": {"amount": 0},
+                    },
+                }
+            }
+            from idlemmo_bot.api import TradeValidationError
+            with self.assertRaises(TradeValidationError):
+                receiver._validate_incoming_items(bad_trade, record)
+
+class TestRequestPolicy(unittest.TestCase):
+    def test_non_idempotent_post_is_not_retried(self):
+        client = IdleMMOClient.__new__(IdleMMOClient)
+        client.log = Mock()
+        client.client = Mock()
+        first = response(503, {"message": "busy"})
+        client.client.request.return_value = first
+        result = client._post("https://example.test/mutate")
+        self.assertIs(result, first)
+        client.client.request.assert_called_once()
+
+    def test_read_only_post_can_retry(self):
+        client = IdleMMOClient.__new__(IdleMMOClient)
+        client.log = Mock()
+        client.client = Mock()
+        client.client.request.side_effect = [
+            response(503, {"message": "busy"}),
+            response(200, {"ok": True}),
+        ]
+        original_sleep = __import__("time").sleep
+        try:
+            __import__("time").sleep = lambda _: None
+            result = client._post(
+                "https://example.test/read",
+                policy=__import__("idlemmo_bot.api", fromlist=["RequestPolicy"]).RequestPolicy.READ_ONLY,
+            )
+        finally:
+            __import__("time").sleep = original_sleep
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(client.client.request.call_count, 2)
 
 
 if __name__ == "__main__":
