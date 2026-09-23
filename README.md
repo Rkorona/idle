@@ -176,11 +176,11 @@ accounts:
 
 ## ⚠ 需要你处理的事项
 
-出售计划现在会读取背包物品的单价和数量，调用抓包确认的 `/api/item/vendor/sell` 接口完成出售；成功后的金币收益按 `value × quantity` 计算。接口签名地址优先使用页面返回值，不会写入抓包中的过期签名。
+备用 `sell_plan` 会读取背包物品的数量，调用抓包确认的 `/api/item/vendor/sell` 接口完成出售。配置中的 `value` 表示单件材料出售给 NPC 获得的金币，只有明确知道 NPC 单价时才填写；不能填玩家市场价。接口签名地址优先使用页面返回值，不会写入抓包中的过期签名。
 
 任务和 `sell_plan` 都必须填写材料自己的 `gather_seconds`。它用于计算本批预计耗时和超时上限，不再使用统一的全局采集耗时。请填写游戏中该材料单个采集动作的实际耗时。
 
-`sell_plan` 按列表顺序表示优先级：第一项是主材料，只有这一轮采集或出售失败，才会尝试下一项备用材料。当前建议使用 Yew Log（`skill_item_id=2`、`inventory_item_id=2`）作为主材料，Limestone（`skill_item_id=561`、`inventory_item_id=2018`）作为备用材料。每项的 `gather_seconds` 应填写该材料的单轮实际等待时间，避免较慢的备用材料被提前取消。
+`sell_plan` 只作为手动备用方案；启用 `gold_mode` 时不会同时执行它。按列表顺序表示优先级：第一项是主材料，只有这一轮采集或出售失败，才会尝试下一项备用材料。当前实际配置已将它注释掉。每项的 `gather_seconds` 应填写该材料的单轮实际等待时间，`value` 应填写 NPC 单件出售金币。
 
 如果出售接口返回 `401/403` 并带有 `session has expired` 或 `restart the app`，程序会停止赚钱模式，不会继续采集备用材料。该提示也可能是出售接口的签名/载荷不匹配，并不代表其它接口一定已经失效；需要重新启动程序获取新会话，并进一步用真实请求验证出售端点。
 
@@ -290,7 +290,7 @@ POST /api/skills/data/{skill}
 
 任务材料默认从当前角色的游戏技能目录解析，不需要手工维护 `skill_item_id`、`inventory_item_id` 和 `gather_seconds`；Worker 会按名称读取服务器当前的 `wait_length`。`auto_discover: true` 仍可显式写出，`false` 只用于兼容没有动态目录能力的离线客户端或旧静态数据。
 
-赚钱 `sell_plan` 同样支持 `auto_discover: true`。当前 `config/settings.yml` 已使用这种方式，避免旧的技能 ID/等待时间失效。
+赚钱 `sell_plan` 同样支持 `auto_discover: true`，但当前 `config/settings.yml` 使用的是 `gold_mode`；`sell_plan` 仅保留为备用配置示例。
 
 ### 任务优先级 / 暂停 / 依赖 / 失败上限
 

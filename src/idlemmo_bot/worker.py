@@ -821,9 +821,11 @@ class Worker:
             )
         else:
             self.log.info(
-                "[赚钱]技能目录没有提供 NPC 出售单价，"
-                "不使用玩家市场价；候选=%d，按采集时间选择。",
+                "[赚钱]没有找到满足收益率门槛的材料 "
+                "(候选=%d，门槛=%.2f 金币/分钟)，"
+                "不使用玩家市场价，降级为按采集时间选择。",
                 len(candidates),
+                minimum,
             )
             ranked = sorted(
                 candidates,

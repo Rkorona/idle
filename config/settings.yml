@@ -73,19 +73,20 @@ circuit_breaker:
   failure_threshold: 5
   recovery_seconds: 30
 
-# 没有任务可领时，小号按顺序尝试这些材料并出售，攒金币付交易手续费。
+# 备用赚钱方案：当前启用的是上面的 gold_mode，这里暂不启用。
+# value 是单件材料出售给 NPC 获得的金币，仅在明确知道 NPC 单价时填写。
 # 第一项是优先材料，只有当前一项本轮失败才会尝试下一项备用材料。
-sell_plan: []
-# 推荐使用动态目录，避免技能 ID/等待时间变动后配置失效：
 # sell_plan:
 #   - name: "Yew Log"
 #     skill: "woodcutting"
 #     auto_discover: true
 #     batch_size: 50
+#     value: 2
 #   - name: "Limestone"
 #     skill: "mining"
 #     auto_discover: true
 #     batch_size: 20
+#     value: 1
 #
 # gold_mode.candidates 也支持相同的 {name, skill} 动态解析。
 

@@ -179,6 +179,10 @@ def load_settings(path=SETTINGS_FILE) -> Dict[str, Any]:
             batch_size = int(item.get("batch_size", 50))
             if batch_size <= 0:
                 raise ValueError
+            if item.get("value") is not None:
+                vendor_value = float(item["value"])
+                if not math.isfinite(vendor_value) or vendor_value < 0:
+                    raise ValueError
             if not auto_discover:
                 gather_seconds = float(item["gather_seconds"])
                 if not math.isfinite(gather_seconds) or gather_seconds <= 0:
@@ -193,7 +197,7 @@ def load_settings(path=SETTINGS_FILE) -> Dict[str, Any]:
                     raise ValueError
         except (KeyError, TypeError, ValueError):
             raise SettingsError(
-                f"sell_plan[{i}] 的 batch_size/静态 ID/gather_seconds 配置无效"
+                f"sell_plan[{i}] 的 batch_size/value/静态 ID/gather_seconds 配置无效"
             )
 
     database = raw.get("database") or {}
