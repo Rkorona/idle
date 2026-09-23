@@ -6,11 +6,12 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock
 
-from idlemmo_bot.api import IdleMMOClient, ProtocolError, TradeValidationError
+from idlemmo_bot.api import GameAPIError, IdleMMOClient, ProtocolError, TradeValidationError
 from idlemmo_bot.errors import ErrorCategory, classify_error
 from idlemmo_bot.protocol import (
     endpoint_status,
     require_signed_endpoint,
+    validate_friend_list,
     validate_inventory,
     validate_skill_catalog,
     validate_trade_create,
@@ -30,6 +31,17 @@ def response(status: int, body) -> Mock:
 
 
 class TestEndpointContracts(unittest.TestCase):
+    def test_friends_endpoint_requires_expected_path(self):
+        url = "https://web.idle-mmo.com/api/friends?expires=2099999999&signature=x"
+        self.assertEqual(require_signed_endpoint(url, "friends.endpoint"), url)
+
+    def test_friends_endpoint_rejects_wrong_path(self):
+        with self.assertRaises(ProtocolError):
+            require_signed_endpoint(
+                "https://web.idle-mmo.com/api/party/get?expires=2099999999&signature=x",
+                "friends.endpoint",
+            )
+
     def test_known_endpoint_requires_signature_and_expected_path(self):
         url = "https://web.idle-mmo.com/api/trades?expires=2099999999&signature=x"
         self.assertEqual(require_signed_endpoint(url, "trades.endpoint"), url)
@@ -68,8 +80,10 @@ class TestResponseContracts(unittest.TestCase):
         trade_list = json.loads((FIXTURES / "trade_list_response.json").read_text(encoding="utf-8"))
         trade_create = json.loads((FIXTURES / "trade_create_response.json").read_text(encoding="utf-8"))
         trade_details = json.loads((FIXTURES / "trade_response.json").read_text(encoding="utf-8"))
+        friends = json.loads((FIXTURES / "friends_response.json").read_text(encoding="utf-8"))
         self.assertEqual(len(validate_skill_catalog(skill, "mining")), 1)
         self.assertEqual(validate_inventory(inventory)[0]["item_id"], 23)
+        self.assertEqual(validate_friend_list(friends)[0]["character_id"], 782924)
         self.assertEqual(validate_trade_list(trade_list)[0]["id"], 1335686)
         self.assertEqual(validate_trade_create(trade_create, 201), 1335687)
         self.assertEqual(validate_trade_details(trade_details, 1335686)["id"], 1335686)
@@ -102,6 +116,9 @@ class TestProtocolApiIntegration(unittest.TestCase):
         client.trade_target_id = None
         client.trade_target_name = None
         client.trade_target_profile_url = None
+        client.endpoints["trade.create.endpoint"] = (
+            "https://web.idle-mmo.com/api/trades/create?expires=2099999999&signature=fixture"
+        )
         client.log = Mock()
         return client
 
@@ -116,6 +133,62 @@ class TestProtocolApiIntegration(unittest.TestCase):
         self.assertEqual(result["data"][0]["id"], 1335686)
         kwargs = client._post.call_args.kwargs
         self.assertEqual(kwargs["json"]["character_id"], 301)
+
+    def test_create_trade_resolves_target_from_friends_without_opening_profile(self):
+        client = self._client()
+        friends_page = (FIXTURES / "friends_page.html").read_text(encoding="utf-8")
+        friends_body = json.loads((FIXTURES / "friends_response.json").read_text(encoding="utf-8"))
+
+        def get_response(text):
+            return Mock(status_code=200, text=text, headers={})
+
+        client._get = Mock(return_value=get_response(friends_page))
+        client._post = Mock(
+            side_effect=[
+                response(200, friends_body),
+                response(200, {
+                    "status": "success",
+                    "character_trade": {"id": 7, "trade_partner_id": 782924},
+                }),
+            ]
+        )
+        client.get_auth_headers = Mock(return_value={})
+
+        trade_id = client.create_trade(782924)
+        self.assertEqual(trade_id, 7)
+        self.assertEqual(
+            client._get.call_args_list[0].args[0],
+            client.profile_url,
+        )
+        self.assertEqual(len(client._get.call_args_list), 1)
+        self.assertEqual(
+            client._post.call_args_list[0].kwargs["json"]["type"],
+            "friends",
+        )
+        self.assertEqual(
+            client._post.call_args_list[1].kwargs["json"]["character_id"],
+            782924,
+        )
+        self.assertEqual(client.trade_target_name, "rkoronax")
+        self.assertEqual(
+            client.trade_target_profile_url,
+            "https://web.idle-mmo.com/@rkoronax?same_window=true",
+        )
+
+    def test_find_friend_rejects_non_friend_target(self):
+        client = self._client()
+        client.list_friends = Mock(return_value={
+            "data": [{
+                "id": 188266,
+                "character_id": 782924,
+                "name": "rkoronax",
+                "profile_url": "https://web.idle-mmo.com/@rkoronax?same_window=true",
+            }],
+            "current_page": 1,
+            "last_page": 1,
+        })
+        with self.assertRaises(GameAPIError):
+            client.find_friend(201)
 
     def test_skill_start_rejects_wrong_endpoint_path_before_post(self):
         client = self._client()
@@ -155,16 +228,24 @@ class TestProtocolApiIntegration(unittest.TestCase):
         client._get = Mock(return_value=Mock(status_code=200, text=page_html))
         client._post = Mock(return_value=response(200, body))
         client.get_auth_headers = Mock(return_value={})
+        client.profile_url = "https://web.idle-mmo.com/@WorkerOne?same_window=true"
         client._refresh_trade_context = Mock(
             side_effect=lambda _url: client._parse_page_context(page_html, update_identity=False)
         )
-        data = client.get_trade_details(1335686, trade_page_url=client.trade_target_profile_url)
+        data = client.get_trade_details(1335686, target_character_id=201)
+        client._refresh_trade_context.assert_called_once_with(client.profile_url)
         self.assertEqual(data["trade"]["id"], 1335686)
 
     def test_create_trade_response_contract_preserves_trade_validation_type(self):
         client = self._client()
         page_html = (FIXTURES / "trade_page.html").read_text(encoding="utf-8")
         client._get = Mock(return_value=Mock(status_code=200, text=page_html))
+        client.find_friend = Mock(return_value={
+            "id": 188266,
+            "character_id": 201,
+            "name": "TargetCharacter",
+            "profile_url": "https://web.idle-mmo.com/@TargetCharacter?same_window=true",
+        })
         client._post = Mock(return_value=response(200, {
             "status": "success",
             "character_trade": {"id": 7, "trade_partner_id": 999},

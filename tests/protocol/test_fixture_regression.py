@@ -54,3 +54,27 @@ def test_trade_fixture_keeps_endpoint_family_and_fixture_json_is_valid() -> None
     assert "trades.endpoint" in client.endpoints
     assert payload["trade"]["status"] == "PROCESSED"
     assert payload["trade"]["recipient"]["id"] == 201
+
+
+def test_friends_fixture_extracts_endpoint_and_target_fields() -> None:
+    html = (FIXTURES / "friends_page.html").read_text(encoding="utf-8")
+    payload = json.loads((FIXTURES / "friends_response.json").read_text(encoding="utf-8"))
+    client = IdleMMOClient.__new__(IdleMMOClient)
+    client.endpoints = {}
+    client.runtime_meta = {}
+    client.character_name = "WorkerOne"
+    client.character_id = "301"
+    client.api_token = "fixture-token"
+    client.profile_url = "https://web.idle-mmo.com/@WorkerOne?same_window=true"
+    client.trade_target_id = None
+    client.trade_target_name = None
+    client.trade_target_profile_url = None
+    client.log = type("Log", (), {"debug": lambda *_args, **_kwargs: None})()
+
+    client._parse_page_context(html, update_identity=False)
+
+    assert client.endpoints["friends.endpoint"].startswith(
+        "https://web.idle-mmo.com/api/friends?"
+    )
+    assert payload["data"][0]["character_id"] == 782924
+    assert payload["data"][0]["name"] == "rkoronax"

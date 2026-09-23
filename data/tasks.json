@@ -8,7 +8,7 @@
       "inventory_item_id": 2,
       "name": "Yew Log",
       "target_quantity": 50,
-      "batch_size": 5,
+      "batch_size": 10,
       "gather_seconds": 15,
       "delivered_quantity": 0,
       "status": "PENDING",

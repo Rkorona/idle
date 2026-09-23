@@ -27,9 +27,13 @@ class EndpointContract:
 
 
 _ENDPOINTS: dict[str, EndpointContract] = {
+    "friends.endpoint": EndpointContract("friends.endpoint", ("/api/friends",)),
     "trades.endpoint": EndpointContract("trades.endpoint", ("/api/trades",)),
     "trade.create.endpoint": EndpointContract("trade.create.endpoint", ("/api/trades/create",)),
-    "trade.get.endpoint": EndpointContract("trade.get.endpoint", ("/api/trades/get",)),
+    "trade.get.endpoint": EndpointContract(
+        "trade.get.endpoint",
+        ("/api/trades/get", "/api/trades/trade/get"),
+    ),
     "trade.accept.endpoint": EndpointContract(
         "trade.accept.endpoint",
         ("/api/trades/accept", "/api/trades/trade/accept"),
@@ -223,6 +227,26 @@ def validate_trade_list(data: Mapping[str, Any]) -> list[Dict[str, Any]]:
         if trade.get("id") is not None:
             _positive_int(trade.get("id"), f"trades.data[{index}].id")
     return [dict(trade) for trade in rows]
+
+
+def validate_friend_list(data: Mapping[str, Any]) -> list[Dict[str, Any]]:
+    """校验 /api/friends 的好友列表响应。"""
+    if not isinstance(data, Mapping):
+        raise ProtocolError("好友列表响应必须是 object")
+    rows = data.get("data")
+    if not isinstance(rows, list):
+        raise ProtocolError("好友列表响应缺少 data[]")
+    for index, friend in enumerate(rows):
+        if not isinstance(friend, Mapping):
+            raise ProtocolError(f"好友列表 data[{index}] 必须是 object")
+        _positive_int(friend.get("character_id"), f"friends.data[{index}].character_id")
+        name = friend.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ProtocolError(f"好友列表 data[{index}].name 必须是非空字符串")
+        profile_url = friend.get("profile_url")
+        if not isinstance(profile_url, str) or not profile_url.strip():
+            raise ProtocolError(f"好友列表 data[{index}].profile_url 必须是非空字符串")
+    return [dict(friend) for friend in rows]
 
 
 def validate_trade_details(data: Mapping[str, Any], requested_trade_id: int) -> Dict[str, Any]:

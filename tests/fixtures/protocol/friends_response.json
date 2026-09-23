@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": 188266,
+      "character_id": 782924,
+      "name": "rkoronax",
+      "avatar_url": "https://cdn.idle-mmo.com/avatar-fixture.png",
+      "background_url": "https://cdn.idle-mmo.com/background-fixture.jpg",
+      "is_pinned": false,
+      "profile_url": "https://web.idle-mmo.com/@rkoronax?same_window=true",
+      "level": {"label": "Total Level", "value": 242},
+      "status": {"label": "Online", "dot_class": "bg-green-500", "activity": "46 seconds ago"},
+      "friend_request_id": null
+    }
+  ],
+  "current_page": 1,
+  "last_page": 1,
+  "total": 1,
+  "pending_friend_requests": 0,
+  "summary": {"label": "Slots Used", "value": "1 / 25"},
+  "empty_state": {"title": "No Friends", "description": "It looks like you have no friends."}
+}

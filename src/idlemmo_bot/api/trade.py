@@ -4,12 +4,12 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, Optional
 
-from ..config import BASE_URL
 from .exceptions import GameAPIError, ProtocolError, TradeValidationError
 from .policy import RequestPolicy
 from ..protocol import (
     json_object,
     require_signed_endpoint,
+    validate_friend_list,
     validate_success,
     validate_trade_create,
     validate_trade_details,
@@ -18,6 +18,69 @@ from ..protocol import (
 
 
 class TradeMixin:
+    def list_friends(self, page: int = 1) -> Dict[str, Any]:
+        """读取好友列表，作为当前交易对象解析的入口。"""
+        page = int(page)
+        if page <= 0:
+            raise ValueError("page 必须是正整数")
+
+        profile_url = self.get_profile_url()
+        res_page = self._get(profile_url)
+        self._raise_if_expired_session(res_page, "打开好友列表页面")
+        if res_page.status_code != 200:
+            raise GameAPIError(
+                f"打开好友列表页面失败 (HTTP {res_page.status_code}): {res_page.text}"
+            )
+        self._parse_page_context(res_page.text, update_identity=False)
+
+        endpoint = self.endpoints.get("friends.endpoint")
+        if not endpoint:
+            raise GameAPIError("未找到 friends.endpoint 签名链接")
+        require_signed_endpoint(endpoint, "friends.endpoint", reject_expired=False)
+
+        payload: Dict[str, Any] = {
+            "page": page,
+            "type": "friends",
+            "ts2mic5ytx": "V1VQ",
+            "qty6bx4peh": "VFg=",
+            "gcem8x71nt": "V1ZQQhxbUFlWVlxeVg==",
+            "v": "1.0.0.1",
+        }
+        payload.update(self._runtime_fields())
+        res = self._post(
+            endpoint,
+            json=payload,
+            headers=self.get_auth_headers(referer=profile_url),
+            policy=RequestPolicy.READ_ONLY,
+        )
+        self._raise_if_expired_session(res, "查询好友列表请求")
+        if res.status_code != 200:
+            raise GameAPIError(f"查询好友列表失败 (HTTP {res.status_code}): {res.text}")
+        data = json_object(res, "好友列表")
+        validate_friend_list(data)
+        return data
+
+    def find_friend(self, target_character_id: int) -> Dict[str, Any]:
+        """按角色 ID 在好友列表中找到交易目标。"""
+        target_character_id = int(target_character_id)
+        if target_character_id <= 0:
+            raise ValueError("target_character_id 必须是正整数")
+
+        page = 1
+        while True:
+            data = self.list_friends(page)
+            friends = validate_friend_list(data)
+            for friend in friends:
+                if int(friend["character_id"]) == target_character_id:
+                    return friend
+
+            last_page = int(data.get("last_page", page) or page)
+            if page >= last_page:
+                break
+            page += 1
+
+        raise GameAPIError(f"目标角色 {target_character_id} 不在当前好友列表中")
+
     def list_trades(self, page: int = 1) -> Dict[str, Any]:
         """读取当前角色交易列表。
 
@@ -66,35 +129,27 @@ class TradeMixin:
     def create_trade(self, target_character_id: int) -> int:
         """发起交易并返回 trade_id。
 
-        先打开对方真实角色主页，从页面标题解析角色名；交易 Referer 不再把
-        character_id 误当成 URL 中的角色名。
+        先从好友列表取得真实角色名与 profile_url，再打开对方主页建立交易上下文。
         """
         target_character_id = int(target_character_id)
-        partner_page_by_id = f"{BASE_URL}/@{target_character_id}?same_window=true"
-        res = self._get(partner_page_by_id)
-        self._raise_if_expired_session(res, "打开交易对方主页")
-        if res.status_code != 200:
-            raise GameAPIError(f"打开交易对方主页失败 (HTTP {res.status_code}): {res.text}")
-
-        partner_name = self._extract_character_name(res.text)
-        target_id_from_page: Optional[int] = None
-        char_match = re.search(r'name="character-id"\s+content="([^"]+)"', res.text)
-        if char_match:
-            try:
-                target_id_from_page = int(char_match.group(1))
-            except ValueError:
-                pass
-        if target_id_from_page is not None and target_id_from_page != target_character_id:
+        friend = self.find_friend(target_character_id)
+        if int(friend["character_id"]) != target_character_id:
             raise TradeValidationError(
-                f"交易目标身份异常: 请求={target_character_id}, 页面={target_id_from_page}"
+                f"好友目标身份异常: 请求={target_character_id}, 好友记录={friend.get('character_id')}"
             )
-        if not partner_name:
-            raise GameAPIError("无法从交易对方主页解析角色名")
+        partner_name = str(friend["name"]).strip()
+        partner_profile_url = self._extract_clean_url(str(friend["profile_url"]))
+        if not partner_name or not partner_profile_url:
+            raise GameAPIError("好友记录缺少交易对方的角色名或主页链接")
 
+        # 新版好友交易流程不需要 GET 对方主页来取得 character-id。
+        # 好友接口已经给出了真实 character_id + profile_url；直接使用当前页面
+        # 已解析的短期交易端点发起 POST /api/trades/create，并把对方 profile_url
+        # 作为后续交易请求的 Referer。GET 对方主页在当前站点会返回当前登录角色
+        # 的页面，从而导致“请求=目标、页面=当前角色”的假身份校验。
         self.trade_target_id = target_character_id
         self.trade_target_name = partner_name
-        self.trade_target_profile_url = f"{BASE_URL}/@{partner_name}?same_window=true"
-        self._parse_page_context(res.text, update_identity=False)
+        self.trade_target_profile_url = partner_profile_url
 
         trade_create_url = self.endpoints.get("trade.create.endpoint")
         if not trade_create_url:
@@ -154,10 +209,10 @@ class TradeMixin:
         """读取交易详情；每次读取前刷新交易页，避免复用过期短签名。"""
         trade_id = int(trade_id)
         if trade_page_url is None:
-            if target_character_id is not None:
-                trade_page_url = self._trade_referer(target_character_id)
-            else:
-                trade_page_url = self.get_profile_url()
+            # 新交易流程中好友的 profile_url 只用于创建交易时的 Referer。
+            # 交易详情端点属于当前登录角色的页面上下文；对方 profile_url
+            # 可能是 UI 路由或已不存在的 URL，不能拿它刷新签名端点。
+            trade_page_url = self.get_profile_url()
         self._refresh_trade_context(trade_page_url)
 
         get_url = self.endpoints.get("trade.get.endpoint")

@@ -124,6 +124,16 @@ class ContextMixin:
                 trade_list_match.group(0)
             )
 
+        friend_list_match = re.search(
+            r'https?:[\\/]+web\.idle-mmo\.com[\\/]+api[\\/]+friends\?[^"\'<>\s]+',
+            html,
+            re.IGNORECASE,
+        )
+        if friend_list_match:
+            self.endpoints["friends.endpoint"] = self._extract_clean_url(
+                friend_list_match.group(0)
+            )
+
     def _runtime_fields(self) -> Dict[str, Any]:
         if "runtime_field" in self.runtime_meta and "runtime_value" in self.runtime_meta:
             return {self.runtime_meta["runtime_field"]: self.runtime_meta["runtime_value"]}
