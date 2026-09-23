@@ -29,12 +29,6 @@ accounts:
     remark: "Vineward"
     role: worker
 
-  worker_4:
-    email: "yang1999325@gmail.com"
-    password_env: "IDLEMMO_WORKER_4_PASSWORD"
-    remark: "Cursedglint"
-    role: worker
-
   worker_5:
     email: "rainyhush7@gmail.com"
     password_env: "IDLEMMO_WORKER_5_PASSWORD"
