@@ -684,6 +684,9 @@ class Worker:
                 self.sell_plan = []
                 return
             except Exception as e:
+                if self.stop.is_set():
+                    self.log.info("[赚钱]收到停止信号，结束当前赚钱轮次。")
+                    return
                 failures.append((name, e))
                 if index < len(self.sell_plan) - 1:
                     self.log.warning(

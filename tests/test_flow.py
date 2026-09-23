@@ -768,6 +768,39 @@ class TestWorkerFlow(unittest.TestCase):
 
         self.assertEqual(client.sold, [(2018, 5)])
 
+    def test_stop_during_earning_is_not_logged_as_material_failure(self):
+        """手动停止导致请求取消时，不应尝试备用材料或记录失败。"""
+        store = make_store([], self.tmp.name)
+        stop = threading.Event()
+
+        class StopOnSell(PrioritySellClient):
+            def sell_item(self, item_id, quantity):
+                stop.set()
+                raise GameAPIError("请求收到停止信号，取消后续网络操作")
+
+        client = StopOnSell("w1")
+        client.inv.update({2: 5, 2018: 5})
+        plans = [
+            {"name": "Yew Log", "skill": "woodcutting", "skill_item_id": 2,
+             "inventory_item_id": 2, "batch_size": 5, "gather_seconds": 16.5},
+            {"name": "Limestone", "skill": "mining", "skill_item_id": 561,
+             "inventory_item_id": 2018, "batch_size": 5, "gather_seconds": 50},
+        ]
+        w = Worker(
+            account("w1"), store, 999, stop,
+            sell_plan=plans, client_factory=lambda e, p, n: client, **FAST,
+        )
+        w.client = client
+
+        with self.assertLogs(w.log, level="INFO") as captured:
+            w._earn_gold_once()
+
+        output = "\n".join(captured.output)
+        self.assertIn("收到停止信号，结束当前赚钱轮次", output)
+        self.assertNotIn("本轮失败", output)
+        self.assertNotIn("所有出售材料本轮均失败", output)
+        self.assertEqual(client.sold, [])
+
     def test_sell_plan_uses_material_specific_gather_time(self):
         """赚钱材料的采集超时应使用计划自己的耗时。"""
         store = make_store([], self.tmp.name)
