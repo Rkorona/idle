@@ -12,55 +12,31 @@ accounts:
     role: main          # main = 不参与自动挂机调度
 
   worker_1:
-    email: "rkoronax@proton.me"
-    password_env: "IDLEMMO_WORKER_1_PASSWORD"
-    remark: "FoxhopeXV"
-    role: worker        
-
-  worker_2:
-    email: "rkoronaxs@proton.me"  
-    password_env: "IDLEMMO_WORKER_2_PASSWORD"
-    remark: "Eternalcursed"
-    role: worker
-
-  worker_3:
-    email: "replitb@proton.me"
-    password_env: "IDLEMMO_WORKER_3_PASSWORD"
-    remark: "Vineward"
-    role: worker
-
-  worker_5:
     email: "rainyhush7@gmail.com"
-    password_env: "IDLEMMO_WORKER_5_PASSWORD"
+    password_env: "IDLEMMO_WORKER_1_PASSWORD"
     remark: "Barkblade"
     role: worker 
  
-  worker_6:
+  worker_2:
     email: "rkoronax@gmail.com"
-    password_env: "IDLEMMO_WORKER_6_PASSWORD"
+    password_env: "IDLEMMO_WORKER_2_PASSWORD"
     remark: "Lnxs"
     role: worker 
   
-  worker_7:
+  worker_3:
     email: "rkoronaxs@gmail.com"
-    password_env: "IDLEMMO_WORKER_7_PASSWORD"
+    password_env: "IDLEMMO_WORKER_3_PASSWORD"
     remark: "Runeh"
     role: worker 
   
-  worker_8:
+  worker_4:
     email: "rkoronax@outlook.com"
-    password_env: "IDLEMMO_WORKER_8_PASSWORD"
+    password_env: "IDLEMMO_WORKER_4_PASSWORD"
     remark: "Keeng"
     role: worker 
     
-  worker_9:
+  worker_5:
     email: "rkoronaxss@outlook.com"
-    password_env: "IDLEMMO_WORKER_9_PASSWORD"
+    password_env: "IDLEMMO_WORKER_5_PASSWORD"
     remark: "Dawnwing"
-    role: worker 
-  
-  worker_10:
-    email: "rkoronaxs@outlook.com"
-    password_env: "IDLEMMO_WORKER_10_PASSWORD"
-    remark: "Ashenw"
     role: worker 
