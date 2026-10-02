@@ -15,6 +15,7 @@ from ..models.account import Credentials
 from ..tasks.base import Task, TaskResult
 from ..tasks.dungeon import SweepTask
 from ..tasks.reward import HarvestTask
+from ..tasks.open_chests import OpenChestsTask
 from .account_service import login
 
 log = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ log = logging.getLogger(__name__)
 REGISTRY: dict[str, Callable[[], Task]] = {
     HarvestTask.name: HarvestTask,
     SweepTask.name: SweepTask,
+    OpenChestsTask.name: OpenChestsTask,
 }
 
 

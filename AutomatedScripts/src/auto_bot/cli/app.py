@@ -4,7 +4,7 @@ import time
 import typer
 
 from ..logging import configure_from_cli
-from .commands import accept, boss, dungeon_fight, gift, run, tower
+from .commands import accept, boss, dungeon_fight, gift, open_chests, run, tower
 from .commands._common import (
     EXIT_USAGE,
     LOG_FILE_OPT,
@@ -51,6 +51,7 @@ app.command("gift")(gift.run)
 app.command("accept-trades")(accept.run)
 app.command("tower")(tower.run)
 app.command("dungeon-fight")(dungeon_fight.run)
+app.command("open-chests")(open_chests.run)
 
 
 def main() -> None:
