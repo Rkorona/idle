@@ -3,6 +3,8 @@
 根据 har 数据包分析：
 - 获取地图信息：GET http://gamemap.firetheword.cn/map_{map_id}_{timestamp}.txt (外部 URL)
 - 开启宝箱：GET /game/world/map/openSnatch/{chest_id}/map/{map_type}
+
+注意：只开启 isRoot="1" 的真正宝箱节点。
 """
 
 from __future__ import annotations
@@ -42,7 +44,9 @@ def run(
     log_file: str | None = LOG_FILE_OPT,
 ) -> None:
     """
-    列出地图中的全部宝箱并按顺序开启。
+    列出地图中的全部宝箱（isRoot=1）并按顺序开启。
+    
+    每个宝箱之间会添加 0.5-2.0 秒的随机延迟，防止请求过快导致服务器错误。
     
     使用方法：
         auto-bot open-chests 30105576
