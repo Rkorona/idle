@@ -1,1 +1,0 @@
-- [技能目录价格字段](skill-catalog-pricing.md) — 技能目录里的市场价不是 NPC 售价；没有 NPC 价格时不要做收益率排序。

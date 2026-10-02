@@ -1,0 +1,18 @@
+.class public interface abstract Lcom/sb/mnmh/module/function/inn/TheInnContract$Model;
+.super Ljava/lang/Object;
+.source "TheInnContract.java"
+
+# interfaces
+.implements Lcom/apesplant/mvp/lib/base/BaseModelCreate;
+.implements Lcom/sb/mnmh/module/function/inn/TheInnService;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/sb/mnmh/module/function/inn/TheInnContract;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "Model"
+.end annotation

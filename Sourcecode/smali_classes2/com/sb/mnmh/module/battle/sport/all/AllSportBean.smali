@@ -1,0 +1,93 @@
+.class public Lcom/sb/mnmh/module/battle/sport/all/AllSportBean;
+.super Ljava/lang/Object;
+.source "AllSportBean.java"
+
+# interfaces
+.implements Lcom/apesplant/mvp/lib/base/listview/IListBean;
+
+
+# instance fields
+.field public area_id:Ljava/lang/String;
+
+.field public create_time:Ljava/lang/String;
+
+.field public fight_num:Ljava/lang/String;
+
+.field public hasFight:Z
+
+.field public id:Ljava/lang/String;
+
+.field public num:Ljava/lang/String;
+
+.field public property:Lcom/sb/mnmh/module/serviceArea/PropertyBean;
+
+.field public ranking_num:Ljava/lang/String;
+
+.field public ranking_type:Ljava/lang/String;
+
+.field public update_time:Ljava/lang/String;
+
+.field public user_id:Ljava/lang/String;
+
+.field public user_img:Ljava/lang/String;
+
+.field public user_name:Ljava/lang/String;
+
+
+# direct methods
+.method public constructor <init>()V
+    .locals 0
+
+    .line 12
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public getPageAt(IILjava/io/Serializable;Lcom/apesplant/mvp/lib/api/IApiConfig;)Lio/reactivex/Observable;
+    .locals 0
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "<D::",
+            "Ljava/io/Serializable;",
+            ">(IITD;",
+            "Lcom/apesplant/mvp/lib/api/IApiConfig;",
+            ")",
+            "Lio/reactivex/Observable;"
+        }
+    .end annotation
+
+    const/4 p2, 0x1
+
+    if-ne p1, p2, :cond_0
+
+    .line 29
+    new-instance p1, Ljava/util/HashMap;
+
+    invoke-direct {p1}, Ljava/util/HashMap;-><init>()V
+
+    .line 30
+    check-cast p3, Ljava/lang/String;
+
+    const-string p2, "ranking_type"
+
+    invoke-virtual {p1, p2, p3}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 31
+    new-instance p2, Lcom/sb/mnmh/module/battle/sport/all/AllSportModule;
+
+    invoke-direct {p2}, Lcom/sb/mnmh/module/battle/sport/all/AllSportModule;-><init>()V
+
+    invoke-virtual {p2, p1}, Lcom/sb/mnmh/module/battle/sport/all/AllSportModule;->topList(Ljava/util/HashMap;)Lio/reactivex/Observable;
+
+    move-result-object p1
+
+    return-object p1
+
+    :cond_0
+    const/4 p1, 0x0
+
+    return-object p1
+.end method

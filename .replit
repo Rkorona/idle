@@ -1,8 +1,0 @@
-modules = ["python-3.10", "bash"]
-
-[nix]
-channel = "stable-25_05"
-packages = ["libyaml"]
-
-[agent]
-expertMode = true
