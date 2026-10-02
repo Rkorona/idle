@@ -1,13 +1,10 @@
 """
 宝箱服务：获取地图中的全部宝箱并按顺序开启。
 
-根据 har 数据包分析：
-- 获取地图信息：GET http://gamemap.firetheword.cn/map_30105576_16.txt (外部 URL)
-  - 返回 JSON 列表，每个元素包含：id, mapId, mapPId, mapType, mapName, x, y, isRoot, createBy, createTime 等
-- 开启宝箱：GET /game/world/map/openSnatch/{chest_id}/map/{map_type}
-  - 返回 JSON 列表，包含物品信息：goods_name, num, name
-
-注意：只有 isRoot="1" 的节点才是真正的宝箱，需要开启。
+根据用户提供的数据：
+- 地图数据：JSON 列表，每个元素包含 id, mapType, isRoot, mapPId 等字段
+- 只有 mapType == 19 的节点才是真正的宝箱
+- 开启接口：GET /game/world/map/openSnatch/{chest_id}/map/19
 """
 
 from __future__ import annotations
@@ -23,7 +20,6 @@ import httpx
 from ..api.client import GameClient
 from ..api.exceptions import ApiError, BusinessError, HttpError
 from ..models.treasure import ChestInfo, MapTreasureData, OpenChestResult
-from ..utils.retry import retry_on_server_error
 
 log = logging.getLogger(__name__)
 
@@ -34,19 +30,15 @@ MAP_DATA_URL_PATTERN = "http://gamemap.firetheword.cn/map_{map_id}_{timestamp}.t
 MIN_DELAY = 0.5
 MAX_DELAY = 2.0
 
+# 真正的宝箱 mapType 值 - 根据用户确认，只有 mapType == 19 才是宝箱
+TREASURE_MAP_TYPE = 19
+
 
 def _parse_map_data(text: str) -> MapTreasureData:
     """
     解析地图文本文件，提取宝箱信息。
     
-    根据 har 文件，地图文件是 JSON 列表格式，每个元素包含：
-    - id: 宝箱 ID
-    - mapType: 地图类型
-    - mapId: 地图 ID
-    - mapPId: 父地图 ID
-    - mapName: 地图名称
-    - x, y: 坐标
-    - isRoot: "1" 表示是真正的宝箱，"0" 表示其他类型节点
+    重要：只提取 mapType == 19 的节点作为宝箱。
     """
     try:
         data = json.loads(text)
@@ -57,43 +49,37 @@ def _parse_map_data(text: str) -> MapTreasureData:
     except json.JSONDecodeError:
         pass
     
-    # 如果不是 JSON，尝试用正则表达式提取
-    return _parse_map_text(text)
+    return MapTreasureData(chests=[])
 
 
 def _parse_map_list(data: list[Any]) -> MapTreasureData:
     """
     解析列表格式的地图数据。
     
-    重要：只提取 isRoot="1" 的节点作为宝箱。
-    根据用户提供的数据，只有 isRoot="1" 的节点才有 mapType=19，才是真正的宝箱。
+    重要：只提取 mapType == 19 的节点作为宝箱。
     """
     chests = []
     for item in data:
-        if isinstance(item, dict):
-            # 只处理 isRoot="1" 的真正宝箱
-            is_root = str(item.get("isRoot", "0"))
-            if is_root != "1":
-                continue
-            
-            # 只有 isRoot="1" 的节点才有 mapType 字段
-            map_type = int(item.get("mapType", item.get("map_type", 0)))
-            # 跳过 mapType=0 的节点（非宝箱）
-            if map_type == 0:
-                continue
-            
-            chest_info = ChestInfo(
-                id=int(item.get("id", 0)),
-                map_type=map_type,
-                name=str(item.get("mapName", item.get("name", ""))),
-                x=int(item.get("x", 0)),
-                y=int(item.get("y", 0)),
-                extra={
-                    k: v for k, v in item.items() 
-                    if k not in ["id", "mapType", "map_type", "mapName", "name", "x", "y", "mapId", "mapPId", "isRoot"]
-                }
-            )
-            chests.append(chest_info)
+        if not isinstance(item, dict):
+            continue
+        
+        # 只处理 mapType == 19 的真正宝箱
+        map_type = int(item.get("mapType", item.get("map_type", 0)))
+        if map_type != TREASURE_MAP_TYPE:
+            continue
+        
+        chest_info = ChestInfo(
+            id=int(item.get("id", 0)),
+            map_type=TREASURE_MAP_TYPE,  # 固定为 19
+            name=str(item.get("mapName", item.get("name", ""))),
+            x=int(item.get("x", 0)),
+            y=int(item.get("y", 0)),
+            extra={
+                k: v for k, v in item.items() 
+                if k not in ["id", "mapType", "map_type", "mapName", "name", "x", "y", "mapId", "mapPId", "isRoot"]
+            }
+        )
+        chests.append(chest_info)
     
     return MapTreasureData(chests=chests)
 
@@ -110,15 +96,12 @@ def _parse_map_dict(data: dict[str, Any]) -> MapTreasureData:
             if isinstance(chest_list, list):
                 for chest in chest_list:
                     if isinstance(chest, dict):
-                        is_root = str(chest.get("isRoot", "0"))
-                        if is_root != "1":
-                            continue
                         map_type = int(chest.get("mapType", chest.get("map_type", 0)))
-                        if map_type == 0:
+                        if map_type != TREASURE_MAP_TYPE:
                             continue
                         chest_info = ChestInfo(
                             id=int(chest.get("id", 0)),
-                            map_type=map_type,
+                            map_type=TREASURE_MAP_TYPE,
                             name=str(chest.get("mapName", chest.get("name", ""))),
                             x=int(chest.get("x", 0)),
                             y=int(chest.get("y", 0)),
@@ -128,22 +111,6 @@ def _parse_map_dict(data: dict[str, Any]) -> MapTreasureData:
                 break
     
     return MapTreasureData(chests=chests, map_id=map_id, map_name=map_name)
-
-
-def _parse_map_text(text: str) -> MapTreasureData:
-    """解析文本格式的地图数据，使用正则表达式。"""
-    import re
-    chests = []
-    
-    # 尝试匹配类似 "id": 123, "mapType": 456, "isRoot": "1" 的模式
-    pattern = r'\{.*?"id"\s*:\s*(\d+).*?"isRoot"\s*:\s*"1".*?"mapType"\s*:\s*(\d+).*?\}'
-    matches = re.findall(pattern, text, re.DOTALL)
-    
-    for chest_id, map_type in matches:
-        if int(map_type) > 0:
-            chests.append(ChestInfo(id=int(chest_id), map_type=int(map_type)))
-    
-    return MapTreasureData(chests=chests)
 
 
 async def fetch_map_data(map_id: int, timestamp: int = 16) -> MapTreasureData:
@@ -171,7 +138,7 @@ async def fetch_map_data(map_id: int, timestamp: int = 16) -> MapTreasureData:
 
 
 def _parse_items(items_data: Any) -> list[tuple[str, int]]:
-    """解析物品列表。根据 har 文件，返回的是 [{goods_name, num, name}, ...] 格式。"""
+    """解析物品列表。"""
     items = []
     if isinstance(items_data, list):
         for item in items_data:
@@ -186,13 +153,10 @@ async def open_chest(client: GameClient, chest_id: int, map_type: int) -> OpenCh
     """
     开启指定的宝箱。
     
-    根据 har 文件，开启接口是 GET 请求：
-    GET /game/world/map/openSnatch/{chest_id}/map/{map_type}
-    
     Args:
         client: 已登录的 GameClient
         chest_id: 宝箱 ID
-        map_type: 地图类型
+        map_type: 地图类型（固定为 19）
         
     Returns:
         OpenChestResult: 开启结果
@@ -202,7 +166,6 @@ async def open_chest(client: GameClient, chest_id: int, map_type: int) -> OpenCh
     try:
         data = await client.get(path)
         
-        # 根据 har 文件，返回的是物品列表 JSON
         if isinstance(data, list):
             return OpenChestResult(
                 chest_id=chest_id,
@@ -211,7 +174,6 @@ async def open_chest(client: GameClient, chest_id: int, map_type: int) -> OpenCh
                 items=_parse_items(data)
             )
         elif isinstance(data, dict):
-            # 可能有 http_code 字段
             http_code = data.get("http_code")
             if http_code == 200:
                 return OpenChestResult(
@@ -235,7 +197,6 @@ async def open_chest(client: GameClient, chest_id: int, map_type: int) -> OpenCh
         )
         
     except (ApiError, HttpError) as e:
-        log.error(f"开启宝箱 {chest_id} 失败: {e}")
         return OpenChestResult(
             chest_id=chest_id,
             success=False,
@@ -253,7 +214,7 @@ async def list_and_open_chests(
     rng: random.Random | None = None,
 ) -> list[OpenChestResult]:
     """
-    获取地图中的全部宝箱并按顺序开启。
+    获取地图中的全部宝箱（mapType == 19）并按顺序开启。
     
     Args:
         client: 已登录的 GameClient
@@ -273,12 +234,12 @@ async def list_and_open_chests(
     map_data = await fetch_map_data(map_id, timestamp)
     
     if not map_data.chests:
-        log.info(f"地图 {map_id} 中未找到宝箱")
+        log.info(f"地图 {map_id} 中未找到宝箱（mapType={TREASURE_MAP_TYPE}）")
         return results
     
-    log.info(f"地图 {map_id} 中找到 {len(map_data.chests)} 个宝箱")
+    log.info(f"地图 {map_id} 中找到 {len(map_data.chests)} 个宝箱（mapType={TREASURE_MAP_TYPE}）")
     
-    # 按顺序开启宝箱，添加随机延迟防止封号
+    # 按顺序开启宝箱，添加随机延迟
     for i, chest in enumerate(map_data.chests):
         log.info(f"正在开启宝箱 {chest.id} (map_type={chest.map_type}) [{i+1}/{len(map_data.chests)}]...")
         result = await open_chest(client, chest.id, chest.map_type)
