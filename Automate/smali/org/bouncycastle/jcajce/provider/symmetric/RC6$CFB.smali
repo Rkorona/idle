@@ -1,0 +1,40 @@
+.class public Lorg/bouncycastle/jcajce/provider/symmetric/RC6$CFB;
+.super Lorg/bouncycastle/jcajce/provider/symmetric/util/a;
+.source "SourceFile"
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lorg/bouncycastle/jcajce/provider/symmetric/RC6;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x9
+    name = "CFB"
+.end annotation
+
+
+# direct methods
+.method public constructor <init>()V
+    .locals 4
+
+    new-instance v0, LO5/e;
+
+    new-instance v1, LZ5/e;
+
+    new-instance v2, LB/j0;
+
+    const/4 v3, 0x2
+
+    invoke-direct {v2, v3}, LB/j0;-><init>(I)V
+
+    const/16 v3, 0x80
+
+    invoke-direct {v1, v2, v3}, LZ5/e;-><init>(LO5/d;I)V
+
+    invoke-direct {v0, v1}, LO5/e;-><init>(LO5/d;)V
+
+    invoke-direct {p0, v0}, Lorg/bouncycastle/jcajce/provider/symmetric/util/a;-><init>(LO5/e;)V
+
+    return-void
+.end method

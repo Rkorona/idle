@@ -1,0 +1,14 @@
+.class public interface abstract Lcom/llamalab/automate/W2;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# virtual methods
+.method public abstract R(Ljava/lang/Throwable;)V
+.end method
+
+.method public abstract m(I)V
+.end method
+
+.method public abstract p(I)V
+.end method

@@ -1,0 +1,13 @@
+.class public final LL/d;
+.super Ljava/lang/Object;
+.source "SourceFile"
+
+
+# direct methods
+.method public static final a(Landroid/os/Bundle;Ljava/lang/String;Landroid/os/IBinder;)V
+    .locals 0
+
+    invoke-static {p0, p1, p2}, LL/c;->n(Landroid/os/Bundle;Ljava/lang/String;Landroid/os/IBinder;)V
+
+    return-void
+.end method
