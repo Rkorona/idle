@@ -1,6 +1,6 @@
 {
   "A array of XML nodes serialized to text."
-  "数组的 XML 节点 serialized 到文本."
+  "序列化为文本的 XML 节点数组。"
 }
 {
   "A connection"
@@ -8,19 +8,19 @@
 }
 {
   "A constant equal to a circle’s circumference divided by its diameter"
-  "圆的圆周率常数"
+  "圆周率常量（圆周长与直径之比）"
 }
 {
   "A constant holding a Not-a-Number (NaN)."
-  "一个包含非数字(NaN)的常数"
+  "表示非数值（NaN）的常量。"
 }
 {
   "A destination for Go to blocks."
-  "目标用于 Go 到模块."
+  "“跳转”块的目标位置。"
 }
 {
   "A file or directory was opened."
-  "文件或目录是已打开."
+  "文件或目录已打开。"
 }
 {
   "A file or subdirectory was moved from the monitored directory."
@@ -28,55 +28,55 @@
 }
 {
   "A GTalk connection has been disconnected."
-  "GTalk 连接有已已断开."
+  "GTalk 连接已断开。"
 }
 {
   "A GTalk connection has been established."
-  "一个 GTalk 连接已建立"
+  "GTalk 连接已建立。"
 }
 {
   "<p>This app is a powerful tool. Improper use may result in unintentional loss of data, exposed personal information or incur mobile carrier costs. Use with caution, this software comes with ABSOLUTELY NO WARRANTY. Click <i>Accept</i> to acknowledge that you have read, accepted and agree to be bound by the terms and conditions in the <a href=intent:#Intent;component=com.llamalab.automate/.EulaActivity;end>End User License Agreement</a>.</p>This app respects your privacy therefore it doesn’t show ads nor gather usage statistics (analytics), and its optional features that do require “personal information” only collect the essential data. This app uses <i>Google Play services</i> which collect version information about its components, the OS, this app and the app (store) that installed it. See <a href=intent:#Intent;component=com.llamalab.automate/.PrivacyPolicyActivity;end>Privacy Policy</a>."
-  "<p>这个应用程序是一个强大的工具不正确的使用可能导致数据无意中丢失、个人信息泄露或产生手机费用请谨慎使用,此软件不提供任何保证点击<i>接受</i> 表示您已经阅读、接受并同意遵守<a href=intent:#Intent;component=com.llamalab.automate/.EulaActivity;end>最终用户许可协议</a> 中的条款和条件</p> 此应用程序尊重您的隐私,因此不会展示广告,也不会收集使用数据(分析报告),它的可选功能如果需要“个人信息”,也只会收集必要的数据此应用程序使用<i>Google Play 服务</i>,后者会收集有关其组件、操作系统、此应用程序和安装它的应用程序(商店)的版本信息请参阅<a href=intent:#Intent;component=com.llamalab.automate/.PrivacyPolicyActivity;end>隐私政策</a>"
+  "<p>本应用功能强大。使用不当可能导致数据意外丢失、个人信息泄露或产生运营商费用，请谨慎使用。本软件不提供任何明示或暗示的保证。点击<i>接受</i>即表示您确认已阅读并接受<a href=intent:#Intent;component=com.llamalab.automate/.EulaActivity;end>最终用户许可协议</a>中的条款。</p>本应用尊重您的隐私，因此不会展示广告或收集使用统计信息（分析数据）。需要使用“个人信息”的可选功能仅会收集必要信息。本应用使用<i>Google Play 服务</i>；该服务会收集其组件、操作系统、本应用以及安装本应用的应用商店的版本信息。请参阅<a href=intent:#Intent;component=com.llamalab.automate/.PrivacyPolicyActivity;end>隐私政策</a>。"
 }
 {
   "<p>Allow <b>Automate</b> to %1$s?</p>A rooted device is required, otherwise <a href=intent:/adb.html#Intent;component=com.llamalab.automate/.HelpActivity;end>adb</a> has to be used."
-  "<p>允许<b>Automate</b>%1$s 吗?</p> 需要 root 权限的设备,否则必须使用<a href=intent:/adb.html#Intent;component=com.llamalab.automate/.HelpActivity;end>adb</a>。"
+  "<p>是否允许 <b>Automate</b>%1$s？</p>此操作需要已获取 root 权限的设备；否则必须使用 <a href=intent:/adb.html#Intent;component=com.llamalab.automate/.HelpActivity;end>adb</a>。"
 }
 {
   "<b>Automate</b> can request installation of app packages, ensure they come from trusted sources. No data is collected or shared, see <a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Privacy Policy</a>."
-  "<b>Automate</b> 可以请求安装应用程序包,请确保它们来自可信来源。没有收集或共享任何数据,请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
+  "<b>Automate</b> 可以请求安装应用包。请确保应用包来自可信来源。本应用不会收集或共享数据，详情请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
 }
 {
   "<b>Automate</b> features that may access or collect “personal information” has an age restriction, see <a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Privacy Policy</a>. Can’t be changed once confirmed."
-  "<b>Automate</b> 那些可能会访问或收集“个人信息”的功能有年龄限制,请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a> 确认后无法更改"
+  "<b>Automate</b> 中可能访问或收集“个人信息”的功能设有年龄限制。请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。确认后无法更改。"
 }
 {
   "<b>Automate</b> require the following privileges to %1$s:"
-  "<b>Automate</b> 需要以下权限来%1$s:"
+  "<b>Automate</b> 需要以下权限才能%1$s："
 }
 {
   "<b>Automate</b> requires access to location data while in the background to run a flow including the <i>Bluetooth device scan</i>, <i>Cell signal strength</i>, <i>Cell tower near</i>, <i>Location at</i>, <i>Location get</i>, <i>Location mock</i>, <i>Mobile service set state</i>, <i>Network service discover</i>, <i>Wi-Fi network connect</i>, <i>Wi-Fi network connected</i> or <i>Wi-Fi network scan</i> block. No data is collected or shared, see <a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Privacy Policy</a>."
-  "<b>Automate</b> 需要在后台访问位置数据才能运行包含<i>蓝牙设备扫描</i>、<i>蜂窝信号强度</i>、<i>附近蜂窝塔</i>、<i>当前位置</i>、<i>获取位置</i>、<i>模拟位置</i>、<i>移动服务设置状态</i>、<i>网络服务发现</i>、<i>WiFi 网络连接</i>、<i>WiFi 网络已连接</i> 或<i>WiFi 网络扫描</i> 模块的流程没有收集或共享任何数据,请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>"
+  "<b>Automate</b> 需要在后台访问位置信息，才能运行包含以下块的流程：<i>蓝牙设备扫描</i>、<i>蜂窝信号强度</i>、<i>附近的蜂窝基站</i>、<i>指定位置</i>、<i>获取位置</i>、<i>模拟位置</i>、<i>设置移动网络服务状态</i>、<i>发现网络服务</i>、<i>连接 Wi-Fi 网络</i>、<i>Wi-Fi 网络已连接</i>或<i>扫描 Wi-Fi 网络</i>。本应用不会收集或共享数据。请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
 }
 {
   "<b>Automate</b> requires the following privilege to %1$s:"
-  "<b>Automate</b> 需要以下权限来%1$s:"
+  "<b>Automate</b> 需要以下权限才能%1$s："
 }
 {
   "<b>Automate</b> uses the <i>Accessibility API</i> to interact with the UI, intercept key presses and read notifications & “toast” messages. No data is collected or shared, see <a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Privacy Policy</a>."
-  "<b>Automate</b> 使用<i>无障碍 API</i> 来与用户界面交互,拦截键盘输入并读取通知和“toast”消息。没有收集或共享任何数据,请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
+  "<b>Automate</b> 使用<i>无障碍 API</i>与界面交互、拦截按键，并读取通知和“Toast”提示。本应用不会收集或共享数据。请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
 }
 {
   "<b>Automate</b> uses the <i>Accessibility API</i> to show an accessibility button and intercept its presses. No data is collected or shared, see <a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Privacy Policy</a>."
-  "<b>Automate</b> 使用<i>无障碍 API</i> 来显示一个无障碍按钮并拦截它的点击没有收集或共享任何数据,请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>"
+  "<b>Automate</b> 使用<i>无障碍 API</i>显示无障碍按钮并响应按钮操作。本应用不会收集或共享数据。请参阅<a href=intent:/privacy.html#Intent;component=com.llamalab.automate/.HelpActivity;end>隐私政策</a>。"
 }
 {
   "<b>Use with caution!</b> Disable the <i>Run on system startup</i> option in <a href=intent:#Intent;component=com.llamalab.automate/.prefs.SettingsActivity;end>settings</a> during testing, and read the <a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Safe mode</a> help page."
-  "<b>请谨慎使用!</b> 在测试期间,请在<a href=intent:#Intent;component=com.llamalab.automate/.prefs.SettingsActivity;end>设置</a> 中禁用<i>开机启动</i> 选项,并阅读<a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>安全模式</a> 帮助页面"
+  "<b>请谨慎操作！</b> 测试期间，请在<a href=intent:#Intent;component=com.llamalab.automate/.prefs.SettingsActivity;end>设置</a>中关闭<i>开机时运行</i>，并阅读<a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>安全模式</a>帮助页面。"
 }
 {
   "<b>Automate</b> will have its permissions automatically revoked if not “interacted” with over a few months, possibly causing long running flows to fail, disable the <i>Remove permissions if app isn’t used</i> option in menu, <i>Play Protect</i>, <i>Permissions for Unused Apps</i>. Click <i>Forget</i> if it’s unavailable."
-  "如果几个月内未与<b>Automate</b>“交互”,其权限可能会被自动撤销,从而导致长期运行的流程失败请在菜单中的<i>Play Protect</i>、<i>未使用的应用的权限</i> 中禁用<i>如果应用未使用则撤销权限</i> 选项如果无法禁用,请点击<i>忘记</i>"
+  "如果几个月内未使用 <b>Automate</b>，系统可能会自动撤销其权限，导致长期运行的流程失败。请在菜单的 <i>Play Protect</i> → <i>未使用的应用的权限</i>中关闭<i>应用未使用时移除权限</i>。如果找不到此选项，请点按<i>忘记</i>。"
 }
 {
   "A file or subdirectory was moved to the monitored directory."
@@ -84,19 +84,19 @@
 }
 {
   "A file was deleted from the monitored directory."
-  "文件是已删除从 monitored 目录."
+  "监控目录中的文件已删除。"
 }
 {
   "A hint that audio is about to become “noisy” due to a change in audio outputs."
-  "一个提示，由于音频输出的变化，音频即将变得“嘈杂”"
+  "音频输出设备即将切换时发出的提示，例如拔下耳机时。"
 }
 {
   "A malicious or improper flow could repeatedly shutdown, reboot or lock the device so you can’t access it! Read the <a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>Safe mode</a> help page on how to recover from such a situation."
-  "恶意或不当的流程可能会反复关闭、重新启动或锁定设备，使您无法访问它！请阅读<a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>安全模式</a> 帮助页面，了解如何从这种情况中恢复"
+  "恶意或配置不当的流程可能反复关机、重启或锁定设备，导致您无法使用设备！如遇到这种情况，请阅读<a href=intent:/safe_mode.html#Intent;component=com.llamalab.automate/.HelpActivity;end>安全模式</a>帮助页面，了解如何恢复。"
 }
 {
   "A new application package has been installed on the device."
-  " 新应用软件包有已已安装在设备."
+  "设备上已安装新的应用。"
 }
 {
   "A new call arrived and is ringing or waiting. In the latter case, another call is already active."
@@ -108,19 +108,19 @@
 }
 {
   "A new picture has been added to the media store."
-  "一个新图片已添加到媒体库"
+  "媒体库中已添加新图片。"
 }
 {
   "A new version of an application package has been installed, replacing an existing version that was previously installed."
-  "已安装了一个新版本的应用程序包，取代了之前已安装的现有版本"
+  "应用包已更新为新版本，替换了设备上原有的版本。"
 }
 {
   "A new version of your application has been installed over an existing one."
-  " 新 version 的你的应用有已已安装在...上方一个现有一个."
+  "应用已安装新版本，替换了原有版本。"
 }
 {
   "A new video has been added to the media store."
-  " 新视频有已已添加到媒体 store."
+  "媒体库中已添加新视频。"
 }
 {
   "A numeric value."
@@ -128,11 +128,11 @@
 }
 {
   "A single XML node serialized to text."
-  "单个 XML 节点 serialized 到文本."
+  "序列化为文本的单个 XML 节点。"
 }
 {
   "A special location provider for receiving locations without actually initiating a location fix."
-  "一种特殊的位置提供程序，用于接收位置而不实际启动位置修复"
+  "一种特殊的位置提供程序，可接收位置信息而不实际启动定位过程。"
 }
 {
   "A specific, timely recommendation."
@@ -148,7 +148,7 @@
 }
 {
   "A tag written by Automate. Can contain content."
-  "标签已写入通过 Automate. 可以包含内容."
+  "由 Automate 写入的标签，可以包含内容。"
 }
 {
   "A textual value."
@@ -156,11 +156,11 @@
 }
 {
   "A user ID has been removed from the system."
-  " 用户 ID 有已已移除从系统."
+  "系统中已移除此用户 ID。"
 }
 {
   "A user declared variable."
-  "用户 declared 变量."
+  "用户声明的变量。"
 }
 {
   "APN settings"
@@ -192,11 +192,11 @@
 }
 {
   "Accept handover (Android 9+)"
-  "接受 handover (Android 9+)"
+  "接受通话切换（Android 9+）"
 }
 {
   "Accept or block a screened call."
-  "接受或模块 screened 通话."
+  "接听或拦截经过筛选的来电。"
 }
 {
   "Access API’s for SIP calling over VOIP or Wi-Fi."
@@ -216,7 +216,7 @@
 }
 {
   "Access loader usage stats."
-  "访问loader 使用情况 stats"
+  "访问加载器使用情况统计信息。"
 }
 {
   "Access media location (Android 11+)"
@@ -228,7 +228,7 @@
 }
 {
   "Access posted notifications."
-  "访问posted 通知"
+  "读取已发布的通知。"
 }
 {
   "Access the fingerprint scanner."
@@ -236,15 +236,15 @@
 }
 {
   "Access to body sensors such as heart rate, etc.."
-  "访问身体传感器，如心率等"
+  "访问心率等身体传感器。"
 }
 {
   "Access to coarse location information."
-  "访问到 coarse 位置信息"
+  "访问粗略位置信息"
 }
 {
   "Access to fine location information."
-  "访问到 fine 位置信息"
+  "访问精确位置信息"
 }
 {
   "Accessibility (Android 13+)"
@@ -268,11 +268,11 @@
 }
 {
   "Accessibility button chooser (Android 12+)"
-  "无障碍按钮 chooser (Android 12+)"
+  "无障碍按钮选择器（Android 12+）"
 }
 {
   "Accessibility display inversion enabled (Android 5+)"
-  "无障碍显示 inversion 已启用 (Android 5+)"
+  "无障碍显示反色已启用（Android 5+）"
 }
 {
   "Accessibility enabled"
@@ -284,15 +284,15 @@
 }
 {
   "Accessibility service has to access assist screenshot."
-  "无障碍服务有到访问辅助 screenshot."
+  "无障碍服务需要访问辅助功能截图。"
 }
 {
   "Accessibility service has to access assist structure."
-  "无障碍服务有到访问辅助 structure."
+  "无障碍服务需要访问辅助功能界面结构。"
 }
 {
   "Accessibility service not running"
-  "无障碍服务不运行中"
+  "无障碍服务未运行"
 }
 {
   "Accessibility settings"
@@ -308,7 +308,7 @@
 }
 {
   "Accessibility speak password (Android 4.0.3+)"
-  "无障碍 speak 密码 (Android 4.0.3+)"
+  "无障碍服务朗读密码（Android 4.0.3+）"
 }
 {
   "Account generic add"
@@ -320,11 +320,11 @@
 }
 {
   "Account pick?"
-  "账户选择?"
+  "选择账户？"
 }
 {
   "Account sync enabled?"
-  "账户同步已启用?"
+  "账户同步已启用？"
 }
 {
   "Account sync request"
@@ -352,27 +352,27 @@
 }
 {
   "Action notification"
-  "操作通知"
+  "通知操作"
 }
 {
   "Action primary"
-  "操作主要"
+  "主要操作"
 }
 {
   "Action quaternary"
-  "操作 quaternary"
+  "第四操作"
 }
 {
   "Action quinary"
-  "操作 quinary"
+  "第五操作"
 }
 {
   "Action secondary"
-  "操作次要"
+  "次要操作"
 }
 {
   "Action tertiary"
-  "操作 tertiary"
+  "第三操作"
 }
 {
   "Activate VPN (Android 4.4+)"
@@ -384,11 +384,11 @@
 }
 {
   "Activate an existing or create a new alarm in “clock” app."
-  "激活现有或创建新闹钟在 “时钟” 应用"
+  "在“时钟”应用中启用现有闹钟或创建新闹钟。"
 }
 {
   "Activate an existing or create a new timer in “clock” app."
-  "激活现有或创建新计时器在 “时钟” 应用"
+  "在“时钟”应用中启用现有计时器或创建新计时器。"
 }
 {
   "Activate device doze"
@@ -400,19 +400,19 @@
 }
 {
   "Active discovery"
-  "活动 discovery"
+  "主动发现"
 }
 {
   "Active low energy (Android 4.3+)"
-  "活动低能耗 (Android 4.3+)"
+  "低功耗模式（Android 4.3+）"
 }
 {
   "Active low latency (Android 6+)"
-  "活动低 latency (Android 6+)"
+  "低延迟模式（Android 6+）"
 }
 {
   "Active or deactivate device idle “doze” mode."
-  "活动或停用设备空闲 “休眠” 模式."
+  "启用或停用设备空闲（Doze）模式。"
 }
 {
   "Active profile UUID"
@@ -432,11 +432,11 @@
 }
 {
   "Activity recognition (Android 10+)"
-  "活动 recognition (Android 10+)"
+  "活动识别（Android 10+）"
 }
 {
   "Activity visible in the UI."
-  "活动可见在用户界面."
+  "界面中的 Activity 可见。"
 }
 {
   "Adaptive Multi-Rate Narrowband, the standard 3GPP speech codec used by GSM and UTMS. Saved in a 3GPP container as a .3gp file."
@@ -464,7 +464,7 @@
 }
 {
   "Add blocks, then drag the dots to connect them."
-  "添加块，然后拖动点连接它们"
+  "添加块，然后拖动连接点将它们连接起来。"
 }
 {
   "Add event"
@@ -472,7 +472,7 @@
 }
 {
   "Add files to the media store, Gallery and Music app."
-  "将文件添加到媒体库、画廊和音乐应用"
+  "将文件添加到媒体库，以及图库和音乐应用。"
 }
 {
   "Add media"
@@ -480,7 +480,7 @@
 }
 {
   "Add messages to the voice-mail content provider."
-  "添加消息到  voice-邮件内容提供者"
+  "向语音信箱内容提供程序添加消息。"
 }
 {
   "Add network"
@@ -488,7 +488,7 @@
 }
 {
   "Add network if unconfigured"
-  "添加网络如果 unconfigured"
+  "未配置时添加网络"
 }
 {
   "Add or replace a “Generic credentials” account."
@@ -500,7 +500,7 @@
 }
 {
   "Add to an existing zip file"
-  "添加到现有邮政编码文件"
+  "添加到现有 ZIP 文件"
 }
 {
   "Add variable"
@@ -512,7 +512,7 @@
 }
 {
   "Adds the delta to the stored value and assign the sum to the variable."
-  "将增量添加到存储的值，并将总和分配给变量"
+  "将增量加到已存储的值，并把总和赋给变量。"
 }
 {
   "Adjust Bluetooth volume."
@@ -528,7 +528,7 @@
 }
 {
   "Adjust master volume."
-  "调整master 音量"
+  "调整主音量。"
 }
 {
   "Adjust music/video volume."
@@ -564,35 +564,35 @@
 }
 {
   "Age verification"
-  "年龄 verification"
+  "年龄验证"
 }
 {
   "Airplane mode"
-  "飞行模式模式"
+  "飞行模式"
 }
 {
   "Airplane mode enabled?"
-  "飞行模式模式已启用?"
+  "飞行模式已启用？"
 }
 {
   "Airplane mode on"
-  "飞行模式模式在"
+  "飞行模式已开启"
 }
 {
   "Airplane mode radios"
-  "飞行模式模式无线电"
+  "飞行模式无线设备"
 }
 {
   "Airplane mode set state"
-  "飞行模式模式设置状态"
+  "设置飞行模式状态"
 }
 {
   "Airplane mode settings"
-  "飞行模式模式设置"
+  "飞行模式设置"
 }
 {
   "Airplane mode workaround"
-  "飞行模式模式变通方案"
+  "飞行模式兼容处理"
 }
 {
   "Alarm add"
@@ -600,11 +600,11 @@
 }
 {
   "Alarm alert"
-  "闹钟 alert"
+  "闹钟提醒"
 }
 {
   "Alarm clock"
-  "闹钟时钟"
+  "闹钟"
 }
 {
   "Alarm clock & native timer"
@@ -624,7 +624,7 @@
 }
 {
   "All CPUs"
-  "全部 CPUs"
+  "所有 CPU 核心"
 }
 {
   "All apps"
@@ -632,11 +632,11 @@
 }
 {
   "All day"
-  "全部日"
+  "全天"
 }
 {
   "All files may not be visible"
-  "全部文件可能不为可见"
+  "可能无法显示所有文件"
 }
 {
   "All running fibers have been halted due to an earlier crash, stop the causing flow before resuming to prevent it from recurring."
@@ -644,7 +644,7 @@
 }
 {
   "Allow <b>Automate</b> to <i>%1$s</i> by navigating to <i>Permissions</i>, <i>Nearby devices</i> then choose <i>Allow</i>."
-  "通过导航到<i>权限</i>，<i>附近设备</i>，然后选择<i>允许</i>，允许<b>Automate</b> <i>%1$s</i>。"
+  "请依次进入<i>权限</i> > <i>附近设备</i>，然后选择<i>允许</i>，以允许<b>Automate</b> <i>%1$s</i>。"
 }
 {
   "Allow Automate to evaluate blocks that can execute arbitrary shell commands with access to all device features and storage that the app has already been, and ever will be, granted. This is potentially dangerous."
@@ -656,11 +656,11 @@
 }
 {
   "Allow and display call in dialer app."
-  "允许和显示通话在 dialer 应用"
+  "允许此来电，并在拨号器应用中显示。"
 }
 {
   "Allow backup"
-  "允许backup"
+  "允许备份"
 }
 {
   "Allow mock location"
@@ -668,11 +668,11 @@
 }
 {
   "Allow negative"
-  "允许negative"
+  "允许负数"
 }
 {
   "Allow new"
-  "允许新"
+  "允许新建"
 }
 {
   "Allow new filename"
@@ -680,19 +680,19 @@
 }
 {
   "Allow no selection"
-  "允许否选择"
+  "允许不选择任何项"
 }
 {
   "Allow parallel launches from this block"
-  "允许从此模块并行发射"
+  "允许从此块并行启动流程"
 }
 {
   "Allow plug-in to assign any variable"
-  "允许插件到 assign 任意变量"
+  "允许插件为任意变量赋值"
 }
 {
   "Allow selection of multiple choices"
-  "允许选择的多个 choices"
+  "允许多选"
 }
 {
   "Allow sleep"
@@ -700,19 +700,19 @@
 }
 {
   "Allow the user to create a new document. Data must be content URI."
-  "允许用户创建新文档. 数据必须为内容 URI"
+  "允许用户创建新文档。数据必须是 content URI。"
 }
 {
   "Allow the user to pick a directory subtree."
-  "允许用户选择目录 subtree"
+  "允许用户选择目录及其子目录。"
 }
 {
   "Allow the user to pick one or more existing documents."
-  "允许用户选择一个或更多现有文档"
+  "允许用户选择一个或多个现有文档。"
 }
 {
   "Allow the user to select a particular kind of data and return it."
-  "允许用户选择特定类型的数据和返回它"
+  "允许用户选择指定类型的数据并返回所选内容。"
 }
 {
   "Allowed geolocation origins"
@@ -720,7 +720,7 @@
 }
 {
   "Allowed to run in the background."
-  "允许到运行在后台."
+  "允许在后台运行。"
 }
 {
   "Allowing <b>Automate</b> to <i>access deprecated system features</i> requires installation of the <i>Legacy extension</i> (add-on) app, which due to policy restrictions is not allowed to be published on the <i>Google Play store</i>, download from <a href=https://llamalab.com/automate/doc/extensions.html>llamalab.com</a>."
@@ -752,7 +752,7 @@
 }
 {
   "Alternative launch"
-  "Alternative 启动"
+  "备用启动"
 }
 {
   "Always edit flowchart"
@@ -764,7 +764,7 @@
 }
 {
   "Always interrupt"
-  "始终 interrupt"
+  "始终中断"
 }
 {
   "Always show."
@@ -780,7 +780,7 @@
 }
 {
   "Ambient light?"
-  "Ambient 浅色?"
+  "环境光？"
 }
 {
   "Ambient temperature?"
@@ -832,11 +832,11 @@
 }
 {
   "An e-mail will be sent."
-  "e-邮件将为已发送."
+  "将发送电子邮件。"
 }
 {
   "An existing application package has been changed (e.g. a component has been enabled or disabled)."
-  " 现有应用软件包有已已更改 (e.g. 一个组件有已已启用或已禁用)."
+  "设备上已安装的应用发生了变化（例如，某个组件被启用或停用）。"
 }
 {
   "An existing application package has been completely removed from the device."
@@ -844,11 +844,11 @@
 }
 {
   "An existing application package has been removed from the device."
-  " 现有应用软件包有已已移除从设备."
+  "设备上已安装的应用已被移除。"
 }
 {
   "An input method has been changed."
-  "输入方法有已已更改."
+  "输入法已更改。"
 }
 {
   "An outgoing call is about to be placed."
@@ -896,11 +896,11 @@
 }
 {
   "Any app can use the display, not just its owner or apps already shown on it."
-  "任意应用可以使用显示, 不仅其 owner 或应用已经已显示在它."
+  "任何应用都可以使用此显示屏，不仅限于设备所有者或已在屏幕上显示的应用。"
 }
 {
   "Any existing task that would be associated with the activity is cleared before the new activity is started."
-  "任意现有任务该会为关联与活动是已清除之前新活动是已开始."
+  "启动新界面前，会先清除与其关联的现有任务。"
 }
 {
   "Any permission grant also include sub-paths."
@@ -964,11 +964,11 @@
 }
 {
   "App displayed in the foreground."
-  "应用 displayed 在前台."
+  "应用正在前台显示。"
 }
 {
   "App e-mail"
-  "应用 e-邮件"
+  "应用电子邮件地址"
 }
 {
   "App error"
@@ -1036,11 +1036,11 @@
 }
 {
   "App notification visibility get"
-  "应用通知 visibility 获取"
+  "获取应用通知可见性"
 }
 {
   "App notification visibility set"
-  "应用通知 visibility 设置"
+  "设置应用通知可见性"
 }
 {
   "App packages"
@@ -1264,7 +1264,7 @@
 }
 {
   "As created by base64Encode function."
-  "作为已创建通过 base64Encode function."
+  "由 base64Encode 函数生成。"
 }
 {
   "As created by hexEncode function."
@@ -1284,7 +1284,7 @@
 }
 {
   "Assist screenshot (Android 6+)"
-  "辅助 screenshot (Android 6+)"
+  "辅助功能截图（Android 6+）"
 }
 {
   "Assist structure (Android 6+)"
@@ -1456,7 +1456,7 @@
 }
 {
   "Audio stream"
-  "音频 stream"
+  "音频流"
 }
 {
   "Audio stream mute set state"
@@ -1812,7 +1812,7 @@
 }
 {
   "Battery temperature (°C)"
-  "电池 temperature (°C)"
+  "电池温度（°C）"
 }
 {
   "Battery usage current (mA)"
@@ -1840,7 +1840,7 @@
 }
 {
   "Block and hang up call."
-  "模块和挂断上通话."
+  "拦截来电并挂断。"
 }
 {
   "Block call from appearing in dialer app."
@@ -1848,11 +1848,11 @@
 }
 {
   "Block disturbances (Android 7+)"
-  "模块 disturbances (Android 7+)"
+  "屏蔽打扰（Android 7+）"
 }
 {
   "Block id"
-  "模块 ID"
+  "块 ID"
 }
 {
   "Block level accuracy is considered to be about 100 meter accuracy. Using a coarse accuracy such as this often consumes less power."
@@ -2308,7 +2308,7 @@
 }
 {
   "CDMA network call waiting"
-  "CDMA 网络通话 waiting"
+  "CDMA 网络呼叫等待"
 }
 {
   "CDMA one min beep"
@@ -2448,7 +2448,7 @@
 }
 {
   "Call supervisory: call waiting"
-  "通话监督: 通话 waiting"
+  "通话监控：呼叫等待"
 }
 {
   "Call supervisory: confirm"
@@ -2600,7 +2600,7 @@
 }
 {
   "Capture an still image then return it, for use when the device is locked."
-  "捕获仍然图像则返回它, 用于使用当设备是已锁定"
+  "拍摄并返回一张静态图像；设备锁定时也可使用。"
 }
 {
   "Capture image"
@@ -2784,7 +2784,7 @@
 }
 {
   "Check audio or video playback."
-  "检查音频或视频播放."
+  "检查音频或视频是否正在播放。"
 }
 {
   "Check audio volume."
@@ -2792,7 +2792,7 @@
 }
 {
   "Check battery charge level."
-  "检查电池 charge 级别."
+  "检查电池电量。"
 }
 {
   "Check cellular call state."
@@ -2804,11 +2804,11 @@
 }
 {
   "Check default data network capabilities."
-  "检查默认数据网络 capabilities."
+  "检查默认数据网络的功能。"
 }
 {
   "Check device acceleration."
-  "检查设备 acceleration."
+  "检查设备加速度。"
 }
 {
   "Check device orientation."
@@ -2816,11 +2816,11 @@
 }
 {
   "Check distance to device."
-  "检查距离到设备."
+  "检查与设备之间的距离。"
 }
 {
   "Check heart rate."
-  "检查 heart 速率."
+  "检查心率。"
 }
 {
   "Check hinge angle of foldable device."
@@ -2828,27 +2828,27 @@
 }
 {
   "Check if Bluetooth is enabled."
-  "检查如果蓝牙是已启用."
+  "检查蓝牙是否已启用。"
 }
 {
   "Check if Bluetooth tethering is enabled."
-  "检查如果蓝牙网络共享是已启用."
+  "检查蓝牙网络共享是否已启用。"
 }
 {
   "Check if NFC is enabled."
-  "检查如果 NFC 是已启用."
+  "检查 NFC 是否已启用。"
 }
 {
   "Check if UI element is shown. Use the Inspect layout block instead."
-  "检查是否显示 UI 元素请改用 Inspect layout 块"
+  "检查界面元素是否显示。此功能已弃用，请改用“检查界面布局”块。"
 }
 {
   "Check if UI is in split-screen mode."
-  "检查如果用户界面是在 split-屏幕模式."
+  "检查界面是否处于分屏模式。"
 }
 {
   "Check if USB tethering is enabled."
-  "检查如果 USB 网络共享是已启用."
+  "检查 USB 网络共享是否已启用。"
 }
 {
   "Check if Wi-Fi hotspot is enabled."
@@ -2864,31 +2864,31 @@
 }
 {
   "Check if a Bluetooth is connected."
-  "检查如果蓝牙是已连接."
+  "检查是否已连接蓝牙设备。"
 }
 {
   "Check if a camera is available."
-  "检查如果相机是可用."
+  "检查相机是否可用。"
 }
 {
   "Check if a display is turned on."
-  "检查如果显示是已打开在."
+  "检查屏幕是否已点亮。"
 }
 {
   "Check if a fiber has stopped."
-  "检查如果 fiber 有已停止."
+  "检查流程执行实例是否已停止。"
 }
 {
   "Check if a file or directory exists on external storage, and get information about it."
-  "检查如果一个文件或目录 exists 在外部存储, 和获取信息关于它."
+  "检查外部存储中是否存在指定文件或目录，并获取其信息。"
 }
 {
   "Check if a host is reachable."
-  "检查如果主机是 reachable."
+  "检查主机是否可连接。"
 }
 {
   "Check if a network (internet) is connected."
-  "检查如果网络 (互联网) 是已连接."
+  "检查网络（互联网）是否已连接。"
 }
 {
   "Check if a status bar notification is posted."
@@ -2896,23 +2896,23 @@
 }
 {
   "Check if a wired headset plugged in."
-  "检查如果 wired 耳机已插入在."
+  "检查是否已插入有线耳机。"
 }
 {
   "Check if airplane mode is enabled."
-  "检查如果飞行模式模式是已启用."
+  "检查飞行模式是否已开启。"
 }
 {
   "Check if an app is allowed to show notifications, or not."
-  "检查如果一个应用是允许到显示通知, 或不."
+  "检查应用是否获准显示通知。"
 }
 {
   "Check if an audio device is connected."
-  "检查如果音频设备是已连接."
+  "检查是否已连接音频设备。"
 }
 {
   "Check if an audio device is recording."
-  "检查如果音频设备是录制."
+  "检查音频设备是否正在录音。"
 }
 {
   "Check if an audio stream is muted."
@@ -2920,75 +2920,75 @@
 }
 {
   "Check if an expression result is true."
-  "检查如果 expression 结果是真."
+  "检查表达式的结果是否为真。"
 }
 {
   "Check if app is installed, and get information about it."
-  "检查如果应用是已安装, 和获取信息关于它."
+  "检查应用是否已安装，并获取其相关信息。"
 }
 {
   "Check if automatic account data sync is enabled."
-  "检查如果自动账户数据同步是已启用."
+  "检查账户数据自动同步是否已启用。"
 }
 {
   "Check if battery is charging."
-  "检查如果电池是充电."
+  "检查电池是否正在充电。"
 }
 {
   "Check if car UI mode is enabled."
-  "检查如果车载用户界面模式是已启用."
+  "检查车载界面模式是否已启用。"
 }
 {
   "Check if device is docked."
-  "检查如果设备是 docked."
+  "检查设备是否已连接到扩展坞。"
 }
 {
   "Check if device is in an “interactive” state."
-  "检查如果设备是在 “interactive” 状态."
+  "检查设备是否处于可交互状态。"
 }
 {
   "Check if device is in idle “doze” mode."
-  "检查如果设备是在空闲 “休眠” 模式."
+  "检查设备是否处于闲置（Doze）模式。"
 }
 {
   "Check if device is locked."
-  "检查如果设备是已锁定."
+  "检查设备是否已锁定。"
 }
 {
   "Check if external storage media is mounted or unmounted."
-  "检查如果外部存储媒体是已挂载或已卸载."
+  "检查外部存储介质的挂载状态。"
 }
 {
   "Check if location provider (GPS) is enabled."
-  "检查如果位置提供者 (GPS) 是已启用."
+  "检查定位服务（GPS）是否已启用。"
 }
 {
   "Check if microphone is muted."
-  "检查如果麦克风是 muted."
+  "检查麦克风是否已静音。"
 }
 {
   "Check if mobile data is enabled."
-  "检查如果移动数据是已启用."
+  "检查移动数据是否已启用。"
 }
 {
   "Check if night UI mode is enabled."
-  "检查如果 night 用户界面模式是已启用."
+  "检查夜间界面模式是否已启用。"
 }
 {
   "Check if power save mode is enabled."
-  "检查如果电源保存模式是已启用."
+  "检查省电模式是否已启用。"
 }
 {
   "Check if power source plugged in."
-  "检查如果电源来源已插入在."
+  "检查设备是否已接通电源。"
 }
 {
   "Check if restrict background data is enabled."
-  "检查如果 restrict 后台数据是已启用."
+  "检查是否已限制后台数据。"
 }
 {
   "Check if speakerphone on."
-  "检查如果扬声器在."
+  "检查免提扬声器是否已开启。"
 }
 {
   "Check if the physical keyboard is visible."
@@ -2996,7 +2996,7 @@
 }
 {
   "Check interruptions (Do Not Disturb) setting."
-  "检查 interruptions (做不打扰) 设置."
+  "检查勿扰模式设置。"
 }
 {
   "Check location."
@@ -3004,7 +3004,7 @@
 }
 {
   "Check magnetic field strength."
-  "检查 magnetic 字段强度."
+  "检查磁场强度。"
 }
 {
   "Check nearby cell towers."
@@ -3012,15 +3012,15 @@
 }
 {
   "Check network throughput."
-  "检查网络 throughput."
+  "检查网络吞吐量。"
 }
 {
   "Check or await a specific or recurring window of time."
-  "检查或等待一个特定或 recurring 窗口的时间."
+  "检查或等待某个指定或重复的时间段。"
 }
 {
   "Check out the Automate community."
-  "检查输出 Automate 社区."
+  "访问 Automate 社区。"
 }
 {
   "Check relative humidity."
@@ -3072,7 +3072,7 @@
 }
 {
   "Child fiber URI"
-  "子级 fiber URI"
+  "子流程执行实例 URI"
 }
 {
   "Choice dialog"
@@ -3128,7 +3128,7 @@
 }
 {
   "Clear default dialog choices."
-  "清除默认对话框 choices."
+  "清除对话框中的默认选项。"
 }
 {
   "Clear defaults"
@@ -3640,7 +3640,7 @@
 }
 {
   "Continue handover of a call from another app."
-  "继续 handover 的通话从另一个应用."
+  "继续从其他应用切换过来的通话。"
 }
 {
   "Continuous auto focus mode intended for taking pictures. The camera continuously tries to focus."
@@ -3744,7 +3744,7 @@
 }
 {
   "Create a new item in the given container, initializing it from the current contents of the clipboard. Data must be a content URI of the directory in which to place the data."
-  "在给定容器中创建一个新项目，从剪贴板的当前内容初始化数据必须是要放置数据的目录的内容 URI"
+  "在指定容器中创建新项目，并使用剪贴板当前内容初始化该项目。数据必须是目标目录的 content URI。"
 }
 {
   "Create a new task and launch an activity into it."
@@ -3996,11 +3996,11 @@
 }
 {
   "Current temperature"
-  "当前 temperature"
+  "当前温度"
 }
 {
   "Current throughput (B/s)"
-  "当前 throughput (/)"
+  "当前吞吐量（字节/秒）"
 }
 {
   "Current timeout"
@@ -4216,7 +4216,7 @@
 }
 {
   "Data was written to a file."
-  "数据是已写入到文件."
+  "数据已写入文件。"
 }
 {
   "Data will be confidentiality protected."
@@ -4424,7 +4424,7 @@
 }
 {
   "Delete the given data URI from its container."
-  "删除 given 数据 URI 从其容器"
+  "从所在容器中删除指定的 data URI。"
 }
 {
   "Delete “%s” flow?"
@@ -4564,11 +4564,11 @@
 }
 {
   "Device is connected to cell for data."
-  "设备是已连接到蜂窝用于数据."
+  "设备已连接到蜂窝网络以使用数据。"
 }
 {
   "Device is connected to cell for signalling and possibly data."
-  "设备是已连接到蜂窝用于 signalling 和可能数据."
+  "设备已连接到蜂窝网络以接收信号，也可能正在使用数据。"
 }
 {
   "Device is shutting down."
@@ -4608,7 +4608,7 @@
 }
 {
   "Device provisioned"
-  "设备 provisioned"
+  "设备已完成初始设置"
 }
 {
   "Device reboot"
@@ -4724,7 +4724,7 @@
 }
 {
   "Dim screen"
-  "Dim 屏幕"
+  "调暗屏幕"
 }
 {
   "Directly launch live wallpaper preview for immediate user confirm. Extras must include android.service.wallpaper.extra.LIVE_WALLPAPER_COMPONENT."
@@ -4804,7 +4804,7 @@
 }
 {
   "Disable to prevent Automate from overriding other NFC apps, the NFC tag scanned block will not detect the “Any” type of tags."
-  "禁用到阻止 Automate 从 overriding 其他 NFC 应用,  NFC 标签已扫描模块将不检测  “任意” 类型的标签"
+  "关闭此选项可避免 Automate 覆盖其他 NFC 应用；关闭后，“扫描 NFC 标签”块将无法检测“任意”类型的标签。"
 }
 {
   "Disconnect BT device"
@@ -4836,23 +4836,23 @@
 }
 {
   "Dismiss UI element."
-  "Dismiss 用户界面元素."
+  "关闭界面元素。"
 }
 {
   "Dismiss a timer in “clock” app."
-  "Dismiss 计时器在 “时钟” 应用."
+  "关闭“时钟”应用中的计时器。"
 }
 {
   "Dismiss alarm (Android 6+)"
-  "Dismiss 闹钟 (Android 6+)"
+  "关闭闹钟（Android 6+）"
 }
 {
   "Dismiss an alarm in “clock” app."
-  "Dismiss 闹钟在 “时钟” 应用."
+  "关闭“时钟”应用中的闹钟。"
 }
 {
   "Dismiss button"
-  "Dismiss 按钮"
+  "关闭按钮"
 }
 {
   "Dismiss notification shade (Android 12+)"
@@ -4860,7 +4860,7 @@
 }
 {
   "Dismiss timer (Android 9+)"
-  "Dismiss 计时器 (Android 9+)"
+  "关闭计时器（Android 9+）"
 }
 {
   "Display an activity chooser, allowing the user to pick what they want to before proceeding."
@@ -5236,7 +5236,7 @@
 }
 {
   "Enable or disable night UI mode."
-  "启用或禁用 night 用户界面模式"
+  "启用或停用夜间界面模式。"
 }
 {
   "Enable or disable notification for an app."
@@ -5408,7 +5408,7 @@
 }
 {
   "Exit code"
-  "Exit 代码"
+  "退出代码"
 }
 {
   "Expand (Android 4.4+)"
@@ -5476,19 +5476,19 @@
 }
 {
   "External media has been removed."
-  "外部媒体有已已移除."
+  "外部存储介质已移除。"
 }
 {
   "External media is present and mounted at its mount point."
-  "外部媒体是存在和已挂载在其挂载点."
+  "检测到外部存储介质，且已挂载。"
 }
 {
   "External media is present but cannot be mounted."
-  "外部媒体是存在 but 不能为已挂载."
+  "检测到外部存储介质，但无法挂载。"
 }
 {
   "External media is present, and being disk-checked."
-  "外部媒体是存在, 和正在 disk-已选中."
+  "检测到外部存储介质，正在检查磁盘。"
 }
 {
   "External media is present, but is using an incompatible file-system (or is blank)."
@@ -5496,7 +5496,7 @@
 }
 {
   "External media is present, but not mounted at its mount point."
-  "外部媒体是存在, but 不已挂载在其挂载点."
+  "检测到外部存储介质，但尚未挂载。"
 }
 {
   "External media is unmounted because it is being shared via USB mass storage."
@@ -5504,15 +5504,15 @@
 }
 {
   "External media was removed from SD card slot, but mount point was not unmounted."
-  "外部媒体已从 SD 卡插槽中移除，但挂载点未卸载"
+  "外部存储介质已从 SD 卡槽取出，但挂载点仍处于挂载状态。"
 }
 {
   "External power has been connected to the device."
-  "外部电源有已已连接到设备."
+  "设备已接通外部电源。"
 }
 {
   "External power has been removed from the device."
-  "外部电源有已已移除从设备."
+  "设备已断开外部电源。"
 }
 {
   "External storage"
@@ -5524,7 +5524,7 @@
 }
 {
   "External type that only Automate can read."
-  "外部类型该仅 Automate 可以读取."
+  "仅 Automate 可读取的外部类型。"
 }
 {
   "Extract content from a zip file."
@@ -5584,43 +5584,43 @@
 }
 {
   "Failed to change option"
-  "失败到更改选项"
+  "更改选项失败"
 }
 {
   "Failed to complete Premium purchase"
-  "失败到完成高级版购买"
+  "Premium 购买未能完成"
 }
 {
   "Failed to format tag"
-  "失败到格式标签"
+  "格式化标签失败"
 }
 {
   "Failed to load icon"
-  "失败到加载 icon"
+  "加载图标失败"
 }
 {
   "Failed to modify permission"
-  "无法修改权限"
+  "修改权限失败"
 }
 {
   "Failed to read flow"
-  "失败到读取流程"
+  "读取流程失败"
 }
 {
   "Failed to restore backup"
-  "失败到恢复 backup"
+  "恢复备份失败"
 }
 {
   "Failed to write MMS"
-  "失败到写入彩信"
+  "写入彩信失败"
 }
 {
   "Failed to write SMS"
-  "失败到写入短信"
+  "写入短信失败"
 }
 {
   "Failed to write tag"
-  "失败到写入标签"
+  "写入标签失败"
 }
 {
   "Failure block id"
@@ -5652,7 +5652,7 @@
 }
 {
   "Fiber stopped?"
-  "Fiber 已停止?"
+  "流程执行实例已停止？"
 }
 {
   "Field strength"
@@ -5668,7 +5668,7 @@
 }
 {
   "File accessed"
-  "文件 accessed"
+  "文件已访问"
 }
 {
   "File copy"
@@ -5688,11 +5688,11 @@
 }
 {
   "File exists?"
-  "文件 exists?"
+  "文件是否存在？"
 }
 {
   "File extension"
-  "文件 extension"
+  "文件扩展名"
 }
 {
   "File list"
@@ -5700,11 +5700,11 @@
 }
 {
   "File make directory"
-  "文件使目录"
+  "创建目录"
 }
 {
   "File modified"
-  "文件 modified"
+  "文件已修改"
 }
 {
   "File monitor"
@@ -5716,7 +5716,7 @@
 }
 {
   "File moved from"
-  "文件已移动从"
+  "文件移出位置"
 }
 {
   "File moved to"
@@ -5740,7 +5740,7 @@
 }
 {
   "Filter from other apps"
-  "Filter 从其他应用"
+  "筛选其他应用的内容"
 }
 {
   "Financial app read SMS."
@@ -5752,15 +5752,15 @@
 }
 {
   "Find coordinates from a location name."
-  "查找坐标从位置名称."
+  "根据地点名称查找坐标。"
 }
 {
   "Find location name from coordinates."
-  "查找位置名称从坐标."
+  "根据坐标查找地点名称。"
 }
 {
   "Fine location"
-  "Fine 位置"
+  "精确位置"
 }
 {
   "Fingerprint gesture"
@@ -5772,11 +5772,11 @@
 }
 {
   "Flash attention light"
-  "闪光灯注意灯"
+  "闪烁提示灯"
 }
 {
   "Flash mode"
-  "Flash 模式"
+  "闪光灯模式"
 }
 {
   "Flash will always be fired during snapshot."
@@ -5808,7 +5808,7 @@
 }
 {
   "Flow beginning pick?"
-  "开始流程选择?"
+  "选择流程起点？"
 }
 {
   "Flow created with a newer version: %1$d"
@@ -5824,7 +5824,7 @@
 }
 {
   "Flow pick?"
-  "流程选择?"
+  "选择流程？"
 }
 {
   "Flow shortcut"
@@ -5848,15 +5848,15 @@
 }
 {
   "Flows shared with the community can be downloaded and used by anyone! Make sure it doesn’t include sensitive information. Users uploading malicious or useless flows will be banned."
-  "与社区共享的流程可供任何人下载和使用！请确保不包含敏感信息上传恶意或无用的流程的用户将被封禁"
+  "与社区分享的流程可供任何人下载和使用！请勿在流程中包含敏感信息。上传恶意或无用流程的用户将被封禁。"
 }
 {
   "Flows that lock the device or watch for failed password attempts will stop working."
-  "流程该锁定设备或监视用于失败密码尝试将停止 working."
+  "用于锁定设备或监测密码输入失败的流程将停止运行。"
 }
 {
   "Focus an UI element."
-  "焦点用户界面元素."
+  "聚焦界面元素。"
 }
 {
   "Focus is fixed."
@@ -5896,7 +5896,7 @@
 }
 {
   "For entering a URI (web address)."
-  "用于 entering URI (网页地址)."
+  "用于输入 URI（网页地址）。"
 }
 {
   "For entering a date and time."
@@ -6084,7 +6084,7 @@
 }
 {
   "From e-mail"
-  "从 e-邮件"
+  "发件人电子邮件地址"
 }
 {
   "From starred contacts only"
@@ -6428,7 +6428,7 @@
 }
 {
   "Get notifications visibility"
-  "获取通知 visibility"
+  "获取通知可见性"
 }
 {
   "Get or await an alarm set in the Clock app."
@@ -6536,7 +6536,7 @@
 }
 {
   "Global: Control whether the process CPU usage meter should be shown. If 0, no. If 1, yes."
-  "全局：控制是否显示进程 CPU 使用率仪表如果为 0，则不显示如果为 1，则显示"
+  "全局设置：是否显示进程 CPU 使用率计量器。0 表示不显示，1 表示显示。"
 }
 {
   "Global: Delay (in seconds) before repeating the Wi-Fi networks available notification. Connecting to a network will reset the timer."
@@ -6600,7 +6600,7 @@
 }
 {
   "Global: USB mass storage enabled. If 0, no. If 1, yes."
-  "全局: USB mass 存储已启用. 如果 0, 否. 如果 1, 是."
+  "全局设置：是否已启用 USB 大容量存储。0 表示未启用，1 表示已启用。"
 }
 {
   "Global: When the number of open networks exceeds this number, the least-recently-used excess networks will be removed."
@@ -6608,47 +6608,47 @@
 }
 {
   "Global: Whether ADB is enabled."
-  "全局: 是否 ADB 是已启用."
+  "全局设置：ADB 是否已启用。"
 }
 {
   "Global: Whether Airplane Mode is on."
-  "全局: 是否飞行模式模式是在."
+  "全局设置：飞行模式是否已开启。"
 }
 {
   "Global: Whether bluetooth is enabled (1) or disabled (0)."
-  "全局: 是否蓝牙是已启用 (1) 或已禁用 (0)."
+  "全局设置：蓝牙是否已启用（1）或已停用（0）。"
 }
 {
   "Global: Whether data roaming is enabled (1) or disabled (0)."
-  "全局: 是否数据漫游是已启用 (1) 或已禁用 (0)."
+  "全局设置：数据漫游是否已启用（1）或已停用（0）。"
 }
 {
   "Global: Whether the Wi-Fi should be on. Only the Wi-Fi service should touch this."
-  "全局：Wi-Fi 是否应该启用只有 Wi-Fi 服务应该触及此设置"
+  "全局设置：Wi-Fi 是否应开启。只有 Wi-Fi 服务应修改此设置。"
 }
 {
   "Global: Whether the Wi-Fi watchdog is enabled. If 0, no. If 1, yes."
-  "全局：Wi-Fi 看门狗是否已启用如果为 0，则否如果为 1，则是"
+  "全局设置：Wi-Fi 监控服务是否已启用。0 表示未启用，1 表示已启用。"
 }
 {
   "Global: Whether the device has been provisioned. If 0, no. If 1, yes."
-  "全局: 是否设备有已 provisioned. 如果 0, 否. 如果 1, 是."
+  "全局设置：设备是否已完成初始设置。0 表示未完成，1 表示已完成。"
 }
 {
   "Global: Whether the package installer should allow installation of apps downloaded from sources other than Google Play. If 1, allow installing from other sources. If 0, only allow installing from Google Play."
-  "全局：软件包安装程序是否应允许从 Google Play 以外的来源下载的应用程序进行安装如果为 1，则允许从其他来源安装如果为 0，则只允许从 Google Play 安装"
+  "全局设置：软件包安装程序是否允许安装从 Google Play 以外来源下载的应用。1 表示允许从其他来源安装，0 表示仅允许从 Google Play 安装。"
 }
 {
   "Global: Whether to notify the user of open networks."
-  "全局: 是否到 notify 用户的打开网络."
+  "全局设置：是否在发现开放式 Wi-Fi 网络时通知用户。"
 }
 {
   "Global: Whether user has enabled development settings."
-  "全局: 是否用户有已启用开发设置."
+  "全局设置：用户是否已启用开发者选项。"
 }
 {
   "Global: Whether we keep the device on while the device is plugged in. If 0, never stay on while plugged in. If 1, stay on for AC charger. If 2, stay on for USB charger. If 4, to stay on for wireless charger."
-  "全局：在设备插入电源时是否保持设备开启如果为 0，则永远不在插入电源时保持开启如果为 1，则在交流充电器上保持开启如果为 2，则在 USB 充电器上保持开启如果为 4，则在无线充电器上保持开启"
+  "全局设置：设备接通电源时是否保持屏幕常亮。0 表示不常亮；1 表示使用交流电源时常亮；2 表示使用 USB 电源时常亮；4 表示使用无线充电器时常亮。"
 }
 {
   "Gmail send"
@@ -6764,7 +6764,7 @@
 }
 {
   "Grant prefix URI permission (Android 5+)"
-  "授予 prefix URI 权限 (Android 5+)"
+  "授予 URI 前缀权限（Android 5+）"
 }
 {
   "HDMI ARC (Audio Return Channel)"
@@ -7036,7 +7036,7 @@
 }
 {
   "If the activity is already running in the current task, finish any activities on top of it and deliver the intent to the existing activity."
-  "如果活动是已经运行中在当前任务, 完成任意活动在顶部的它和 deliver 意图到现有活动."
+  "如果此界面已在当前任务中运行，则关闭其上方的界面，并将 Intent 交给已存在的界面处理。"
 }
 {
   "If the launched activity is already running, it’s brought to the front of its history stack."
@@ -7136,7 +7136,7 @@
 }
 {
   "Image rotate"
-  "图像 rotate"
+  "旋转图像"
 }
 {
   "Image sample color"
@@ -7364,7 +7364,7 @@
 }
 {
   "Inspect how an app Activity was started, its package, class and with what action, data URI, MIME type, categories and extras. Long-click home (Assistant) button to inspect."
-  "检查应用程序 Activity 的启动方式，其包、类和操作，数据 URI、MIME 类型、类别和附加项长按主页 (助手) 按钮进行检查"
+  "查看应用 Activity 的启动信息，包括包名、类名、操作、数据 URI、MIME 类型、类别和附加数据。长按主页（助理）按钮即可检查。"
 }
 {
   "Inspect layout"
@@ -7380,7 +7380,7 @@
 }
 {
   "Install an app package. Requires Automate legacy extension on Android 6+. Data must be content or package URI."
-  "安装一个应用软件包. 需要 Automate 旧版 extension 在 Android 6+. 数据必须为内容或软件包 URI."
+  "安装应用包。Android 6+ 需要 Automate Legacy 扩展。数据必须是 content URI 或 package URI。"
 }
 {
   "Install generated key"
@@ -7412,7 +7412,7 @@
 }
 {
   "Installation path"
-  "Installation 路径"
+  "安装路径"
 }
 {
   "Installed (Android 4.2+)"
@@ -7432,7 +7432,7 @@
 }
 {
   "Interact across profiles (Android 11+)"
-  "Interact 跨越配置文件 (Android 11+)"
+  "跨用户配置文件交互（Android 11+）"
 }
 {
   "Interact appearing"
@@ -7440,11 +7440,11 @@
 }
 {
   "Interact notification"
-  "Interact 通知"
+  "与通知交互"
 }
 {
   "Interact touch"
-  "Interact 触摸"
+  "触摸交互"
 }
 {
   "Interact with a status bar notification."
@@ -7452,7 +7452,7 @@
 }
 {
   "Interact with accessibility."
-  "Interact 与无障碍."
+  "使用无障碍功能进行交互。"
 }
 {
   "Interact with the user interface."
@@ -7576,7 +7576,7 @@
 }
 {
   "Is audio muted"
-  "是音频 muted"
+  "音频是否已静音"
 }
 {
   "Is audio recording"
@@ -7676,11 +7676,11 @@
 }
 {
   "Is media playing"
-  "是媒体 playing"
+  "媒体是否正在播放"
 }
 {
   "Is microphone muted"
-  "是麦克风 muted"
+  "麦克风是否已静音"
 }
 {
   "Is mobile data enabled"
@@ -7700,7 +7700,7 @@
 }
 {
   "Is network throughput"
-  "是网络 throughput"
+  "网络吞吐量"
 }
 {
   "Is network type"
@@ -7708,7 +7708,7 @@
 }
 {
   "Is night mode enabled"
-  "是 night 模式已启用"
+  "夜间模式是否已启用"
 }
 {
   "Is notifications enabled?"
@@ -8072,7 +8072,7 @@
 }
 {
   "Last modified (timestamp)"
-  "最后 modified (时间戳)"
+  "最后修改时间（时间戳）"
 }
 {
   "Last step (timestamp)"
@@ -8084,7 +8084,7 @@
 }
 {
   "Launch a quick viewer for an URI or a list of URIs."
-  "启动 URI 或 URI 列表的快速查看器"
+  "启动 URI 或 URI 列表的快速查看器。"
 }
 {
   "Launch adjacent (Android 7+)"
@@ -8788,11 +8788,11 @@
 }
 {
   "Maximum temperature"
-  "最大 temperature"
+  "最高温度"
 }
 {
   "Maximum throughput"
-  "最大 throughput"
+  "最大吞吐量"
 }
 {
   "Maximum timeout"
@@ -8912,7 +8912,7 @@
 }
 {
   "Media playing?"
-  "媒体 playing?"
+  "媒体是否正在播放？"
 }
 {
   "Media previous"
@@ -9028,7 +9028,7 @@
 }
 {
   "Messages may have been missed due to device being offline for too long"
-  "消息可能有已未接 due 到设备正在离线用于也长"
+  "设备离线时间过长，可能有消息遗漏。"
 }
 {
   "Meta any"
@@ -9064,7 +9064,7 @@
 }
 {
   "Microphone muted?"
-  "麦克风 muted?"
+  "麦克风是否已静音？"
 }
 {
   "Microphone set mute"
@@ -9132,11 +9132,11 @@
 }
 {
   "Minimum temperature"
-  "最小 temperature"
+  "最低温度"
 }
 {
   "Minimum throughput"
-  "最小 throughput"
+  "最小吞吐量"
 }
 {
   "Minimum timeout"
@@ -9216,7 +9216,7 @@
 }
 {
   "Modified since"
-  "Modified 由于"
+  "修改时间晚于"
 }
 {
   "Modify database"
@@ -9252,7 +9252,7 @@
 }
 {
   "More than %1$d new notifications"
-  "更多 than%1$d 新通知"
+  "有超过 %1$d 条新通知"
 }
 {
   "Motion gesture"
@@ -9424,7 +9424,7 @@
 }
 {
   "NFC is disabled"
-  "NFC 是已禁用"
+  "NFC 已关闭"
 }
 {
   "NFC not supported"
@@ -9548,7 +9548,7 @@
 }
 {
   "Network connectivity has changed."
-  "网络 connectivity 有已更改."
+  "网络连接状态已更改。"
 }
 {
   "Network failure"
@@ -9720,7 +9720,7 @@
 }
 {
   "Network throughput?"
-  "网络 throughput?"
+  "网络吞吐量？"
 }
 {
   "Network type?"
@@ -9788,47 +9788,47 @@
 }
 {
   "Night mode"
-  "Night 模式"
+  "夜间模式"
 }
 {
   "Night mode enabled?"
-  "Night 模式已启用?"
+  "夜间模式已启用？"
 }
 {
   "Night mode set state"
-  "Night 模式设置状态"
+  "设置夜间模式状态"
 }
 {
   "Night portrait"
-  "Night 竖屏"
+  "夜间竖屏"
 }
 {
   "No %d running blocks limit, keep all your flows running."
-  "否%d 运行中模块限制, 保持全部你的流程运行中."
+  "不再受最多 %d 个运行中块的限制，让所有流程持续运行。"
 }
 {
   "No abort (Android 4.4+)"
-  "无中止（Android 4.4+）"
+  "不允许中止（Android 4.4+）"
 }
 {
   "No access"
-  "否访问"
+  "无权访问"
 }
 {
   "No access granted"
-  "否访问 granted"
+  "未授予访问权限"
 }
 {
   "No accessible accounts"
-  "否 accessible 账户"
+  "没有可访问的账户"
 }
 {
   "No account name"
-  "否账户名称"
+  "未提供账户名称"
 }
 {
   "No activity."
-  "否活动."
+  "没有可用的活动。"
 }
 {
   "No animation"
@@ -9836,39 +9836,39 @@
 }
 {
   "No app can perform action"
-  "否应用可以执行操作"
+  "没有应用可以执行此操作"
 }
 {
   "No audio."
-  "否音频."
+  "无音频。"
 }
 {
   "No button"
-  "否按钮"
+  "没有按钮"
 }
 {
   "No component found"
-  "否组件找到"
+  "未找到组件"
 }
 {
   "No content"
-  "否内容"
+  "无内容"
 }
 {
   "No description"
-  "否描述"
+  "无描述"
 }
 {
   "No devices found"
-  "否设备找到"
+  "未找到设备"
 }
 {
   "No e-mail client installed"
-  "否 e-邮件客户端已安装"
+  "未安装电子邮件客户端"
 }
 {
   "No file-system"
-  "否文件-系统"
+  "无文件系统"
 }
 {
   "No flags"
@@ -9876,7 +9876,7 @@
 }
 {
   "No flow awaiting Google Assistant action"
-  "否流程 awaiting Google 助手操作"
+  "没有正在等待 Google 助理操作的流程"
 }
 {
   "No flow awaiting alternative launch"
@@ -9884,23 +9884,23 @@
 }
 {
   "No flow awaiting assist request"
-  "否流程 awaiting 辅助请求"
+  "没有正在等待辅助请求的流程"
 }
 {
   "No flow awaiting shared content"
-  "否流程 awaiting 共享内容"
+  "没有正在等待共享内容的流程"
 }
 {
   "No flow awaiting text selection"
-  "否流程 awaiting 文本选择"
+  "没有正在等待文本选择的流程"
 }
 {
   "No flow offering content"
-  "否流程 offering 内容"
+  "没有提供内容的流程"
 }
 {
   "No gesture recorded"
-  "否手势已录制"
+  "未记录手势"
 }
 {
   "No history"
@@ -9908,7 +9908,7 @@
 }
 {
   "No isolated storage (Android 11+)"
-  "否 isolated 存储 (Android 11+)"
+  "不使用隔离存储（Android 11+）"
 }
 {
   "No locations will be returned unless a different client has requested location updates in which case this request will act as a passive listener to those locations."
@@ -9920,7 +9920,7 @@
 }
 {
   "No notifications"
-  "否通知"
+  "无通知"
 }
 {
   "No override"
@@ -9928,11 +9928,11 @@
 }
 {
   "No plug-in selected"
-  "否插件已选择"
+  "未选择插件"
 }
 {
   "No power"
-  "否电源"
+  "无电源"
 }
 {
   "No preference specified, let the system decide the best orientation."
@@ -9940,11 +9940,11 @@
 }
 {
   "No result found"
-  "否结果找到"
+  "未找到结果"
 }
 {
   "No result found for “%s”"
-  "否结果找到用于 “%s”"
+  "未找到与“%s”匹配的结果"
 }
 {
   "No review"
@@ -9952,15 +9952,15 @@
 }
 {
   "No security"
-  "否安全"
+  "无安全保护"
 }
 {
   "No security applied."
-  "否安全 applied."
+  "未启用安全保护。"
 }
 {
   "No selection"
-  "否选择"
+  "未选择任何项"
 }
 {
   "No sensor"
@@ -9968,7 +9968,7 @@
 }
 {
   "No settings"
-  "否设置"
+  "未设置任何选项"
 }
 {
   "No sound"
@@ -9980,23 +9980,23 @@
 }
 {
   "No title"
-  "否标题"
+  "无标题"
 }
 {
   "No type conversion."
-  "否类型 conversion."
+  "不进行类型转换。"
 }
 {
   "No variables"
-  "否变量"
+  "无变量"
 }
 {
   "No “%s” flow awaiting Google Assistant action"
-  "否 “%s” 流程 awaiting Google 助手操作"
+  "没有名为“%s”的流程正在等待 Google 助理操作"
 }
 {
   "No “missed call” notification"
-  "否 “未接通话” 通知"
+  "没有“未接来电”通知"
 }
 {
   "Not VCN managed (Android 12+)"
@@ -10112,7 +10112,7 @@
 }
 {
   "Notification interact"
-  "通知 interact"
+  "与通知交互"
 }
 {
   "Notification listener settings (Android 5.1+)"
@@ -10276,7 +10276,7 @@
 }
 {
   "Only keep Wi-Fi enabled at home. Asks if you’re currently at home, or for your home location."
-  "仅在家中保持 Wi-Fi 开启询问您当前是否在家，或者询问您的家庭位置"
+  "仅在家时保持 Wi-Fi 开启。系统会询问您当前是否在家，或要求您设置家庭位置。"
 }
 {
   "Only launch intent if it resolve to a result that is not a browser, fail otherwise."
@@ -10396,7 +10396,7 @@
 }
 {
   "Outgoing e-mail message."
-  "拨出 e-邮件消息."
+  "待发送的电子邮件。"
 }
 {
   "Output mix"
@@ -10588,7 +10588,7 @@
 }
 {
   "Perform a call to someone. Data may a tel URI."
-  "执行通话到某人. 数据可能  tel URI。"
+  "拨打指定号码。数据可以是 tel URI。"
 }
 {
   "Perform a data synchronization."
@@ -10600,7 +10600,7 @@
 }
 {
   "Perform a search for media. Extras must include query, may include android.intent.extra.album, android.intent.extra.artist, android.intent.extra.title or android.intent.extra.focus."
-  "搜索媒体附加项必须包括查询，可以包括 android.intent.extra.album、android.intent.extra.artist、android.intent.extra.title 或 android.intent.extra.focus"
+  "搜索媒体。附加数据必须包含 query，也可以包含 android.intent.extra.album、android.intent.extra.artist、android.intent.extra.title 或 android.intent.extra.focus。"
 }
 {
   "Perform a search."
@@ -10712,7 +10712,7 @@
 }
 {
   "Pick an item from the data, returning what was selected. Data should be a content URI with a directory of items from which to pick."
-  "选择一个项目从数据, returning 什么是已选择. 数据应该为一个内容 URI 与一个目录的项目从其到选择."
+  "从数据中选择一个项目，并返回所选内容。数据应为 content URI，指向包含可选项目的目录。"
 }
 {
   "Pick app"
@@ -11236,7 +11236,7 @@
 }
 {
   "Primary e-mail"
-  "主要 e-邮件"
+  "主要电子邮件地址"
 }
 {
   "Primary phone number"
@@ -11908,7 +11908,7 @@
 }
 {
   "Replacement text"
-  "Replacement 文本"
+  "替换文本"
 }
 {
   "Replaces each substring in text that matches the regular expression with the given replacement."
@@ -12208,7 +12208,7 @@
 }
 {
   "Returns Euler’s constant raised to the power of number."
-  "返回自然对数的底数 e 的 number 次方"
+  "返回自然常数 e 的指定次幂。"
 }
 {
   "Returns [year, month, dayOfMonth, hourOfDay, minute, second, millisecond, weekday, weekOfYear, dayOfYear, dstOffset] of the timestamp in time zone."
@@ -12316,7 +12316,7 @@
 }
 {
   "Returns path converted to a URI."
-  "返回路径 converted 到 URI."
+  "返回由路径转换得到的 URI。"
 }
 {
   "Returns the Base64 decoded text."
@@ -12324,7 +12324,7 @@
 }
 {
   "Returns the Base64 encoded text."
-  "返回 Base64 encoded 文本."
+  "返回 Base64 编码后的文本。"
 }
 {
   "Returns the CRC32 checksum of text."
@@ -12540,11 +12540,11 @@
 }
 {
   "Returns the value encoded in application/json format."
-  "返回值 encoded 在应用/JSON 格式."
+  "返回以 application/json 格式编码的值。"
 }
 {
   "Returns the value encoded in application/xml format."
-  "返回值 encoded 在应用/XML 格式."
+  "返回以 application/xml 格式编码的值。"
 }
 {
   "Returns the value of base raised to the power of exponent."
@@ -12576,11 +12576,11 @@
 }
 {
   "Review the given media file, for use when the device is locked. Data URI may be item to review."
-  "审查给定的媒体文件，用于在设备锁定时使用数据 URI 可能是要审查的项目"
+  "查看指定媒体文件，以便在设备锁定时使用。data URI 可以指向要查看的媒体项。"
 }
 {
   "Review the given media file. Data URI may be item to review."
-  "审查给定的媒体文件数据 URI 可能是要审查的项目"
+  "查看指定媒体文件。data URI 可以指向要查看的媒体项。"
 }
 {
   "Rewind media key."
@@ -12632,7 +12632,7 @@
 }
 {
   "Rotate an image."
-  "Rotate 图像."
+  "旋转图像。"
 }
 {
   "Rows as arrays"
@@ -13041,7 +13041,7 @@
 }
 {
   "Secure: If touch exploration is enabled (1) or disabled (0)."
-  "安全: 如果触摸 exploration 是已启用 (1) 或已禁用 (0)."
+  "安全设置：触摸浏览功能是否已启用（1）或已停用（0）。"
 }
 {
   "Secure: List of input methods that are currently enabled. This is a string containing the IDs of all enabled input methods, each ID separated by ':'."
@@ -13085,27 +13085,27 @@
 }
 {
   "Secure: Whether accessibility is enabled (1) or disabled (0)."
-  "安全：是否启用辅助功能（1）或禁用（0）。"
+  "安全设置：无障碍功能是否已启用（1）或已停用（0）。"
 }
 {
   "Secure: Whether autolock is enabled (1) or disabled (0)."
-  "安全: 是否 autolock 是已启用 (1) 或已禁用 (0)."
+  "安全设置：自动锁定是否已启用（1）或已停用（0）。"
 }
 {
   "Secure: Whether background data usage is allowed. If 0, no. If 1, yes."
-  "安全: 是否后台数据使用情况是允许. 如果 0, 否. 如果 1, 是."
+  "安全设置：是否允许使用后台数据。0 表示不允许，1 表示允许。"
 }
 {
   "Secure: Whether display color inversion is enabled. If 0, no. If 1, yes."
-  "安全: 是否显示颜色 inversion 是已启用. 如果 0, 否. 如果 1, 是."
+  "安全设置：颜色反转是否已启用。0 表示未启用，1 表示已启用。"
 }
 {
   "Secure: Whether the lock pattern is visible as the user enters. If 0, no. If 1, yes."
-  "安全：锁定图案在用户输入时是否可见。如果为 0，则不可见。如果为 1，则可见。"
+  "安全设置：用户绘制解锁图案时是否显示图案。0 表示隐藏，1 表示显示。"
 }
 {
   "Secure: Whether the lock pattern will vibrate as the user enters. If 0, no. If 1, yes."
-  "安全：当用户输入时，锁定图案是否会振动。如果为 0，则不会。如果为 1，则会。"
+  "安全设置：用户绘制解锁图案时是否振动。0 表示不振动，1 表示振动。"
 }
 {
   "SecureOn account"
@@ -13457,7 +13457,7 @@
 }
 {
   "Send a message to someone specified by the data. Data may be a mailto or sms URI."
-  "发送消息到某人指定通过数据. 数据可能为  mailto 或短信 URI"
+  "向数据中指定的对象发送消息。数据可以是 mailto 或 sms URI。"
 }
 {
   "Send an MMS without user interaction."
@@ -13513,15 +13513,15 @@
 }
 {
   "Sensor landscape"
-  "Sensor 横屏"
+  "传感器横屏"
 }
 {
   "Sensor not available"
-  "Sensor 不可用"
+  "传感器不可用"
 }
 {
   "Sensor portrait"
-  "Sensor 竖屏"
+  "传感器竖屏"
 }
 {
   "Sent after the screen turns off."
@@ -13541,15 +13541,15 @@
 }
 {
   "Sent to the installer package of an application when that application is first launched (that is the first time it is moved out of the stopped state)."
-  "已发送到 installer 软件包的一个应用当该应用是第一已启动 (该是第一时间它是已移动输出的已停止状态)."
+  "应用首次启动时（即首次从停止状态转为运行状态时）发送给其安装程序包。"
 }
 {
   "Sent to the system package verifier when a package is verified."
-  "已发送到系统软件包 verifier 当一个软件包是已验证."
+  "应用包完成验证后发送给系统软件包验证器。"
 }
 {
   "Sent to the system package verifier when a package needs to be verified."
-  "已发送到系统软件包 verifier 当一个软件包需要到为已验证."
+  "应用包需要验证时发送给系统软件包验证器。"
 }
 {
   "Sent when a user switch is happening, causing the process’s user to be brought to the foreground."
@@ -13781,7 +13781,7 @@
 }
 {
   "Set notifications visibility"
-  "设置通知 visibility"
+  "设置通知可见性"
 }
 {
   "Set period"
@@ -14033,7 +14033,7 @@
 }
 {
   "Show a dialog with a list of choices and await user decision."
-  "显示一个对话框与一个列表的 choices 和等待用户决定."
+  "显示包含选项列表的对话框，并等待用户选择。"
 }
 {
   "Show a location in the default map app."
@@ -14077,7 +14077,7 @@
 }
 {
   "Show activity choices"
-  "显示活动 choices"
+  "显示 Activity 选择列表"
 }
 {
   "Show activity for reporting a bug."
@@ -14185,7 +14185,7 @@
 }
 {
   "Show settings for choosing wallpaper. Data URI must be an image resource/file."
-  "显示choosing 壁纸. 数据 URI 必须为图像 resource/文件的设置。"
+  "显示壁纸选择设置。data URI 必须指向图像资源或文件。"
 }
 {
   "Show settings for global search."
@@ -14697,11 +14697,11 @@
 }
 {
   "Start a Camera app and wait for the user to record a video."
-  "启动相机应用和 wait 用于用户到录制视频。"
+  "启动相机应用，并等待用户录制视频。"
 }
 {
   "Start a Camera app and wait for the user to take a picture."
-  "启动相机应用和 wait 用于用户到获取图片。"
+  "启动相机应用，并等待用户拍照。"
 }
 {
   "Start action associated with long pressing on the search key."
@@ -15173,23 +15173,23 @@
 }
 {
   "System: A formatted string of the next alarm that is set, or the empty string if there is no alarm set."
-  "系统:  formatted 字符串的下一闹钟该是设置, 或空字符串如果那里是否闹钟设置."
+  "系统设置：下一个已设闹钟的格式化字符串；如果未设置闹钟，则为空字符串。"
 }
 {
   "System: Auto caps in text editors. If 0, no. If 1, yes."
-  "System:文本编辑器中的自动大写功能如果为 0，则不启用如果为 1，则启用"
+  "系统设置：文本编辑器是否自动将单词首字母大写。0 表示关闭，1 表示开启。"
 }
 {
   "System: Auto punctuate in text editors. This feature converts two spaces to a “.” and space. If 0, no. If 1, yes."
-  "System:文本编辑器中的自动标点功能此功能将两个空格转换为一个句号和一个空格如果为 0，则不启用如果为 1，则启用"
+  "系统设置：文本编辑器是否启用自动标点。此功能会将连续两个空格替换为句号和空格。0 表示关闭，1 表示开启。"
 }
 {
   "System: Auto replace (AutoText) in text editors. If 0, no. If 1, yes."
-  "System:文本编辑器中的自动替换（自动文本）功能如果为 0，则不启用如果为 1，则启用"
+  "系统设置：是否在文本编辑器中启用自动替换（AutoText）。0 表示关闭，1 表示开启。"
 }
 {
   "System: Bluetooth discoverability timeout. If this value is non-zero, then Bluetooth becomes discoverable for a certain number of seconds, after which is becomes simply connectable. The value is in seconds."
-  "System：蓝牙可发现超时时长。若此值不为零，蓝牙将在该秒数内保持可被发现状态；扫描完成后，该值将被重置为零。"
+  "系统设置：蓝牙可发现超时时长。此值非 0 时，蓝牙会在指定秒数内处于可发现状态，超时后将变为仅可连接。单位为秒。"
 }
 {
   "System: CDMA only settings DTMF tone type played by the dialer when dialing. If 0, normal. If 1, long."
@@ -15197,31 +15197,31 @@
 }
 {
   "System: Control whether the accelerometer will be used to change screen orientation. If 0, it will not be used unless explicitly requested by the application; if 1, it will be used by default unless explicitly disabled by the application."
-  "System:控制是否使用加速度计来改变屏幕方向如果为 0，则除非应用明确请求，否则不会使用；如果为 1，则默认使用，除非应用明确禁用"
+  "系统设置：是否使用加速度计改变屏幕方向。0 表示默认不使用，除非应用明确请求；1 表示默认使用，除非应用明确禁用。"
 }
 {
   "System: Control whether to enable automatic brightness mode. If 0, use manually set level. If 1, automatic adjustment."
-  "System:控制是否启用自动亮度模式如果为 0，则使用手动设置的亮度级别如果为 1，则自动调整"
+  "系统设置：屏幕亮度模式。0 表示使用手动亮度，1 表示自动调节亮度。"
 }
 {
   "System: Date format string; mm/dd/yyyy, dd/mm/yyyy or yyyy/mm/dd."
-  "System:日期格式字符串；mm/dd/yyyy、dd/mm/yyyy 或 yyyy/mm/dd"
+  "系统设置：日期格式字符串，格式示例：mm/dd/yyyy、dd/mm/yyyy 或 yyyy/mm/dd。"
 }
 {
   "System: Default screen rotation when no other policy applies."
-  "系统: 默认屏幕旋转当否其他政策 applies."
+  "系统设置：未应用其他规则时使用的默认屏幕方向。"
 }
 {
   "System: Determines whether remote devices may discover and/or connect to this device. If 0, neither connectable nor discoverable. If 1, connectable but not discoverable. If 2, discoverable and connectable."
-  "System:决定远程设备是否可以发现和/或连接到此设备如果为 0，则不可连接且不可发现如果为 1，则可连接但不可发现如果为 2，则可发现且可连接"
+  "系统设置：控制远程设备能否发现或连接到此设备。0 表示不可发现且不可连接；1 表示可连接但不可发现；2 表示可发现且可连接。"
 }
 {
   "System: Determines which streams are affected by mute. The stream type’s bit should be set to 1 if it should be muted when a mute request is received."
-  "System:确定哪些音频流受到静音的影响如果音频流的位应设置为 1，则在收到静音请求时将其静音"
+  "系统设置：指定静音操作会影响哪些音频流。收到静音请求时，若某音频流对应的位设为 1，该音频流就会静音。"
 }
 {
   "System: Determines which streams are affected by ringer mode changes. The stream type’s bit should be set to 1 if it should be muted when going into an inaudible ringer mode."
-  "System:确定在响铃模式更改时哪些音频流受到影响如果音频流的位为 1，则在进入不可听的响铃模式时会将其静音"
+  "系统设置：指定铃声模式变化会影响哪些音频流。音频流对应的位设为 1 时，切换到无声铃声模式会使该音频流静音。"
 }
 {
   "System: Display times as 12 or 24 hours. If 12, 12-hour format. If 24, 24-hour format."
@@ -15229,19 +15229,19 @@
 }
 {
   "System: If using static IP, the gateway’s IP address."
-  "System:如果使用静态 IP，则为网关的 IP 地址"
+  "系统设置：使用静态 IP 时的网关 IP 地址。"
 }
 {
   "System: If using static IP, the net mask."
-  "System:如果使用静态 IP，则为网络掩码"
+  "系统设置：使用静态 IP 时的子网掩码。"
 }
 {
   "System: If using static IP, the primary DNS’s IP address."
-  "System:如果使用静态 IP，则为主 DNS 的 IP 地址"
+  "系统设置：使用静态 IP 时的主 DNS 服务器 IP 地址。"
 }
 {
   "System: If using static IP, the secondary DNS’s IP address."
-  "System:如果使用静态 IP，则为次要 DNS 的 IP 地址"
+  "系统设置：使用静态 IP 时的备用 DNS 服务器 IP 地址。"
 }
 {
   "System: Name of activity to use for wallpaper on the home screen."
@@ -15249,7 +15249,7 @@
 }
 {
   "System: Persistent store for the system-wide default alarm alert."
-  "System:系统范围内默认的闹钟提示的持久存储"
+  "系统设置：全局默认闹钟提示的持久化存储项。"
 }
 {
   "System: Persistent store for the system-wide default notification sound."
@@ -15257,15 +15257,15 @@
 }
 {
   "System: Persistent store for the system-wide default ringtone URI."
-  "系统: 持久 store 用于系统范围默认铃声 URI."
+  "系统设置：系统默认铃声 URI 的持久化存储。"
 }
 {
   "System: Scaling factor for fonts."
-  "System:字体的缩放因子"
+  "系统设置：字体缩放比例。"
 }
 {
   "System: Showing password characters in text editors. If 0, no. If 1, yes."
-  "系统: 显示密码字符在文本 editors. 如果 0, 否. 如果 1, 是."
+  "系统设置：是否在文本框中显示密码字符。0 表示不显示，1 表示显示。"
 }
 {
   "System: The screen backlight brightness between 0 and 255."
@@ -15281,35 +15281,35 @@
 }
 {
   "System: What happens when the user presses the end call button when in call. If 0, do nothing. If 1, go to the home screen. If 2, put the device to sleep and locks the keyguard. If 3, go to the home screen or puts the device to sleep if the user is already on the home screen."
-  "System:用户在通话中按下结束通话按钮时的操作如果为 0，则不执行任何操作如果为 1，则返回主屏幕如果为 2，则将设备置于休眠状态并锁定键盘如果为 3，则返回主屏幕或在用户已在主屏幕上的情况下将设备置于休眠状态"
+  "系统设置：通话中按下结束通话键后的行为。0 表示不执行操作；1 表示返回主屏幕；2 表示让设备进入休眠并锁定屏幕；3 表示返回主屏幕，若当前已在主屏幕，则让设备进入休眠。"
 }
 {
   "System: Whether or not to dim the screen. If 0, no. If 1, yes."
-  "系统: 是否或不到 dim 屏幕. 如果 0, 否. 如果 1, 是."
+  "系统设置：是否调暗屏幕。0 表示不调暗，1 表示调暗。"
 }
 {
   "System: Whether the audible DTMF tones are played by the dialer when dialing. If 0, no. If 1, yes."
-  "System:拨号时拨号器是否播放可听到的 DTMF 音调如果为 0，则不播放如果为 1，则播放"
+  "系统设置：拨号时是否播放 DTMF 按键音。0 表示不播放，1 表示播放。"
 }
 {
   "System: Whether the haptic feedback (long presses, etc.) are enabled. If 0, no. If 1, yes."
-  "System:是否启用触觉反馈（长按等）如果为 0，则不启用如果为 1，则启用"
+  "系统设置：是否启用触觉反馈（例如长按振动）。0 表示关闭，1 表示开启。"
 }
 {
   "System: Whether the phone vibrates when it’s ringing due to an incoming call. If 0, no. If 1, yes."
-  "System:是否在来电时响铃时手机会震动如果为 0，则不震动如果为 1，则震动"
+  "系统设置：来电响铃时手机是否振动。0 表示不振动，1 表示振动。"
 }
 {
   "System: Whether the setup wizard has been run before (on first boot), or if it still needs to be run. If non-zero, has been run in the past. If 0, has not been run."
-  "System:设置向导是否已在之前运行过（在首次启动时），或者是否仍需要运行如果非零，已在过去运行过如果为 0，则未运行"
+  "系统设置：首次开机设置向导是否已运行。非 0 表示曾运行过，0 表示尚未运行。"
 }
 {
   "System: Whether the sounds effects (key clicks, lid open, etc) are enabled."
-  "System:是否启用声音效果（按键声音、盖子打开声音等）"
+  "系统设置：是否启用按键音、翻盖声等音效。"
 }
 {
   "System: Whether to use static IP and other static network attributes. If 0, no. If 1, yes."
-  "System:是否使用静态 IP 和其他静态网络属性如果为 0，则不使用如果为 1，则使用"
+  "系统设置：是否使用静态 IP 地址及其他静态网络参数。0 表示不使用，1 表示使用。"
 }
 {
   "TTS default pitch"
@@ -15465,11 +15465,11 @@
 }
 {
   "Tag with id %s was written successfully."
-  "标签与 ID%s 是已写入成功地."
+  "ID 为 %s 的标签已成功写入。"
 }
 {
   "Take a screenshot."
-  "获取 screenshot."
+  "截取屏幕。"
 }
 {
   "Take an image of the current screen."
@@ -15501,7 +15501,7 @@
 }
 {
   "Take photos at night."
-  "获取照片在 night."
+  "夜间拍照。"
 }
 {
   "Take photos in a theater. Flash light is off."
@@ -15537,7 +15537,7 @@
 }
 {
   "Take screenshot (Android 9+)"
-  "获取 screenshot (Android 9+)"
+  "截取屏幕（Android 9+）"
 }
 {
   "Take sunset photos."
@@ -15561,7 +15561,7 @@
 }
 {
   "Taker fiber URI"
-  "接受者纤维 URI"
+  "接收方流程执行实例 URI"
 }
 {
   "Tap link to grant, otherwise options below may be disabled or show generic values."
@@ -15733,11 +15733,11 @@
 }
 {
   "The app is installed for the calling user."
-  "应用是已安装用于 calling 用户."
+  "该应用已安装给当前调用用户。"
 }
 {
   "The app is installed in the device’s system image."
-  " 应用是已安装在设备’s 系统图像."
+  "该应用已预装在设备的系统映像中。"
 }
 {
   "The app is installed on secondary external storage (removable SD card)."
@@ -15829,7 +15829,7 @@
 }
 {
   "The background data usage setting has changed."
-  "后台数据使用情况设置有已更改."
+  "后台数据使用设置已更改。"
 }
 {
   "The background metered network activity restriction setting has changed."
@@ -15849,7 +15849,7 @@
 }
 {
   "The current device’s locale has changed."
-  "当前设备’ 地区有已更改."
+  "设备的语言和地区设置已更改。"
 }
 {
   "The current local time as seconds past midnight, January 1, 1970 UTC."
@@ -15857,15 +15857,15 @@
 }
 {
   "The current system wallpaper has changed."
-  "当前系统壁纸有已更改."
+  "系统壁纸已更改。"
 }
 {
   "The current time has changed. Sent every minute."
-  "当前时间有已更改. 已发送每个分钟."
+  "当前时间已更改。此事件每分钟发送一次。"
 }
 {
   "The date has changed."
-  "日期有已更改."
+  "日期已更改。"
 }
 {
   "The default audio source."
@@ -15921,7 +15921,7 @@
 }
 {
   "The fiber will only proceed immediately if there’s a single or no match, otherwise pause until the user has picked a component. Don’t assume the fiber will pause!"
-  "流程只有在只有一个或没有匹配项时才会立即继续，否则将暂停，直到用户选择了一个组件不要假设流程会暂停！"
+  "只有找到一个或零个匹配项时，流程才会立即继续；如果有多个匹配项，则会暂停，等待用户选择组件。请勿假设流程一定会暂停！"
 }
 {
   "The fiber will pause for the duration, as accurately as possible."
@@ -15973,7 +15973,7 @@
 }
 {
   "The fiber will pause until playback has completed."
-  "fiber 将暂停直到播放有已完成."
+  "流程将暂停，直到播放结束。"
 }
 {
   "The fiber will pause until the UI element has appeared on screen."
@@ -16173,11 +16173,11 @@
 }
 {
   "The media scanner has finished scanning a directory."
-  "媒体扫描器有已完成扫描目录."
+  "媒体扫描器已完成目录扫描。"
 }
 {
   "The media scanner has started scanning a directory."
-  "媒体扫描器有已开始扫描目录."
+  "媒体扫描器已开始扫描目录。"
 }
 {
   "The monitored file or directory was deleted and monitoring effectively stops."
@@ -16193,7 +16193,7 @@
 }
 {
   "The next scheduled AlarmClock has changed."
-  "下一已计划 AlarmClock 有已更改."
+  "下一个计划闹钟已更改。"
 }
 {
   "The owner’s availability may change, but should be considered busy that will conflict."
@@ -16221,7 +16221,7 @@
 }
 {
   "The tag was moved prematurely"
-  "标签是已移动 prematurely"
+  "标签被提前移走。"
 }
 {
   "The time was set."
@@ -16229,11 +16229,11 @@
 }
 {
   "The timezone has changed."
-  "时区有已更改."
+  "时区已更改。"
 }
 {
   "The user has cleared the data of a package."
-  " 用户有已清除数据的一个软件包."
+  "用户已清除某个应用的数据。"
 }
 {
   "The user has restarted a package, and all of its processes have been killed."
@@ -16253,7 +16253,7 @@
 }
 {
   "The “Camera Button” was pressed."
-  "“相机按钮” 是已按下."
+  "已按下“相机按钮”。"
 }
 {
   "The “Lock” option is enabled by default in flowchart editor."
@@ -16261,7 +16261,7 @@
 }
 {
   "The “Media Button” was pressed."
-  "“媒体按钮” 是已按下."
+  "已按下“媒体按钮”。"
 }
 {
   "The “running” state and count"
@@ -16277,7 +16277,7 @@
 }
 {
   "This block deprecated, use the “%s” block instead."
-  "此模块已弃用, 使用 “%s” 模块 instead."
+  "此块已弃用，请改用“%s”块。"
 }
 {
   "This block no longer work! Tap the header above for an explanation why."
@@ -16461,7 +16461,7 @@
 }
 {
   "This feature requires a device with a camera flash."
-  "此功能需要一个设备与一个相机 flash."
+  "此功能需要配备相机闪光灯的设备。"
 }
 {
   "This feature requires a device with a camera."
@@ -16497,7 +16497,7 @@
 }
 {
   "This is broadcast when a user action should request a temporary system dialog to dismiss."
-  "此是广播当一个用户操作应该请求一个临时系统对话框到 dismiss."
+  "当用户操作需要关闭临时系统对话框时，会发送此广播。"
 }
 {
   "This provider determines location based on availability of cell tower and Wi-Fi access points."
@@ -16657,7 +16657,7 @@
 }
 {
   "To e-mail"
-  "到 e-邮件"
+  "收件人电子邮件地址"
 }
 {
   "Toast posted"
@@ -16869,15 +16869,15 @@
 }
 {
   "URI authority"
-  "URI 授权"
+  "URI 的 authority 部分"
 }
 {
   "URI of content changed (Android 4.1+)"
-  "URI 的内容已更改 (Android 4.1+)"
+  "内容变更的 URI（Android 4.1+）"
 }
 {
   "URI of inserted content"
-  "URI 的 inserted 内容"
+  "已插入内容的 URI"
 }
 {
   "URI path"
@@ -17069,7 +17069,7 @@
 }
 {
   "Use Google Play Services location API."
-  "使用 Google 播放服务位置 API."
+  "使用 Google Play 服务定位 API。"
 }
 {
   "Use Google mail"
@@ -17097,7 +17097,7 @@
 }
 {
   "Use maximum speed when a threshold is exceeded, otherwise slowly scale with workload. Disable auxiliary CPUs when idle."
-  "当超过阈值时使用最大速度，否则根据工作负载缓慢缩放空闲时禁用辅助 CPU"
+  "超过阈值时使用最高速度；否则根据负载缓慢调整速度。设备空闲时关闭辅助 CPU。"
 }
 {
   "Use of Web Storage API."
@@ -17145,7 +17145,7 @@
 }
 {
   "Use visibility as specified in notification by the app."
-  "使用 visibility 作为指定在通知通过应用."
+  "使用应用在通知中指定的可见性。"
 }
 {
   "Use with caution! Improper modification of a content provider may result in lost or corrupt data."
@@ -17213,7 +17213,7 @@
 }
 {
   "Used for voice if capable, for data otherwise."
-  "如果支持语音则用于语音，否则用于数据"
+  "设备支持语音时用于语音通话，否则用于数据传输。"
 }
 {
   "Used subscription id"
@@ -17417,7 +17417,7 @@
 }
 {
   "Value should be a content URI of a contact."
-  "值应该为一个内容 URI 的一个联系人."
+  "值应为联系人的 content URI。"
 }
 {
   "Value should be a name as used to display the contact."
@@ -17445,7 +17445,7 @@
 }
 {
   "Value should be an e-mail address, glob supported."
-  "值应该为 e-邮件地址, glob 支持."
+  "值应为电子邮件地址；支持 glob 通配模式。"
 }
 {
   "Value should be an event start date as the user entered it, glob supported."
@@ -17629,7 +17629,7 @@
 }
 {
   "Voice recognition"
-  "语音 recognition"
+  "语音识别"
 }
 {
   "Voice search"
@@ -17669,15 +17669,15 @@
 }
 {
   "Wait for a media/headset button to be pressed."
-  "Wait 用于一个媒体/耳机按钮到为已按下."
+  "等待媒体/耳机按键按下。"
 }
 {
   "Wait for an NFC tag to be scanned."
-  "Wait 用于 NFC 标签到为已扫描."
+  "等待扫描 NFC 标签。"
 }
 {
   "Wait for an amount of time."
-  "Wait 用于数量的时间."
+  "等待指定时长。"
 }
 {
   "Wait for debugger"
@@ -17877,7 +17877,7 @@
 }
 {
   "When audio muted"
-  "当音频 muted"
+  "音频静音时"
 }
 {
   "When audio recording"
@@ -18017,7 +18017,7 @@
 }
 {
   "When file exists"
-  "当文件 exists"
+  "文件存在时"
 }
 {
   "When foreground app"
@@ -18085,11 +18085,11 @@
 }
 {
   "When media playing"
-  "当媒体 playing"
+  "媒体播放时"
 }
 {
   "When microphone muted"
-  "当麦克风 muted"
+  "麦克风静音时"
 }
 {
   "When missed"
@@ -18117,7 +18117,7 @@
 }
 {
   "When network throughput"
-  "当网络 throughput"
+  "网络吞吐量变化时"
 }
 {
   "When network type"
@@ -18125,11 +18125,11 @@
 }
 {
   "When night mode enabled"
-  "当 night 模式已启用"
+  "夜间模式启用时"
 }
 {
   "When no more steps"
-  "当否更多 steps"
+  "没有后续步骤时"
 }
 {
   "When notification"
@@ -18493,7 +18493,7 @@
 }
 {
   "Working directory"
-  "Working 目录"
+  "工作目录"
 }
 {
   "Writable file closed"
@@ -18613,7 +18613,7 @@
 }
 {
   "You have no flow"
-  "你有否流程"
+  "没有可用流程"
 }
 {
   "You seem to enjoy Automate, write a review or rate it at the Google Play store?"
@@ -19653,7 +19653,7 @@
 }
 {
   "Fiber URI"
-  "纤维 URI"
+  "流程执行实例 URI"
 }
 {
   "Global: The policy for deciding when Wi-Fi should go to sleep (which will in turn switch to using the mobile data as an Internet connection). If 0, default. If 1, use defaul when the device is on battery but never go to sleep when the device is plugged in. If 2, never go to sleep."
@@ -22053,7 +22053,7 @@
 }
 {
   "The fiber will proceed when variables are available for the taking, it may be immediately."
-  "The 纤维 will proceed when variables are available for the taking, it may be immediately."
+  "有变量可供获取时，流程将继续运行；也可能立即继续。"
 }
 {
   "Fork"
@@ -22241,7 +22241,7 @@
 }
 {
   "Text recognition"
-  "文本 recognition"
+  "文本识别"
 }
 {
   "Disable Ethernet tether"
@@ -22453,7 +22453,7 @@
 }
 {
   "No Content"
-  "否内容"
+  "无内容"
 }
 {
   "Part content or filename"
@@ -22505,7 +22505,7 @@
 }
 {
   "Flow screensaver"
-  "流程 screensaver"
+  "流程屏保"
 }
 {
   "Listen through connected USB cable."
@@ -22577,7 +22577,7 @@
 }
 {
   "OneDrive file exists"
-  "OneDrive 文件 exists"
+  "OneDrive 文件存在"
 }
 {
   "List OneDrive"
@@ -22605,7 +22605,7 @@
 }
 {
   "Integer columns as bigint, float as number."
-  "整数列为 bigint，浮点数列为 number。"
+  "整数字段以 bigint 表示，浮点数字段以 number 表示。"
 }
 {
   "Integer and float columns as number."
@@ -22641,35 +22641,35 @@
 }
 {
   "Bluetooth device unpair"
-  "蓝牙设备 unpair"
+  "取消蓝牙设备配对"
 }
 {
   "Check if the device has configured a secure lock screen."
-  "检查如果设备有已配置一个安全锁定屏幕."
+  "检查设备是否已设置安全锁屏。"
 }
 {
   "Device secure?"
-  "设备安全?"
+  "设备是否已设置安全锁屏？"
 }
 {
   "Check power mode for a display."
-  "检查电源模式用于显示."
+  "检查显示屏的电源模式。"
 }
 {
   "Display power mode?"
-  "显示电源模式?"
+  "显示屏电源模式？"
 }
 {
   "Screensaver created"
-  "Screensaver 已创建"
+  "屏保已创建"
 }
 {
   "Screensaver setup"
-  "Screensaver 设置"
+  "设置屏保"
 }
 {
   "Play a DTMF tone in an ongoing call."
-  "播放 DTMF 音调在正在进行的通话."
+  "在通话过程中播放 DTMF 按键音。"
 }
 {
   "DTMF tone play"
@@ -22681,7 +22681,7 @@
 }
 {
   "File APK extract"
-  "文件 APK 提取"
+  "提取 APK 文件"
 }
 {
   "Extract a single part of an multipart encoded file."
@@ -22689,7 +22689,7 @@
 }
 {
   "File multipart extract"
-  "文件 multipart 提取"
+  "提取多部分编码文件"
 }
 {
   "Check if camera flash LED light is enabled."
@@ -22701,7 +22701,7 @@
 }
 {
   "Floating button show"
-  "Floating 按钮显示"
+  "显示悬浮按钮"
 }
 {
   "Check if the physical keyboard is visible/extended."
@@ -22709,23 +22709,23 @@
 }
 {
   "Hardware keyboard visible?"
-  "Hardware 键盘可见?"
+  "硬件键盘是否可见？"
 }
 {
   "Listen for incoming HTTP requests over Bluetooth."
-  "监听用于来电 HTTP 请求在...上方蓝牙."
+  "通过蓝牙监听传入的 HTTP 请求。"
 }
 {
   "HTTP accept Bluetooth"
-  "HTTP 接受蓝牙"
+  "通过蓝牙接收 HTTP 请求"
 }
 {
   "Listen for incoming HTTP requests."
-  "监听用于来电 HTTP 请求."
+  "监听传入的 HTTP 请求。"
 }
 {
   "HTTP accept"
-  "HTTP 接受"
+  "接收 HTTP 请求"
 }
 {
   "Send a response to incoming HTTP request."
@@ -22737,19 +22737,19 @@
 }
 {
   "Inspect the layout of the user interface shown on screen."
-  "检查布局的用户接口已显示在屏幕."
+  "检查屏幕上显示的界面布局。"
 }
 {
   "Await changes in a text field."
-  "等待更改在文本字段."
+  "等待文本字段内容发生变化。"
 }
 {
   "Inspect text edit"
-  "检查文本编辑"
+  "检查文本编辑框"
 }
 {
   "Update the properties of an adapter view within a custom interface."
-  "更新属性的一个 adapter 查看在...内一个自定义接口."
+  "更新自定义界面中适配器视图的属性。"
 }
 {
   "Interface request"
@@ -22765,11 +22765,11 @@
 }
 {
   "Check if a file or directory exists on Microsoft OneDrive, and get information about it."
-  "检查如果一个文件或目录 exists 在 Microsoft OneDrive, 和获取信息关于它."
+  "检查 Microsoft OneDrive 中是否存在指定文件或目录，并获取其信息。"
 }
 {
   "OneDrive file exists?"
-  "OneDrive 文件 exists?"
+  "OneDrive 文件是否存在？"
 }
 {
   "OneDrive list"
@@ -22781,7 +22781,7 @@
 }
 {
   "OneDrive make directory"
-  "OneDrive 使目录"
+  "在 OneDrive 中创建目录"
 }
 {
   "OneDrive upload"
@@ -22789,31 +22789,31 @@
 }
 {
   "Check if a work profile is in quiet mode"
-  "检查如果一个工作配置文件是在静音模式"
+  "检查工作资料是否处于静默模式。"
 }
 {
   "Profile quiet mode enabled?"
-  "配置文件静音模式已启用?"
+  "工作资料的静默模式已启用？"
 }
 {
   "Check if the software keyboard is visible on screen."
-  "检查如果 software 键盘是可见在屏幕."
+  "检查屏幕上是否显示软键盘。"
 }
 {
   "Software keyboard visible?"
-  "Software 键盘可见?"
+  "软键盘是否可见？"
 }
 {
   "Check if a USB device is attached."
-  "检查如果 USB 设备是附加."
+  "检查是否已连接 USB 设备。"
 }
 {
   "USB device attached?"
-  "USB 设备附加?"
+  "USB 设备是否已连接？"
 }
 {
   "User has chosen a wallpaper interface."
-  "用户有已选择壁纸接口."
+  "用户已选择壁纸界面。"
 }
 {
   "Wallpaper setup"
@@ -29553,11 +29553,11 @@
 }
 {
   "A new screensaver interface has been created."
-  "新 screensaver 接口有已已创建."
+  "已创建新的屏保界面。"
 }
 {
   "A new wallpaper interface has been created."
-  "新壁纸接口有已已创建."
+  "已创建新的壁纸界面。"
 }
 {
   "Accept multiple"
@@ -29717,7 +29717,7 @@
 }
 {
   "Authentication is required and has failed or has not yet been provided."
-  "认证是需要和有失败或有不 yet 已已提供."
+  "需要身份验证，但验证失败或尚未提供身份验证信息。"
 }
 {
   "Automate community"
@@ -30001,7 +30001,7 @@
 }
 {
   "Failed to write flow"
-  "失败到写入流程"
+  "写入流程失败"
 }
 {
   "Feature name"
@@ -30369,23 +30369,23 @@
 }
 {
   "No credentials (Android 11+)"
-  "否凭据 (Android 11+)"
+  "无凭据（Android 11+）"
 }
 {
   "No data transfer"
-  "否数据 transfer"
+  "不传输数据"
 }
 {
   "No flow providing wallpaper"
-  "否流程 providing 壁纸"
+  "没有提供壁纸的流程"
 }
 {
   "No flow providing widget"
-  "否流程 providing 小部件"
+  "没有提供小部件的流程"
 }
 {
   "No key selected, or none installed"
-  "否键已选择, 或无已安装"
+  "未选择密钥，或尚未安装任何密钥"
 }
 {
   "No limit"
@@ -30713,7 +30713,7 @@
 }
 {
   "Secure: Whether accessibility is enabled (1) or diabled (0)."
-  "安全: 是否无障碍是已启用 (1) 或 diabled (0)."
+  "安全设置：无障碍功能是否已启用（1）或已停用（0）。"
 }
 {
   "Selection end"
@@ -30805,7 +30805,7 @@
 }
 {
   "Show screen for controlling whether an app can send full screen intents. Data must be a package URI."
-  "显示用于控制是否应用可以发送满屏幕意图. 数据必须为软件包 URI的页面。"
+  "显示用于控制应用是否可以发送全屏 Intent 的设置页面。数据必须是应用包 URI。"
 }
 {
   "Show screen for controlling which apps are allowed to write/modify system settings. Data may be a package URI."
@@ -30961,7 +30961,7 @@
 }
 {
   "The lock screen was shown."
-  "锁定屏幕是已显示."
+  "锁屏界面已显示。"
 }
 {
   "The standard response for successful request."
@@ -31037,11 +31037,11 @@
 }
 {
   "User has chosen a screensaver interface."
-  "用户有已选择 screensaver 接口."
+  "用户已选择屏保界面。"
 }
 {
   "User has started adding a home or lock screen widget interface."
-  "用户有已开始 adding 一个主页或锁定屏幕小部件接口."
+  "用户已开始添加主屏幕或锁屏小部件。"
 }
 {
   "VPN settings (Android 7+)"
