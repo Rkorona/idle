@@ -224,3 +224,17 @@ BOSS 实际战斗严格走三步：
 
 以后新增 BOSS 界域，只需在 `src/auto_bot/models/boss.py` 的 `BOSS_ZONES` 里增加一个 `BossZone(...)`。
 - `gift` 后续灵宝流程会先调用 `/game/treasure/fengling/search`，从“未装备”结果中读取当前小号实际灵宝 `id`，后续镶嵌与装备均使用该 ID，不再固定使用旧账号的灵宝 ID。
+
+## 注册小号
+
+新增 `register` 子命令。`--count` 表示需要成功注册的账号数量；服务端返回 HTTP 400
+时会重新生成 `client_id` 并重试。每个账号最多尝试 `--max-attempts` 次，成功后立即
+追加写入本地凭据文件，格式为 `账户,密码,区服`。
+
+```bash
+auto-bot register --count 10
+auto-bot register --count 10 --output accounts.txt
+auto-bot register --count 10 --max-attempts 20
+```
+
+默认输出文件为 `accounts_registered.txt`，默认区服为 49。

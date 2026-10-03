@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 LOGIN = "/game/login/login"
+REGISTER_IOS = "/game/login/regIos"
 LIST_ZHAN_QU = "/game/area/listZhanQuan"
 LIST_AREA = "/game/area/listArea/{zhanqu_id}"
 USER_INFO = "/game/user/info/index"
