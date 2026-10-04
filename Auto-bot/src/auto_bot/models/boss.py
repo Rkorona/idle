@@ -32,6 +32,7 @@ BOSS_ZONES: tuple[BossZone, ...] = (
     BossZone("神界界域", 3, (301,)),
     BossZone("圣界界域", 3, (300,)),
     BossZone("帝界界域", 3, (3005,)),
+    BossZone("神话界界域", 3, (69915,)),
 )
 
 
