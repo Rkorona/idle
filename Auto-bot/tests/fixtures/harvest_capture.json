@@ -1,0 +1,123 @@
+{
+ "slots_online": [
+  {
+   "remarks": null,
+   "id": 1,
+   "user_id": 71588,
+   "offline_max_time": null,
+   "offline_start_time": 1790269123,
+   "is_offline": true,
+   "offline_master": 3100250835,
+   "offline_rate": null,
+   "area_id": null,
+   "create_time": null,
+   "update_time": null,
+   "offline_difficult_id": 27,
+   "function_id": 1,
+   "offline_master_world_level": null,
+   "offline_master_name": "[魔书等级：0][血书等级：0][难度：7-无上级]神玄-玄界天机层圣歌之主",
+   "function_name": "本尊",
+   "o_code": null,
+   "online_name": "仙君挂机位置",
+   "is_child_onlie": false
+  }
+ ],
+ "settle_ok": {
+  "gold": "4451699089184003700000",
+  "success": true,
+  "time": 6871,
+  "experience": "72227071281883150000000",
+  "drop_list": [
+   {
+    "goods_name": "挂机加成百分比",
+    "num": 0
+   },
+   {
+    "goods_name": "真转生丹",
+    "num": 655994252700
+   },
+   {
+    "goods_name": "神龙珠-神魔",
+    "num": 11695199780
+   },
+   {
+    "goods_name": "圣玄石",
+    "num": 57322586880
+   },
+   {
+    "goods_name": "轮回道则⑥",
+    "num": 34249840200
+   },
+   {
+    "goods_name": "圣神石",
+    "num": 112270998960
+   },
+   {
+    "goods_name": "梦幻种子",
+    "num": 125141
+   },
+   {
+    "goods_name": "仙迹碎片",
+    "num": 125141
+   },
+   {
+    "goods_name": "兔子碎片(每日掉落10000/8069)",
+    "num": 193
+   },
+   {
+    "goods_name": "本命神器碎片",
+    "num": 125141
+   }
+  ]
+ },
+ "slots_offline": [
+  {
+   "remarks": null,
+   "id": 1,
+   "user_id": 71588,
+   "offline_max_time": null,
+   "offline_start_time": 1790269123,
+   "is_offline": false,
+   "offline_master": 3100250835,
+   "offline_rate": null,
+   "area_id": null,
+   "create_time": null,
+   "update_time": null,
+   "offline_difficult_id": 27,
+   "function_id": 1,
+   "offline_master_world_level": null,
+   "offline_master_name": "[魔书等级：0][血书等级：0][难度：7-无上级]神玄-玄界天机层圣歌之主",
+   "function_name": "本尊",
+   "o_code": null,
+   "online_name": "仙君挂机位置",
+   "is_child_onlie": false
+  }
+ ],
+ "start_ok": {
+  "message": null,
+  "http_code": 200
+ },
+ "slots_restarted": [
+  {
+   "remarks": null,
+   "id": 1,
+   "user_id": 71588,
+   "offline_max_time": null,
+   "offline_start_time": 1790275999,
+   "is_offline": true,
+   "offline_master": 3100250835,
+   "offline_rate": null,
+   "area_id": null,
+   "create_time": null,
+   "update_time": null,
+   "offline_difficult_id": 27,
+   "function_id": 1,
+   "offline_master_world_level": null,
+   "offline_master_name": "[魔书等级：0][血书等级：0][难度：7-无上级]神玄-玄界天机层圣歌之主",
+   "function_name": "本尊",
+   "o_code": null,
+   "online_name": "仙君挂机位置",
+   "is_child_onlie": false
+  }
+ ]
+}
