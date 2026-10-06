@@ -8,6 +8,7 @@ import logging
 import typer
 
 from ...api import ApiError, GameClient
+from ...api.exceptions import SessionExpiredError
 from ...config import Settings
 from ...services import bag_service, dungeon_service, sign_service, trade_service
 from ...services.account_service import get_account_id, login
@@ -15,6 +16,7 @@ from ...services.gift_setup_service import (
     BOUNDARY_LIFE_MODE_ID,
     LUCK_LIFE_MODE_ID,
     MASTER_USER_ID,
+    exchange_god_fragment,
     level_up_life_mode,
     run_followup,
 )
@@ -70,7 +72,7 @@ def run(
     剩下几阶段）-> 副本卷轴 -> 6 大副本一键通关 -> 重新登录 -> 一键扫荡全部副本
     -> 循环"用一个回溯之门 -> 签到 -> 用 368 个副本卷轴 -> 扫荡全部副本"直到
     回溯之门用完 -> 用掉扫荡掉落的礼包 -> 幸运/界限命则各升级一轮 -> 把
-    白名单里的物品都转给大号 -> 大号再卖 1 个转生丹给这个小号（2600000 钻石）
+    商城兑换一次神幻碎片 -> 把白名单里的物品都转给大号 -> 大号再卖 1 个转生丹给这个小号（2600000 钻石）
     -> 小号查一遍待接受交易列表并逐笔接受（卖家挂单之后必须买家自己接受
     才会真正过账，钻石/物品才会到账）。全部小号跑完后，最后登录大号，把
     交易列表里待接受的（小号转给大号的物资）逐笔接受，直到列表查空。
@@ -209,6 +211,20 @@ def run(
                             tail_res["life_mode_ok"] = True
 
                         if "error" not in tail_res:
+                            # 交易给大号之前先商城兑换一次神幻碎片：它在白名单里，
+                            # 兑换出来的会跟其它物品一起转给大号。兑换失败（比如货币
+                            # 不够、商品售罄）不中断后面的转交易，只记下原因；会话
+                            # 失效则照常往上抛，触发重登。
+                            try:
+                                await exchange_god_fragment(client)
+                                tail_res["fragment_ok"] = True
+                            except SessionExpiredError:
+                                raise
+                            except ApiError as e:
+                                tail_res["fragment_ok"] = False
+                                tail_res["fragment_error"] = str(e)
+
+                        if "error" not in tail_res:
                             trade_results = await trade_service.sell_all_tradeable_items(
                                 client, MASTER_USER_ID
                             )
@@ -339,6 +355,11 @@ def run(
                 echo(f"    {line}")
         if tail_res.get("life_mode_ok"):
             echo("  ✓ 幸运/界限命则各升级一轮")
+        if "fragment_ok" in tail_res:
+            mark = "✓" if tail_res["fragment_ok"] else "✗"
+            echo(f"  {mark} 商城兑换神幻碎片")
+            if not tail_res["fragment_ok"] and tail_res.get("fragment_error"):
+                echo(f"    {tail_res['fragment_error']}")
         if "trade_total" in tail_res:
             echo(
                 f"  交易给大号：尝试 {tail_res['trade_total']} 件，"

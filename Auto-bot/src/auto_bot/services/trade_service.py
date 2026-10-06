@@ -52,6 +52,7 @@ TRADEABLE_GOODS_IDS: dict[int, str] = {
     500169: "太阴精铁",
     1500161: "神之法灵",
     160023281: "神之秘卷",
+    160123315: "神幻碎片",
 }
 
 
@@ -107,7 +108,7 @@ async def sell_item(
 #: 抓包（大号卖东西给小号.har）单价固定 2600000 钻石、每次卖 1 个。
 REBIRTH_PILL_GOODS_ID = 1
 REBIRTH_PILL_MONEY_TYPE = "2"
-REBIRTH_PILL_PRICE = "2600000.0"
+REBIRTH_PILL_PRICE = "2800000.0"
 REBIRTH_PILL_LIMIT = "1"
 
 

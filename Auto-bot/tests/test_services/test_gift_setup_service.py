@@ -376,3 +376,15 @@ async def test_claim_level_gifts_single_failure_does_not_abort_others():
     assert [r.task_id for r in picked] == [19, 24]
     assert picked[0].ok is False and picked[0].error is not None
     assert picked[1].ok is True and picked[1].error is None
+
+
+@pytest.mark.asyncio
+async def test_exchange_god_fragment_uses_fixed_exchange_id_and_num():
+    seen = []
+
+    def handler(req):
+        seen.append((req.method, req.url.path))
+        return httpx.Response(200, json={"message": None, "http_code": 200})
+
+    await gift_setup_service.exchange_god_fragment(client_for(handler))
+    assert seen == [("GET", "/game/shop/exchange/id/4521100001190/num/1")]

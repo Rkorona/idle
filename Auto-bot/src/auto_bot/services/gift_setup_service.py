@@ -330,6 +330,26 @@ async def buy_shop_item(client: GameClient, goods_id: int, num: int) -> None:
     await retry_on_rate_limit(_do, max_attempts=RATE_LIMIT_MAX_ATTEMPTS, delay=RATE_LIMIT_RETRY_DELAY)
 
 
+#: 商城兑换"神幻碎片"的兑换项 id（抓包 购买神幻碎片.har）。注意这是兑换项 id，
+#: 不是物品模板 goods_id（神幻碎片的 goods_id 是 160123315，见 trade_service）。
+GOD_FRAGMENT_EXCHANGE_ID = 4521100001190
+GOD_FRAGMENT_EXCHANGE_NUM = 1
+
+
+async def exchange_god_fragment(
+    client: GameClient, num: int = GOD_FRAGMENT_EXCHANGE_NUM
+) -> None:
+    """商城兑换一次"神幻碎片"：GET /game/shop/exchange/id/{id}/num/{num}。"""
+
+    async def _do() -> None:
+        data = await client.get(
+            endpoints.SHOP_EXCHANGE.format(exchange_id=GOD_FRAGMENT_EXCHANGE_ID, num=num)
+        )
+        _require_ok(data, f"商城兑换神幻碎片 num={num}")
+
+    await retry_on_rate_limit(_do, max_attempts=RATE_LIMIT_MAX_ATTEMPTS, delay=RATE_LIMIT_RETRY_DELAY)
+
+
 async def buy_rebirth_pill(client: GameClient, num: int = REBIRTH_PILL_BUY_NUM) -> None:
     """去商店购买"转生丹"（固定商品 id=478）。"""
     await buy_shop_item(client, REBIRTH_PILL_SHOP_ID, num)
