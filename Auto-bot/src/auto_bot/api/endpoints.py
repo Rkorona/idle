@@ -80,8 +80,8 @@ EMPLOYEE_BENEFITS_PICK = "/game/gift/employee/benefits/pick/{id}"  # 领取一�
 # --- 小号礼包后续第二阶段：用完一京金币卡以后，买丹 -> 轮回 -> 梦幻加速卡 ->
 #     结束挂机 -> 二次刷总等级 ---
 SHOP_BUY = "/game/shop/buy/id/{goods_id}/num/{num}"        # 商城购买；goods_id 固定，num 抓包见过传 1（这里用于买 100 兆转生丹）
-SHOP_EXCHANGE = "/game/shop/exchange/id/{exchange_id}/num/{num}"  # 商城兑换（抓包 购买神幻碎片.har：GET，成功返回 {"message":null,"http_code":200}）
 AGAIN_USER_LEVEL = "/game/again/user/level/num/{num}"      # 轮回；抓包 num 固定传 1
+SHOP_EXCHANGE = "/game/shop/exchange/id/{exchange_id}/num/{num}"  # 商城兑换（用物品换物品）；抓包：id=4521100001190 用 10 个卡卷换 1800 神幻碎片，响应 {"message":null,"http_code":200}
 
 # --- 命则（"命运法则"）：激活 + 升级，function_id 固定不变 ---
 LIFE_MODE_ACTIVATE = "/game/mode/life/activation/function/{function_id}"

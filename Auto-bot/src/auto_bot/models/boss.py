@@ -27,11 +27,11 @@ class BossZone:
 # 当前抓包确认的两个 BOSS 区域。
 # 以后新增区域，例如 BossZone("神界界域", 4, (401, 402))，无需改主流程。
 BOSS_ZONES: tuple[BossZone, ...] = (
-    BossZone("人间界域", 3, (6,)),
-    BossZone("仙界界域", 3, (302,)),
-    BossZone("神界界域", 3, (301,)),
-    BossZone("圣界界域", 3, (300,)),
-    BossZone("帝界界域", 3, (3005,)),
+    # BossZone("人间界域", 3, (6,)),
+    # BossZone("仙界界域", 3, (302,)),
+    # BossZone("神界界域", 3, (301,)),
+    # BossZone("圣界界域", 3, (300,)),
+    # BossZone("帝界界域", 3, (3005,)),
     BossZone("神话界界域", 3, (69915,)),
 )
 

@@ -36,7 +36,7 @@ def test_gift_runs_followup_after_claim_and_use(monkeypatch, tmp_path: Path):
             return TaskResult("gift", True, "领完")
         return TaskResult("bag_use", True, "用完")
 
-    async def fake_followup(client, master_settings, master_creds):
+    async def fake_followup(client, master_settings, master_creds, **kwargs):
         seen["followup"] = {
             "master_user": master_creds.user_name,
             "master_area": master_settings.area_id,
@@ -109,7 +109,7 @@ def test_gift_uses_existing_main_account_config_without_prompt(monkeypatch, tmp_
     async def fake_run_task(client, task, creds):
         return TaskResult(task.name, True, "成功")
 
-    async def fake_followup(client, master_settings, master_creds):
+    async def fake_followup(client, master_settings, master_creds, **kwargs):
         seen["master"] = (master_creds.user_name, master_settings.area_id)
         seen["followup"] = (master_creds.user_name, master_settings.area_id)
         return GiftFollowupReport(

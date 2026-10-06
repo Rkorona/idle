@@ -3,20 +3,22 @@
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import logging
 
 import typer
 
 from ...api import ApiError, GameClient
-from ...api.exceptions import SessionExpiredError
+from ...api.exceptions import BusinessError, HttpError
 from ...config import Settings
+from ...logging import mask_user
 from ...services import bag_service, dungeon_service, sign_service, trade_service
 from ...services.account_service import get_account_id, login
 from ...services.gift_setup_service import (
     BOUNDARY_LIFE_MODE_ID,
     LUCK_LIFE_MODE_ID,
     MASTER_USER_ID,
-    exchange_god_fragment,
+    exchange_divine_fragment,
     level_up_life_mode,
     run_followup,
 )
@@ -45,6 +47,22 @@ from ._common import (
 log = logging.getLogger(__name__)
 
 FILE_OPT = typer.Option(..., "--file", "-f", help="小号列表文件：每行 账号,密码[,区服id]")
+CONCURRENCY_OPT = typer.Option(
+    1,
+    "--concurrency",
+    "-c",
+    min=1,
+    max=10,
+    help="同时处理的小号数量，默认 1（串行）。大号操作内部自动加锁串行。",
+)
+
+#: 并发时第一批小号的启动间隔（秒）：错开登录，别同时冲向服务端。
+START_STAGGER_SECONDS = 2.0
+
+#: 当前正在处理的小号（脱敏名），用来给并发时交错的日志加前缀。
+_current_account: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "gift_current_account", default=None
+)
 
 #: 收尾循环：每轮回溯一天后使用的副本卷轴数量。回溯之门重置了当天额度
 #: （抓包里正常一天的上限是 230），所以这里可以比日常单次的 138 用得更多，
@@ -59,6 +77,7 @@ MAX_REGRESSION_GATE_ROUNDS = 100
 def run(
     file: str = FILE_OPT,
     area: int = AREA_OPT,
+    concurrency: int = CONCURRENCY_OPT,
     master_user: str | None = MASTER_USER_OPT,
     master_password: str | None = MASTER_PASSWORD_OPT,
     master_area: int | None = MASTER_AREA_OPT,
@@ -71,8 +90,8 @@ def run(
     最高难度挂机 -> 刷总等级 -> 领等级礼包 -> 使用一京金币卡 -> ...（礼包后续
     剩下几阶段）-> 副本卷轴 -> 6 大副本一键通关 -> 重新登录 -> 一键扫荡全部副本
     -> 循环"用一个回溯之门 -> 签到 -> 用 368 个副本卷轴 -> 扫荡全部副本"直到
-    回溯之门用完 -> 用掉扫荡掉落的礼包 -> 幸运/界限命则各升级一轮 -> 把
-    商城兑换一次神幻碎片 -> 把白名单里的物品都转给大号 -> 大号再卖 1 个转生丹给这个小号（2600000 钻石）
+    回溯之门用完 -> 用掉扫荡掉落的礼包 -> 幸运/界限命则各升级一轮 ->
+    兑换一次神幻碎片 -> 把白名单里的物品都转给大号 -> 大号再卖 1 个转生丹给这个小号（2600000 钻石）
     -> 小号查一遍待接受交易列表并逐笔接受（卖家挂单之后必须买家自己接受
     才会真正过账，钻石/物品才会到账）。全部小号跑完后，最后登录大号，把
     交易列表里待接受的（小号转给大号的物资）逐笔接受，直到列表查空。
@@ -104,17 +123,32 @@ def run(
     echo(f"共读到 {len(accounts)} 个小号")
     echo(f"大号 user_id=71588，区服 {master_settings.area_id}")
 
-    ok_count = 0
-    fail_count = 0
+    async def _process(entry, master_lock: asyncio.Lock) -> bool:
+        """处理一个小号，返回是否成功。输出先攒到 lines，结束时一次性打印。"""
+        _current_account.set(mask_user(entry.user_name))
+        lines: list[str] = []
 
-    for entry in accounts:
+        def out(msg: str = "", err: bool = False) -> None:
+            lines.append(("E" if err else "O") + msg)
+
+        def flush() -> None:
+            for item in lines:
+                echo(item[1:], err=item[0] == "E")
+
+        try:
+            return await _process_inner(entry, master_lock, out)
+        finally:
+            flush()
+
+    async def _process_inner(entry, master_lock: asyncio.Lock, out) -> bool:
         settings = Settings(
             user_name=entry.user_name,
             password=entry.password,
             area_id=entry.area_id if entry.area_id is not None else area,
         )
         creds = entry.credentials()
-        echo(f"\n== {entry.user_name} (区服 {settings.area_id}) ==")
+        echo(f"▶ 开始 {entry.user_name} (区服 {settings.area_id})")
+        out(f"\n== {entry.user_name} (区服 {settings.area_id}) ==")
         log.info("开始处理小号 %s", entry.user_name)
 
         async def _go():
@@ -131,6 +165,7 @@ def run(
                         master_settings,
                         master_creds,
                         creds=creds,
+                        master_lock=master_lock,
                     )
 
                 # 通关/扫荡放在整条流水线最后：它们要求账号等级达标
@@ -171,6 +206,11 @@ def run(
                         gate_count = await bag_service.count_regression_gates(client)
                         tail_res["gate_count_start"] = gate_count
                         rounds = 0
+                        # 命则升级材料是副本直接掉落的，第一次扫荡掉的不够，
+                        # 要等回溯之门第一轮（卷轴+扫荡）之后才够。每个命则
+                        # 只差最后一次升级：升成功一次就满级，之后的轮次不再
+                        # 尝试；材料不够被拒就记一笔，下一轮扫荡后再试。
+                        life_modes_pending = [LUCK_LIFE_MODE_ID, BOUNDARY_LIFE_MODE_ID]
                         while gate_count > 0 and rounds < MAX_REGRESSION_GATE_ROUNDS:
                             gate_result = await bag_service.use_regression_gate(client, 1)
                             if not gate_result.ok:
@@ -190,11 +230,28 @@ def run(
 
                             await dungeon_service.wait_for_sweep_all_maps(client)
 
+                            # 扫荡掉落了材料：还没满级的命则尝试升级。升级后
+                            # 掉落数量提升，从下一轮扫荡开始生效。
+                            for mode_id in list(life_modes_pending):
+                                try:
+                                    await level_up_life_mode(client, mode_id)
+                                except (BusinessError, HttpError) as e:
+                                    log.info(
+                                        "第 %d 轮后升级命则 %s 未成功（材料可能还不够）: %s",
+                                        rounds + 1,
+                                        mode_id,
+                                        e,
+                                    )
+                                else:
+                                    life_modes_pending.remove(mode_id)
+                                    log.info("第 %d 轮后命则 %s 升级完成", rounds + 1, mode_id)
+
                             rounds += 1
                             gate_count = await bag_service.count_regression_gates(client)
 
                         tail_res["rounds"] = rounds
                         tail_res["gate_count_end"] = gate_count
+                        tail_res["life_modes_pending"] = list(life_modes_pending)
 
                         if "error" not in tail_res:
                             # 回溯之门循环里每一轮"扫荡全部副本"都会掉落礼包落进
@@ -206,23 +263,30 @@ def run(
                             tail_res["bag_use_message"] = bag_use_res.message
 
                         if "error" not in tail_res:
-                            await level_up_life_mode(client, LUCK_LIFE_MODE_ID)
-                            await level_up_life_mode(client, BOUNDARY_LIFE_MODE_ID)
-                            tail_res["life_mode_ok"] = True
+                            # 循环里没升成功的（材料一直不够，或者没有回溯之门
+                            # 可循环）最后兜底再试一次，仍失败只记录不算整体失败。
+                            for mode_id in list(life_modes_pending):
+                                try:
+                                    await level_up_life_mode(client, mode_id)
+                                except (BusinessError, HttpError) as e:
+                                    log.warning("命则 %s 收尾升级失败: %s", mode_id, e)
+                                else:
+                                    life_modes_pending.remove(mode_id)
+                            tail_res["life_modes_pending"] = list(life_modes_pending)
+                            tail_res["life_mode_ok"] = not life_modes_pending
 
                         if "error" not in tail_res:
-                            # 交易给大号之前先商城兑换一次神幻碎片：它在白名单里，
-                            # 兑换出来的会跟其它物品一起转给大号。兑换失败（比如货币
-                            # 不够、商品售罄）不中断后面的转交易，只记下原因；会话
-                            # 失效则照常往上抛，触发重登。
+                            # 转给大号之前先兑换一次神幻碎片（神幻碎片在交易白名单里，
+                            # 兑换完这一步才会跟着一起转走）。卡卷不够、兑换次数
+                            # 已满这类业务失败只记录，不影响后面的交易。
                             try:
-                                await exchange_god_fragment(client)
-                                tail_res["fragment_ok"] = True
-                            except SessionExpiredError:
-                                raise
-                            except ApiError as e:
+                                await exchange_divine_fragment(client, 1)
+                            except (BusinessError, HttpError) as e:
                                 tail_res["fragment_ok"] = False
                                 tail_res["fragment_error"] = str(e)
+                                log.warning("兑换神幻碎片失败: %s", e)
+                            else:
+                                tail_res["fragment_ok"] = True
 
                         if "error" not in tail_res:
                             trade_results = await trade_service.sell_all_tradeable_items(
@@ -248,7 +312,7 @@ def run(
                             # GameClient 登大号，不能复用 client（client.session
                             # 现在是小号的 ticket）。
                             child_account_id = await get_account_id(client)
-                            async with GameClient(master_settings) as master_client:
+                            async with master_lock, GameClient(master_settings) as master_client:
                                 await login(master_client, master_creds)
                                 pill_result = await trade_service.sell_rebirth_pill_to_child(
                                     master_client, child_account_id
@@ -288,106 +352,149 @@ def run(
                 dungeon_res,
                 sweep_error,
                 tail_res,
-            ) = asyncio.run(_go())
+            ) = await _go()
         except ApiError as e:
-            echo(f"  登录失败: {e}", err=True)
+            out(f"  登录失败: {e}", err=True)
             log.debug("小号 %s 的 ApiError 详情", entry.user_name, exc_info=True)
-            fail_count += 1
-            continue
+            return False
         except Exception as e:
-            echo(f"  请求出错: {type(e).__name__}: {e}", err=True)
+            out(f"  请求出错: {type(e).__name__}: {e}", err=True)
             log.debug("小号 %s 的未预期异常详情", entry.user_name, exc_info=True)
-            fail_count += 1
-            continue
+            return False
 
-        echo(f"  小号 user_id={session.user_id}")
-        echo("[领礼包]")
+        out(f"  小号 user_id={session.user_id}")
+        out("[领礼包]")
         for line in claim_res.message.splitlines():
-            echo(line)
-        echo("[用礼包]")
+            out(line)
+        out("[用礼包]")
         for line in use_res.message.splitlines():
-            echo(line)
+            out(line)
 
         if not claim_res.ok or not use_res.ok:
-            echo("[礼包后续/通关/扫荡] 未执行：领礼包或使用礼包失败")
-            fail_count += 1
-            continue
+            out("[礼包后续/通关/扫荡] 未执行：领礼包或使用礼包失败")
+            return False
 
-        echo("[拜师 / 灵宝 / 挂机 / 升级 / 等级礼包 / 金币卡]")
+        out("[拜师 / 灵宝 / 挂机 / 升级 / 等级礼包 / 金币卡]")
         assert followup_res is not None
         for line in followup_res.format_report().splitlines():
-            echo(line)
+            out(line)
 
         if not followup_res.ok:
-            echo("[通关/扫荡] 未执行：礼包后续未全部成功")
-            fail_count += 1
-            continue
+            out("[通关/扫荡] 未执行：礼包后续未全部成功")
+            return False
 
-        echo("[副本卷轴 / 一键通关]")
+        out("[副本卷轴 / 一键通关]")
         assert dungeon_res is not None
         for line in dungeon_res.message.splitlines():
-            echo(line)
+            out(line)
 
         if not dungeon_res.ok:
-            echo("[一键扫荡] 未执行：通关小副本未全部成功")
-            fail_count += 1
-            continue
+            out("[一键扫荡] 未执行：通关小副本未全部成功")
+            return False
 
         if sweep_error is not None:
-            echo(f"[一键扫荡] 失败: {sweep_error}")
-            fail_count += 1
-            continue
-        echo("[一键扫荡] 完成")
+            out(f"[一键扫荡] 失败: {sweep_error}")
+            return False
+        out("[一键扫荡] 完成")
 
-        echo("[回溯之门循环 / 命则升级]")
+        out("[回溯之门循环 / 命则升级]")
         assert tail_res is not None
         tail_error = tail_res.get("error")
-        echo(
+        out(
             f"  回溯之门：开始 {tail_res.get('gate_count_start')} 个，"
             f"完成 {tail_res.get('rounds')} 轮，剩余 {tail_res.get('gate_count_end')} 个"
         )
         if tail_res.get("scroll_exhausted"):
-            echo("  ⓘ 期间副本卷轴已用完，后续轮次只签到 + 扫荡，不再用卷轴")
+            out("  ⓘ 期间副本卷轴已用完，后续轮次只签到 + 扫荡，不再用卷轴")
         if "bag_use_ok" in tail_res:
             mark = "✓" if tail_res["bag_use_ok"] else "✗"
-            echo(f"  {mark} 使用扫荡掉落的礼包")
+            out(f"  {mark} 使用扫荡掉落的礼包")
             for line in str(tail_res.get("bag_use_message") or "").splitlines():
-                echo(f"    {line}")
+                out(f"    {line}")
         if tail_res.get("life_mode_ok"):
-            echo("  ✓ 幸运/界限命则各升级一轮")
+            out("  ✓ 幸运/界限命则已升级")
+        elif tail_res.get("life_modes_pending"):
+            out(f"  ⚠ 命则未升级成功（材料不足？）: {tail_res['life_modes_pending']}")
         if "fragment_ok" in tail_res:
             mark = "✓" if tail_res["fragment_ok"] else "✗"
-            echo(f"  {mark} 商城兑换神幻碎片")
-            if not tail_res["fragment_ok"] and tail_res.get("fragment_error"):
-                echo(f"    {tail_res['fragment_error']}")
+            out(f"  {mark} 兑换神幻碎片 x1")
+            if not tail_res["fragment_ok"]:
+                out(f"    {tail_res['fragment_error']}")
         if "trade_total" in tail_res:
-            echo(
+            out(
                 f"  交易给大号：尝试 {tail_res['trade_total']} 件，"
                 f"失败 {tail_res['trade_failed']} 件"
             )
             if tail_res.get("trade_error_sample"):
-                echo(f"    示例错误: {tail_res['trade_error_sample']}")
+                out(f"    示例错误: {tail_res['trade_error_sample']}")
         if tail_res.get("pill_skipped"):
-            echo("  ⓘ 大号背包里没有转生丹，跳过卖给小号这一步")
+            out("  ⓘ 大号背包里没有转生丹，跳过卖给小号这一步")
         elif "pill_ok" in tail_res:
             mark = "✓" if tail_res["pill_ok"] else "✗"
-            echo(f"  {mark} 大号卖 1 个转生丹给本小号")
+            out(f"  {mark} 大号卖 1 个转生丹给本小号")
             if not tail_res["pill_ok"] and tail_res.get("pill_error"):
-                echo(f"    {tail_res['pill_error']}")
+                out(f"    {tail_res['pill_error']}")
         if "accept_total" in tail_res:
-            echo(
+            out(
                 f"  小号接受交易：{tail_res['accept_total']} 笔，"
                 f"失败 {tail_res['accept_failed']} 笔"
             )
             if tail_res.get("accept_error_sample"):
-                echo(f"    示例错误: {tail_res['accept_error_sample']}")
+                out(f"    示例错误: {tail_res['accept_error_sample']}")
         if tail_error:
-            echo(f"  ✗ {tail_error}")
-            fail_count += 1
-            continue
+            out(f"  ✗ {tail_error}")
+            return False
 
-        ok_count += 1
         log.info("小号 %s 处理完成", entry.user_name)
+        return True
+
+    class _AccountPrefixFilterFactory:
+        """给日志消息加 [小号名] 前缀，并发时才分得清是谁的日志。"""
+
+        def __init__(self) -> None:
+            self._old = logging.getLogRecordFactory()
+
+        def __call__(self, *args, **kwargs):
+            record = self._old(*args, **kwargs)
+            name = _current_account.get()
+            if name:
+                record.msg = f"[{name.replace('%', '%%')}] {record.msg}"
+            return record
+
+    async def _main() -> tuple[int, int]:
+        sem = asyncio.Semaphore(concurrency)
+        master_lock = asyncio.Lock()
+
+        async def _worker(i: int, entry) -> bool:
+            async with sem:
+                # 只错开第一批：后面的小号是前面有人跑完才进来的，天然错开。
+                if concurrency > 1 and i < concurrency:
+                    await asyncio.sleep(START_STAGGER_SECONDS * i)
+                return await _process(entry, master_lock)
+
+        results = await asyncio.gather(
+            *(_worker(i, e) for i, e in enumerate(accounts)), return_exceptions=True
+        )
+        ok = fail = 0
+        for entry, r in zip(accounts, results):
+            if r is True:
+                ok += 1
+            else:
+                fail += 1
+                if isinstance(r, BaseException):
+                    echo(f"{entry.user_name} 处理中断: {type(r).__name__}: {r}", err=True)
+                    log.error("小号 %s 未预期异常", entry.user_name, exc_info=r)
+        return ok, fail
+
+    if concurrency > 1:
+        echo(f"并发数 {concurrency}")
+    log.info("gift 并发数=%d", concurrency)
+    old_factory = logging.getLogRecordFactory()
+    logging.setLogRecordFactory(_AccountPrefixFilterFactory())
+    try:
+        ok_count, fail_count = asyncio.run(_main())
+    finally:
+        logging.setLogRecordFactory(old_factory)
 
     echo(f"\n完成：成功 {ok_count} / 失败 {fail_count}，共 {len(accounts)} 个小号")
 

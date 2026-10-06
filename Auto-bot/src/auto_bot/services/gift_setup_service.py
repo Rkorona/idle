@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import random
 from typing import Any, Awaitable, Callable
 
@@ -36,6 +37,10 @@ GOLD_CARD_USE_NUM = 40000
 
 #: 二阶段（金币卡用完之后）：商城"转生丹"的商品 id，账号之间稳定不变。
 REBIRTH_PILL_SHOP_ID = 478
+
+#: 商城兑换项 4521100001190：用 10 个卡卷换 1800 神幻碎片（抓包 购买神幻碎片.har，
+#: 列表里 task_limit=1、task_max_num=5，每次兑换传 num=1）。
+DIVINE_FRAGMENT_EXCHANGE_ID = 4521100001190
 #: 抓包描述里的"100 兆"。
 REBIRTH_PILL_BUY_NUM = 100_000_000_000_000
 #: 轮回接口固定传 1（一次轮回）。
@@ -330,24 +335,19 @@ async def buy_shop_item(client: GameClient, goods_id: int, num: int) -> None:
     await retry_on_rate_limit(_do, max_attempts=RATE_LIMIT_MAX_ATTEMPTS, delay=RATE_LIMIT_RETRY_DELAY)
 
 
-#: 商城兑换"神幻碎片"的兑换项 id（抓包 购买神幻碎片.har）。注意这是兑换项 id，
-#: 不是物品模板 goods_id（神幻碎片的 goods_id 是 160123315，见 trade_service）。
-GOD_FRAGMENT_EXCHANGE_ID = 4521100001190
-GOD_FRAGMENT_EXCHANGE_NUM = 1
-
-
-async def exchange_god_fragment(
-    client: GameClient, num: int = GOD_FRAGMENT_EXCHANGE_NUM
-) -> None:
-    """商城兑换一次"神幻碎片"：GET /game/shop/exchange/id/{id}/num/{num}。"""
+async def exchange_shop_item(client: GameClient, exchange_id: int, num: int) -> None:
+    """商城兑换接口：抓包响应是 {"message":null,"http_code":200}，失败时 http_code 不是 200。"""
 
     async def _do() -> None:
-        data = await client.get(
-            endpoints.SHOP_EXCHANGE.format(exchange_id=GOD_FRAGMENT_EXCHANGE_ID, num=num)
-        )
-        _require_ok(data, f"商城兑换神幻碎片 num={num}")
+        data = await client.get(endpoints.SHOP_EXCHANGE.format(exchange_id=exchange_id, num=num))
+        _require_ok(data, f"商城兑换 id={exchange_id} num={num}")
 
     await retry_on_rate_limit(_do, max_attempts=RATE_LIMIT_MAX_ATTEMPTS, delay=RATE_LIMIT_RETRY_DELAY)
+
+
+async def exchange_divine_fragment(client: GameClient, num: int = 1) -> None:
+    """兑换"神幻碎片*1800"（固定兑换项 id=4521100001190，消耗 10 个卡卷）。"""
+    await exchange_shop_item(client, DIVINE_FRAGMENT_EXCHANGE_ID, num)
 
 
 async def buy_rebirth_pill(client: GameClient, num: int = REBIRTH_PILL_BUY_NUM) -> None:
@@ -423,6 +423,7 @@ async def run_followup(
     *,
     master_user_id: int = MASTER_USER_ID,
     creds: Credentials | None = None,
+    master_lock: asyncio.Lock | None = None,
 ) -> GiftFollowupReport:
     """完整执行：小号拜师 -> 大号接受 -> 小号灵宝 -> 最高难度挂机 ->
     刷总等级 -> 领等级礼包 -> 使用一京金币卡。
@@ -443,16 +444,21 @@ async def run_followup(
         report.apprentice_requested = True
 
         # 2. 独立登录大号，不覆盖小号 client 的 session；接受完成后小号连接可直接继续。
-        async with GameClient(master_settings) as master_client:
+        # 多小号并发时大号是共享账号：同一时刻只能有一个登录会话（后登录的
+        # 会顶掉先登录的），所以传了 master_lock 就拿锁串行。
+        async with (master_lock or contextlib.nullcontext()):
+            async with GameClient(master_settings) as master_client:
 
-            async def _master_step(fn: Callable[[], Awaitable[Any]]) -> Any:
-                return await _run_step(master_client, master_creds, fn)
+                async def _master_step(fn: Callable[[], Awaitable[Any]]) -> Any:
+                    return await _run_step(master_client, master_creds, fn)
 
-            await _master_step(lambda: login(master_client, master_creds))
-            relation_id = await _master_step(
-                lambda: find_pending_apprentice_id(master_client)
-            )
-            await _master_step(lambda: accept_apprenticeship(master_client, relation_id))
+                await _master_step(lambda: login(master_client, master_creds))
+                relation_id = await _master_step(
+                    lambda: find_pending_apprentice_id(master_client)
+                )
+                await _master_step(
+                    lambda: accept_apprenticeship(master_client, relation_id)
+                )
         report.apprentice_accepted = True
 
         # 3. 小号自己的灵宝操作：先动态查询当前账号的灵宝 id。
