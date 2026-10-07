@@ -1,0 +1,15 @@
+curl -X POST 'http://game12.firetheword.cn/game/login/regIos' \
+  -H 'site: game' \
+  -H 'areaid: 49' \
+  -H 'os: android' \
+  -H 'Accept: */*' \
+  -H 'api_version: 1' \
+  -H 'version: 133' \
+  -H 'userId: 2' \
+  -H 'Content-Type: application/json; charset=UTF-8' \
+  -H 'Content-Length: 48' \
+  -H 'Host: game12.firetheword.cn' \
+  -H 'Connection: Keep-Alive' \
+  -H 'Accept-Encoding: gzip' \
+   --data '{"client_id":"7758A9DADA3347599AC577FC0858E4D8"}' \
+  --compressed
