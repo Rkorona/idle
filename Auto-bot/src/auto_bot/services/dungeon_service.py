@@ -171,8 +171,13 @@ async def fight_master(client: GameClient, map_id: int, fight_id: int) -> BossFi
 #: "一键通关全部副本" (map/one/all/tg) 请求体必须带 wd_level，抓包对比过
 #: "正确请求"（body={"wd_level":"6"} -> 200）和"错误请求"（body 为空 ->
 #: 500 "服务器出错了"），唯一差异就是这个字段；6 是账号目前所在的基础界域
-#: 上限（models.dungeon.REALMS = 1..6），不是随便填的占位值。
-ALL_MAPS_WD_LEVEL = REALMS[-1]
+#: 上限（基础界域 1..6），不是随便填的占位值。
+#:
+#: 注意：这里必须写死 6，不能再写成 REALMS[-1]。REALMS 是给大号遍历副本列表
+#: 用的（大号等级高、解锁了第 7 个界域，所以 REALMS 含 7）；小号没解锁界域 7，
+#: 传 wd_level=7 会被服务端拒绝（HTTP 400 "您的等级不够！"）。大号需要更高
+#: 界域时，由调用方显式传 wd_level，不要跟 REALMS 联动。
+ALL_MAPS_WD_LEVEL = 6
 
 
 async def clear_all_maps(client: GameClient, wd_level: int = ALL_MAPS_WD_LEVEL) -> None:
@@ -246,8 +251,12 @@ async def wait_for_sweep_all_maps(
     max_polls: int = 60,
 ) -> None:
     """反复调用一键扫荡，直到服务端确认扫荡完成，或轮询次数用完直接报错。"""
-    for _ in range(max_polls):
-        if await sweep_all_maps(client, wd_level):
-            return
-        await asyncio.sleep(poll_interval)
-    raise BusinessError(f"一键扫荡全部副本: 轮询 {max_polls} 次仍未完成")
+    try:
+        for _ in range(max_polls):
+            if await sweep_all_maps(client, wd_level):
+                return
+            await asyncio.sleep(poll_interval)
+    except HttpError as e:
+        # 带上 wd_level，方便排查"等级不够"这类跟界域相关的拒绝。
+        raise BusinessError(f"一键扫荡全部副本 (wd_level={wd_level}) 失败: {e}") from e
+    raise BusinessError(f"一键扫荡全部副本 (wd_level={wd_level}): 轮询 {max_polls} 次仍未完成")

@@ -17,7 +17,7 @@ BIG_DUNGEONS: tuple[int, ...] = (7, 6, 2, 3, 4)
 #: 名字是"一维文明/二维文明/三维文明/轮回文明/神玄文明"……这几个大副本
 #: （BIG_DUNGEONS）在每一个界域下都各有一份独立的小副本列表，缺一个界域就
 #: 漏掉一整个"文明"下的副本，不是只漏几个零散的小副本。
-REALMS: tuple[int, ...] = (1, 2, 3, 4, 5, 6)
+REALMS: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7)
 
 #: “切换界域”接口（USER_MAP_LEVEL /user/info/mapLevel/{X}）跟 map/list/num
 #: 查询用的 dimension_level 不是同一个数字空间——之前一直当成同一个值用，
@@ -40,7 +40,7 @@ DISCOVERED_REALM_SWITCH_ID = 2
 #: map/listDimension 返回的是神界自己的子界域（北极神域=12 … 极道神域=17），
 #: 之后 map/list/num 用 dimension_level=12 查询。也就是说 listDimension 的结果
 #: 取决于"当前所处的顶级界域"，必须先切 mapLevel 再查，才能拿到该界域的子界域。
-TOP_REALMS: tuple[int, ...] = (1, 2, 3, 4, 5, 6)
+TOP_REALMS: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7)
 #: 人间：基础子界域 REALMS(1~6) 只属于它，其余顶级界域的子界域全靠 listDimension 给出。
 BASE_TOP_REALM = 1
 
