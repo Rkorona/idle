@@ -6,7 +6,7 @@ import time
 import httpx
 
 # 起始 ID
-START_ID = 41000000225
+START_ID = 324224334101
 
 # 每次请求间隔，秒。建议不要太小，避免给服务器造成压力
 DELAY = 0.200
@@ -21,7 +21,7 @@ HEADERS = {
     "areaid": "49",
     "os": "android",
     "Accept": "*/*",
-    "ticket": "TGT-a2f45ad2f51c5150c114bfe021a2d2cc.apestar.com",
+    "ticket": "TGT-597e156ae0082cc248b4965e5a92ff4d.apestar.com",
     "auth": (
         "5961DF203A8F8731EBE229CEDBD32755830E63B5837C2FD7F0FBB78476C06F38"
         "EB7FEE484BFCF0E2CE6EA26991F4246409CB2657F7E91286969AC57C6CF4D121"
