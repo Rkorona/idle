@@ -80,6 +80,7 @@ def format_report(used: list[BagUseResult], skipped: int) -> str:
 
 class BagUseTask(Task):
     name = "bag_use"
+    label = "用礼包"
     description = "查背包，使用所有当前可使用的礼包/消耗品"
 
     async def run(self, client: GameClient) -> TaskResult:
@@ -103,7 +104,7 @@ class BagUseTask(Task):
                     # can_use=False 挡掉的物品是一回事，只是这里要先请求一次
                     # 才知道，计入 skipped，不进 used，不影响整体 ok 判定。
                     skipped += 1
-                    log.info(
+                    log.debug(
                         "跳过背包物品（今日次数/数量已用完）id=%s name=%s: %s",
                         item.id,
                         item.name,

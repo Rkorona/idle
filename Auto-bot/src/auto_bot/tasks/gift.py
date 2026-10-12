@@ -34,6 +34,7 @@ def format_report(picked: list[GiftPickResult], skipped: int) -> str:
 
 class GiftClaimTask(Task):
     name = "gift"
+    label = "领礼包"
     description = "遍历礼包大类，领取所有当前可领取的礼包，顺便领取月卡"
 
     async def run(self, client: GameClient) -> TaskResult:

@@ -18,6 +18,7 @@ from ..api.client import GameClient
 from ..models.account import Credentials
 from ..models.flow import Flow, FlowResult, Step
 from ..tasks.base import TaskResult
+from ..logging import mask_user
 from .account_service import login
 from .task_runner import get_task, run_task
 
@@ -62,14 +63,15 @@ async def run_flow(
     """
     validate_flow(flow)
 
-    log.info("开始流程 %s（%d 步）", flow.name, len(flow.steps))
-    await login(client, creds)
+    log.info("▶ 流程 %s（%d 步） 账号 %s", flow.name, len(flow.steps), mask_user(creds.user_name))
+    session = await login(client, creds)
+    log.info("登录成功 user_id=%s 区服 %s", session.user_id, session.area_id)
 
     out = FlowResult(flow=flow.name)
     try:
         return await _run_steps(client, flow, creds, out, sleep, rng)
     finally:
-        log.info(
+        log.debug(
             "流程 %s 结束：%s，跳过 %s",
             flow.name,
             "全部成功" if out.ok else "存在失败",
@@ -81,9 +83,10 @@ async def _run_steps(client, flow, creds, out, sleep, rng) -> FlowResult:
     for i, step in enumerate(flow.steps):
         wait = jittered(step.delay, rng)
         if wait > 0:
-            log.info("等待 %.1fs 后执行 %s", wait, step.task)
+            log.debug("等待 %.1fs 后执行 %s", wait, step.task)
             await sleep(wait)
 
+        log.info("[%d/%d] %s", i + 1, len(flow.steps), step.task)
         result = await _run_step(client, step, creds)
         out.results.append(result)
 

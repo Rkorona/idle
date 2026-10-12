@@ -84,6 +84,61 @@ async def test_wait_for_clear_all_maps_gives_up_after_max_polls():
         await svc.wait_for_clear_all_maps(client, poll_interval=0, max_polls=3)
 
 
+RATE_LIMITED = {"message": "少年您点击太快了哦", "data": None, "http_code": 400}
+
+
+@pytest.mark.asyncio
+async def test_wait_for_sweep_all_maps_retries_on_rate_limit():
+    """撞上"点击太快"限流不算失败：退避后继续轮询，直到扫荡完成。"""
+    responses = [
+        httpx.Response(400, json={"message": "正在扫荡中！", "http_code": 400}),
+        httpx.Response(400, json=RATE_LIMITED),
+        httpx.Response(400, json=RATE_LIMITED),
+        httpx.Response(200, json={"message": None, "http_code": 200}),
+    ]
+    seen = []
+
+    def handler(req):
+        seen.append((req.method, req.url.path))
+        return responses.pop(0)
+
+    await svc.wait_for_sweep_all_maps(
+        make_client(handler), poll_interval=0, max_polls=10, rate_limit_delay=0
+    )
+
+    assert seen == [("POST", "/game/map/one/all/pass")] * 4
+
+
+@pytest.mark.asyncio
+async def test_wait_for_sweep_all_maps_other_http_error_still_fails():
+    client = make_client(lambda req: httpx.Response(400, json={"message": "您的等级不够！"}))
+
+    with pytest.raises(BusinessError):
+        await svc.wait_for_sweep_all_maps(client, poll_interval=0, max_polls=5, rate_limit_delay=0)
+
+
+@pytest.mark.asyncio
+async def test_wait_for_sweep_all_maps_gives_up_if_always_rate_limited():
+    client = make_client(lambda req: httpx.Response(400, json=RATE_LIMITED))
+
+    with pytest.raises(BusinessError):
+        await svc.wait_for_sweep_all_maps(client, poll_interval=0, max_polls=3, rate_limit_delay=0)
+
+
+@pytest.mark.asyncio
+async def test_wait_for_clear_all_maps_retries_on_rate_limit():
+    responses = [
+        httpx.Response(400, json=RATE_LIMITED),
+        httpx.Response(200, json={"flag": True}),
+        httpx.Response(200, json={"flag": False}),
+    ]
+    client = make_client(lambda req: responses.pop(0))
+
+    await svc.wait_for_clear_all_maps(client, poll_interval=0, max_polls=5, rate_limit_delay=0)
+
+    assert responses == []
+
+
 @pytest.mark.asyncio
 async def test_clear_all_maps_sends_wd_level_body():
     """抓包对比过：body 缺 wd_level 时服务端稳定返回 500，不是偶发抖动。"""

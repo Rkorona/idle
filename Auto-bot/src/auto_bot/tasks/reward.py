@@ -52,6 +52,7 @@ def format_report(report: HarvestReport) -> str:
 
 class HarvestTask(Task):
     name = "harvest"
+    label = "收菜"
     description = "收取离线挂机收益，并重新开始挂机（固定挂机位，不查列表）"
 
     def __init__(self, function_id: int = MAIN_FUNCTION_ID) -> None:
@@ -63,9 +64,9 @@ class HarvestTask(Task):
         settled: SettleResult | None = None
         try:
             settled = await idle_service.settle(client, self.function_id)
-            log.info("结算完成 function_id=%s time=%ss", self.function_id, settled.seconds)
+            log.debug("结算完成 function_id=%s time=%ss", self.function_id, settled.seconds)
         except BusinessError as e:
-            log.info("没有可收取的挂机收益 function_id=%s: %s", self.function_id, e)
+            log.debug("没有可收取的挂机收益 function_id=%s: %s", self.function_id, e)
 
         # 2) 重新开始挂机。结算已成功时，这里失败也不能丢掉结算结果。
         restarted = False

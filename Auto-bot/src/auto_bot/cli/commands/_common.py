@@ -68,7 +68,7 @@ def init_logging(
     except ValueError as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(EXIT_USAGE)
-    log.info("auto-bot 启动 子命令=%s%s", command, f" 日志文件={path}" if path else "")
+    log.debug("auto-bot 启动 子命令=%s%s", command, f" 日志文件={path}" if path else "")
 
 
 def resolve_credentials(
@@ -79,7 +79,7 @@ def resolve_credentials(
         user = typer.prompt("账号")
     if not password:
         password = typer.prompt("密码", hide_input=True)
-    log.info("使用账号 %s 区服 %s", mask_user(user), area)
+    log.debug("使用账号 %s 区服 %s", mask_user(user), area)
     return Settings(user_name=user, password=password, area_id=area), Credentials(
         user, password
     )

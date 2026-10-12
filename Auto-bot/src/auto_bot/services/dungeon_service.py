@@ -17,10 +17,15 @@ from ..models.response import (
     parse_realms,
     parse_sweep,
 )
+from ..utils.retry import is_rate_limited
 
 #: "一键扫荡全部副本"是异步任务：服务端还没扫完时用这句 400 提示，不是真
 #: 失败，调用方要轮询到 http_code=200 才算扫荡完成。
 SWEEP_ALL_MAPS_IN_PROGRESS_MARKER = "正在扫荡中"
+
+#: 轮询类接口（通关进度查询、一键扫荡）撞上"点击太快"限流（HTTP 400）时的
+#: 退避秒数：不算失败，等一会儿再继续轮询。
+POLL_RATE_LIMIT_DELAY = 0.5
 
 
 def _check(data: Any, what: str) -> None:
@@ -208,13 +213,24 @@ async def is_clear_all_maps_in_progress(client: GameClient) -> bool:
 
 
 async def wait_for_clear_all_maps(
-    client: GameClient, *, poll_interval: float = 2.0, max_polls: int = 60
+    client: GameClient,
+    *,
+    poll_interval: float = 0.5,
+    max_polls: int = 120,
+    rate_limit_delay: float = POLL_RATE_LIMIT_DELAY,
 ) -> None:
     """反复查询通关进度（map/pass/list），直到 flag=false（真正通关完成）
     再返回；轮询次数用完还是 flag=true 就直接报错，不能悄悄当成已完成去
-    扫荡。"""
+    扫荡。撞上"点击太快"限流时退避 ``rate_limit_delay`` 秒继续（占用一次轮询次数）。"""
     for _ in range(max_polls):
-        if not await is_clear_all_maps_in_progress(client):
+        try:
+            in_progress = await is_clear_all_maps_in_progress(client)
+        except HttpError as e:
+            if not is_rate_limited(e):
+                raise
+            await asyncio.sleep(rate_limit_delay)
+            continue
+        if not in_progress:
             return
         await asyncio.sleep(poll_interval)
     raise BusinessError(f"一键通关全部副本: 轮询 {max_polls} 次仍未完成（flag 一直是 true）")
@@ -247,13 +263,25 @@ async def wait_for_sweep_all_maps(
     client: GameClient,
     *,
     wd_level: int = ALL_MAPS_WD_LEVEL,
-    poll_interval: float = 2.0,
-    max_polls: int = 60,
+    poll_interval: float = 0.5,
+    max_polls: int = 120,
+    rate_limit_delay: float = POLL_RATE_LIMIT_DELAY,
 ) -> None:
-    """反复调用一键扫荡，直到服务端确认扫荡完成，或轮询次数用完直接报错。"""
+    """反复调用一键扫荡，直到服务端确认扫荡完成，或轮询次数用完直接报错。
+
+    撞上"点击太快"限流（HTTP 400）不算失败：退避 ``rate_limit_delay`` 秒后继续
+    轮询（占用一次轮询次数）；其它 HttpError 仍按失败抛出。
+    """
     try:
         for _ in range(max_polls):
-            if await sweep_all_maps(client, wd_level):
+            try:
+                done = await sweep_all_maps(client, wd_level)
+            except HttpError as e:
+                if not is_rate_limited(e):
+                    raise
+                await asyncio.sleep(rate_limit_delay)
+                continue
+            if done:
                 return
             await asyncio.sleep(poll_interval)
     except HttpError as e:

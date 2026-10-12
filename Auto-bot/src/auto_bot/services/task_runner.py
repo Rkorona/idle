@@ -53,15 +53,16 @@ async def run_task(
     """
     relogins = 0
     started = time.monotonic()
-    log.info("任务开始 %s", task.name)
+    title = task.label or task.name
+    log.debug("任务开始 %s", task.name)
     while True:
         try:
             result = await task.run(client)
             elapsed = time.monotonic() - started
             if result.ok:
-                log.info("任务完成 %s 耗时 %.1fs", task.name, elapsed)
+                log.info("✓ %s（%.1fs）", title, elapsed)
             else:
-                log.warning("任务未全部成功 %s 耗时 %.1fs", task.name, elapsed)
+                log.warning("%s 未全部成功（%.1fs）", title, elapsed)
             return result
         except SessionExpiredError as e:
             if creds is None:
@@ -80,8 +81,8 @@ async def run_task(
 
             relogins += 1
             message = (
-                f"会话已过期，重新登录后继续 task={task.name} "
-                f"({relogins}{"/" + str(max_session_retries) if max_session_retries is not None else ""})"
+                f"会话已过期，重新登录后继续「{title}」"
+                f"（第 {relogins} 次）"
             )
             if on_event is not None:
                 on_event(message)
@@ -100,7 +101,7 @@ async def run_task(
             if on_event is not None:
                 on_event(message)
             else:
-                log.info(message)
+                log.debug(message)
         except ApiError as e:
             log.error("任务失败 task=%s: %s", task.name, e)
             return TaskResult(task=task.name, ok=False, message=f"任务失败: {e}")

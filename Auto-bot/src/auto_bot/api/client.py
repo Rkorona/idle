@@ -79,7 +79,7 @@ class GameClient:
         # 只记方法/路径/状态/耗时，不记请求体（登录请求体里有密码）
         log.debug("%s %s -> %d %.0fms", method, path, resp.status_code, (time.monotonic() - started) * 1000)
         if resp.status_code == 401:
-            log.info("%s %s -> 401，ticket 已失效", method, path)
+            log.debug("%s %s -> 401，ticket 已失效", method, path)
             raise SessionExpiredError("ticket 已失效，请重新登录")
         if resp.status_code >= 400:
             log.debug("%s %s 错误响应: %s", method, path, resp.text[:200])

@@ -36,7 +36,7 @@ async def login(
         log.error("登录响应异常，缺少 ticket 等字段")
         raise LoginError(f"登录响应异常: {data!r}") from e
     client.session = session
-    log.info("登录成功 user_id=%s 区服=%s", session.user_id, session.area_id)
+    log.debug("登录成功 user_id=%s 区服=%s", session.user_id, session.area_id)
     return session
 
 

@@ -116,6 +116,7 @@ def format_report(report: DungeonClearReport) -> str:
 
 class DungeonClearTask(Task):
     name = "dungeon_clear"
+    label = "副本通关"
     description = "背包用掉副本卷轴，按界域逐个一键通关各大副本下的所有小副本"
 
     async def _clear_maps(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextvars
 import logging
+import time
 
 import typer
 
@@ -57,7 +58,7 @@ CONCURRENCY_OPT = typer.Option(
 )
 
 #: 并发时第一批小号的启动间隔（秒）：错开登录，别同时冲向服务端。
-START_STAGGER_SECONDS = 2.0
+START_STAGGER_SECONDS = 0.5
 
 #: 当前正在处理的小号（脱敏名），用来给并发时交错的日志加前缀。
 _current_account: contextvars.ContextVar[str | None] = contextvars.ContextVar(
@@ -68,6 +69,10 @@ _current_account: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 #: （抓包里正常一天的上限是 230），所以这里可以比日常单次的 138 用得更多，
 #: 抓包好友名 "副本卷轴(0/368)" 显示当时上限已经涨到 368，直接按这个用。
 TAIL_DUNGEON_SCROLL_NUM = 368
+
+#: 回溯之门循环里只在前 N 轮尝试升级命则，之后的轮次不再尝试（后面收尾
+#: 阶段还会兜底再试一次）。
+LIFE_MODE_LEVEL_UP_ROUNDS = 2
 
 #: 收尾循环安全上限：回溯之门实际数量大概二十多个，这里给个宽裕的上限，
 #: 避免 count_regression_gates 因为某种异常一直返回 >0 时死循环。
@@ -119,14 +124,21 @@ def run(
         echo(str(e), err=True)
         raise typer.Exit(EXIT_USAGE)
 
-    log.info("gift 开始：小号 %d 个 文件=%s 大号区服=%s", len(accounts), file, master_settings.area_id)
-    echo(f"共读到 {len(accounts)} 个小号")
-    echo(f"大号 user_id=71588，区服 {master_settings.area_id}")
+    log.debug("gift 文件=%s", file)
+    echo(
+        f"gift：{len(accounts)} 个小号 · 并发 {concurrency} · "
+        f"大号 {MASTER_USER_ID} 区服 {master_settings.area_id}"
+    )
 
-    async def _process(entry, master_lock: asyncio.Lock) -> bool:
-        """处理一个小号，返回是否成功。输出先攒到 lines，结束时一次性打印。"""
+    async def _process(entry, master_lock: asyncio.Lock, idx: int) -> bool:
+        """处理一个小号，返回是否成功。
+
+        实时进度走日志（每个阶段一行，带 [小号] 前缀）；详细报告先攒到 lines，
+        结束时连同一行结论一次性打印，并发时每个小号的报告也不会互相穿插。
+        """
         _current_account.set(mask_user(entry.user_name))
         lines: list[str] = []
+        started = time.monotonic()
 
         def out(msg: str = "", err: bool = False) -> None:
             lines.append(("E" if err else "O") + msg)
@@ -135,21 +147,30 @@ def run(
             for item in lines:
                 echo(item[1:], err=item[0] == "E")
 
+        ok = False
         try:
-            return await _process_inner(entry, master_lock, out)
+            ok = await _process_inner(entry, master_lock, out, idx)
+            return ok
         finally:
             flush()
+            elapsed = time.monotonic() - started
+            mins, secs = divmod(int(elapsed), 60)
+            took = f"{mins}分{secs:02d}秒" if mins else f"{secs}秒"
+            echo(
+                f"{'✓' if ok else '✗'} [{idx + 1}/{len(accounts)}] "
+                f"{entry.user_name} {'完成' if ok else '失败'}（{took}）",
+                err=not ok,
+            )
 
-    async def _process_inner(entry, master_lock: asyncio.Lock, out) -> bool:
+    async def _process_inner(entry, master_lock: asyncio.Lock, out, idx: int) -> bool:
         settings = Settings(
             user_name=entry.user_name,
             password=entry.password,
             area_id=entry.area_id if entry.area_id is not None else area,
         )
         creds = entry.credentials()
-        echo(f"▶ 开始 {entry.user_name} (区服 {settings.area_id})")
-        out(f"\n== {entry.user_name} (区服 {settings.area_id}) ==")
-        log.info("开始处理小号 %s", entry.user_name)
+        log.info("▶ 开始 [%d/%d] 区服 %s", idx + 1, len(accounts), settings.area_id)
+        out(f"── {entry.user_name} (区服 {settings.area_id}) ──")
 
         async def _go():
             async with GameClient(settings) as client:
@@ -160,6 +181,8 @@ def run(
 
                 followup_res = None
                 if claim_res.ok and use_res.ok:
+                    log.info("礼包后续：拜师 / 灵宝 / 挂机 / 刷等级 / 金币卡（耗时较长）")
+                    t0 = time.monotonic()
                     followup_res = await run_followup(
                         client,
                         master_settings,
@@ -167,6 +190,10 @@ def run(
                         creds=creds,
                         master_lock=master_lock,
                     )
+                    if followup_res.ok:
+                        log.info("✓ 礼包后续（%.0fs）", time.monotonic() - t0)
+                    else:
+                        log.warning("礼包后续未全部成功（%.0fs）", time.monotonic() - t0)
 
                 # 通关/扫荡放在整条流水线最后：它们要求账号等级达标
                 # （服务端会拒绝"您的等级不够！"），而升到达标等级正是
@@ -182,10 +209,13 @@ def run(
                         # 同一次登录里调用会扫不全，属于服务端这边的行为，
                         # 不是客户端重试能绕开的，所以这里老老实实重登一次）。
                         try:
+                            log.info("重新登录，一键扫荡全部副本")
                             await login(client, creds)
                             await dungeon_service.wait_for_sweep_all_maps(client)
+                            log.info("✓ 一键扫荡")
                         except ApiError as e:
                             sweep_error = str(e)
+                            log.warning("一键扫荡失败: %s", e)
 
                 # 收尾阶段：循环"用一个回溯之门 -> 签到 -> 用 368 个副本卷轴
                 # -> 扫荡全部副本"，直到回溯之门用完；最后两个命则各升级一轮。
@@ -206,6 +236,7 @@ def run(
                         gate_count = await bag_service.count_regression_gates(client)
                         tail_res["gate_count_start"] = gate_count
                         rounds = 0
+                        log.info("回溯之门循环：共 %d 个", gate_count)
                         # 命则升级材料是副本直接掉落的，第一次扫荡掉的不够，
                         # 要等回溯之门第一轮（卷轴+扫荡）之后才够。每个命则
                         # 只差最后一次升级：升成功一次就满级，之后的轮次不再
@@ -231,23 +262,27 @@ def run(
                             await dungeon_service.wait_for_sweep_all_maps(client)
 
                             # 扫荡掉落了材料：还没满级的命则尝试升级。升级后
-                            # 掉落数量提升，从下一轮扫荡开始生效。
-                            for mode_id in list(life_modes_pending):
-                                try:
-                                    await level_up_life_mode(client, mode_id)
-                                except (BusinessError, HttpError) as e:
-                                    log.info(
-                                        "第 %d 轮后升级命则 %s 未成功（材料可能还不够）: %s",
-                                        rounds + 1,
-                                        mode_id,
-                                        e,
-                                    )
-                                else:
-                                    life_modes_pending.remove(mode_id)
-                                    log.info("第 %d 轮后命则 %s 升级完成", rounds + 1, mode_id)
+                            # 掉落数量提升，从下一轮扫荡开始生效。只在前
+                            # LIFE_MODE_LEVEL_UP_ROUNDS 轮尝试，之后的轮次跳过。
+                            if rounds < LIFE_MODE_LEVEL_UP_ROUNDS:
+                                for mode_id in list(life_modes_pending):
+                                    try:
+                                        await level_up_life_mode(client, mode_id)
+                                    except (BusinessError, HttpError) as e:
+                                        log.debug(
+                                            "第 %d 轮后升级命则 %s 未成功（材料可能还不够）: %s",
+                                            rounds + 1,
+                                            mode_id,
+                                            e,
+                                        )
+                                    else:
+                                        life_modes_pending.remove(mode_id)
+                                        log.info("命则 %s 升级完成（第 %d 轮后）", mode_id, rounds + 1)
 
                             rounds += 1
                             gate_count = await bag_service.count_regression_gates(client)
+                            if rounds % 5 == 0 or gate_count == 0:
+                                log.info("回溯之门：已完成 %d 轮，剩余 %d 个", rounds, gate_count)
 
                         tail_res["rounds"] = rounds
                         tail_res["gate_count_end"] = gate_count
@@ -470,7 +505,7 @@ def run(
                 # 只错开第一批：后面的小号是前面有人跑完才进来的，天然错开。
                 if concurrency > 1 and i < concurrency:
                     await asyncio.sleep(START_STAGGER_SECONDS * i)
-                return await _process(entry, master_lock)
+                return await _process(entry, master_lock, i)
 
         results = await asyncio.gather(
             *(_worker(i, e) for i, e in enumerate(accounts)), return_exceptions=True
@@ -486,9 +521,6 @@ def run(
                     log.error("小号 %s 未预期异常", entry.user_name, exc_info=r)
         return ok, fail
 
-    if concurrency > 1:
-        echo(f"并发数 {concurrency}")
-    log.info("gift 并发数=%d", concurrency)
     old_factory = logging.getLogRecordFactory()
     logging.setLogRecordFactory(_AccountPrefixFilterFactory())
     try:
@@ -501,21 +533,27 @@ def run(
     # 收尾：登录大号，接受小号们挂给大号的交易（小号 sell_all_tradeable_items
     # 只是挂单，大号自己接受后物资才会真正到账）。即使有小号中途失败也照常
     # 收——先前成功的小号、以及失败小号在失败前已经挂出的单都在这个列表里。
-    echo("\n== 大号接受小号交易 ==")
+    echo("── 大号接受小号交易 ──")
     master_accept_failed = 0
 
     async def _master_accept():
         async with GameClient(master_settings) as master_client:
             await login(master_client, master_creds)
 
+            done = 0
+
             def _progress(offer, result) -> None:
+                nonlocal done
+                if result is None:  # "开始接受"回调，不单独输出
+                    return
+                done += 1
                 label = f"#{offer.id} {offer.trade_good_name} x{offer.trade_limit}"
-                if result is None:
-                    echo(f"→ 接受 {label}")
-                elif result.ok:
-                    echo("  ✓ 成功")
+                if not result.ok:
+                    echo(f"  ✗ {label} 失败: {result.error}", err=True)
+                elif done % 20 == 0:
+                    log.info("大号已接受 %d 笔", done)
                 else:
-                    echo(f"  ✗ 失败: {result.error}")
+                    log.debug("大号接受 %s", label)
 
             return await trade_service.accept_incoming_offers_until_empty(
                 master_client, on_offer=_progress

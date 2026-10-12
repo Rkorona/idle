@@ -31,7 +31,7 @@ DEFAULT_TRADE_LIMIT = "3"
 #: （HTTP 400），虽然靠 retry_on_rate_limit 兜底能重试回来，但重试次数
 #: 有限，节奏卡太紧还是会有物品最终交易失败、留在背包里。这里主动隔开，
 #: 减少一开始就撞限流的概率。
-TRADE_INTERVAL_DELAY = 1.5
+TRADE_INTERVAL_DELAY = 1
 
 #: 要转给大号的物品白名单：goods_id -> 物品名（名字只是注释用，方便对照，
 #: 不参与判断）。背包里 is_paimai=true（可交易）的东西通常一大堆，但真正

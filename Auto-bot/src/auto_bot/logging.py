@@ -3,7 +3,9 @@
 设计：
   - 只配置 ``auto_bot`` 这一个 logger（不动 root，第三方库如 httpx 不会刷屏）
   - 控制台 -> stderr（stdout 留给命令的结果输出，方便重定向/管道）
-      默认 INFO；-v / --verbose 为 DEBUG；-q / --quiet 只显示 WARNING 以上
+      默认 INFO（只放"阶段级"进度：一个阶段一行）；逐请求/逐副本的细节都是 DEBUG，
+      -v / --verbose 才显示；-q / --quiet 只显示 WARNING 以上
+      格式很简洁：INFO 不带级别和模块名，WARNING/ERROR 用 ⚠ / ✗ 标记
       AUTOBOT_LOG_LEVEL / --log-level 可直接指定级别
   - 可选日志文件（--log-file / AUTOBOT_LOG_FILE）：永远记录 DEBUG，带完整日期和模块名，
       自动轮转（5MB x 3），适合 cron / 无人值守事后排查
@@ -56,6 +58,33 @@ class _RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         return redact(super().format(record))
+
+
+class _ConsoleFormatter(_RedactingFormatter):
+    """控制台专用的简洁格式（文件日志仍保留完整级别 + 模块名，不受影响）。
+
+      INFO     12:00:01  消息            ← 正常进度，不带级别和模块名
+      WARNING  12:00:01 ⚠ 消息
+      ERROR    12:00:01 ✗ 消息
+      DEBUG    12:00:01 · [tasks.dungeon] 消息   ← 只有 -v 才会看到，需要定位来源
+    """
+
+    _MARK = {logging.WARNING: "⚠", logging.ERROR: "✗", logging.CRITICAL: "✗"}
+
+    def format(self, record: logging.LogRecord) -> str:
+        ts = self.formatTime(record, "%H:%M:%S")
+        if record.levelno >= logging.WARNING:
+            head = f"{ts} {self._MARK.get(record.levelno, '⚠')} "
+        elif record.levelno >= logging.INFO:
+            head = f"{ts}  "
+        else:
+            head = f"{ts} · [{getattr(record, 'short', record.name)}] "
+        text = head + record.getMessage()
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info)
+        if record.exc_text:
+            text += "\n" + record.exc_text
+        return redact(text)
 
 
 class _ShortName(logging.Filter):
@@ -129,9 +158,7 @@ def setup_logging(
     console.setLevel(console_level)
     console.addFilter(_ShortName())
     console.addFilter(_SkipEchoed())
-    console.setFormatter(
-        _RedactingFormatter("%(asctime)s %(levelname)-7s %(short)s: %(message)s", "%H:%M:%S")
-    )
+    console.setFormatter(_ConsoleFormatter())
     setattr(console, _HANDLER_TAG, True)
     logger.addHandler(console)
 

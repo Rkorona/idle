@@ -84,6 +84,7 @@ def format_sweep_report(report: SweepReport, top: int = 10) -> str:
 
 class SweepTask(Task):
     name = "dungeon"
+    label = "副本扫荡"
     description = "按界域扫荡副本：切界域/难度 -> 一键扫荡剩余次数，扫完换下一个界域"
 
     def __init__(
@@ -150,7 +151,7 @@ class SweepTask(Task):
         except ApiError as e:
             log.warning("顶级界域%s: 查询子界域失败，仅按配置继续: %s", top, e)
             return subs
-        log.info("顶级界域%s: listDimension -> %s", top, [(r.code, r.name, r.has_map) for r in found])
+        log.debug("顶级界域%s: listDimension -> %s", top, [(r.code, r.name, r.has_map) for r in found])
         return subs + sorted({r.code for r in found if r.has_map} - set(subs))
 
     async def _read_original_difficulty(self, client: GameClient) -> None:
@@ -171,7 +172,7 @@ class SweepTask(Task):
             return
         try:
             await self._do(dungeon_service.set_difficulty, client, self._original)
-            log.info("难度已恢复为 %s", self._original)
+            log.debug("难度已恢复为 %s", self._original)
         except ApiError as e:  # 含会话过期：不能让恢复失败盖住扫荡结果
             log.error("恢复难度失败: %s", e)
             report.restore_failed = True
@@ -216,12 +217,12 @@ class SweepTask(Task):
                 log.warning("切换到顶级界域%s失败，跳过: %s", top, e)
                 return
             self._cur_diff = None
-            log.info("已切换到顶级界域 %s", top)
+            log.debug("已切换到顶级界域 %s", top)
         subs = [r for r in await self._sub_realms(client, top) if r not in seen]
         if not subs:
-            log.info("顶级界域%s: 没有可扫的子界域", top)
+            log.debug("顶级界域%s: 没有可扫的子界域", top)
             return
-        log.info("顶级界域%s: 子界域 %s", top, subs)
+        log.debug("顶级界域%s: 子界域 %s", top, subs)
         seen.update(subs)
         for realm in subs:
             await self._run_realm(client, realm, report)
@@ -246,7 +247,7 @@ class SweepTask(Task):
                 else:
                     work.append((pid, m, diff))
         if not work:
-            log.info("界域%s: 无可扫荡副本", realm)
+            log.debug("界域%s: 无可扫荡副本", realm)
             return
         # 同难度的放一起减少切换；高难度先扫（sort 稳定，同难度保持列表顺序）
         work.sort(key=lambda w: -(w[2] or 0))
@@ -256,7 +257,7 @@ class SweepTask(Task):
                 report.add(realm, m, "would_sweep", f"剩余 {m.remaining} 次，难度id={diff}")
             return
 
-        log.info("界域%s: %d 个副本待扫", realm, len(work))
+        log.debug("界域%s: %d 个副本待扫", realm, len(work))
 
         # current[pid] = 该大副本最新的列表。扫荡会改次数（可能多个副本共用），
         # 所以扫完后所有缓存作废，下次用到时重查
@@ -284,7 +285,7 @@ class SweepTask(Task):
                 # BOSS 类小副本（比如"魔-关羽"/"神玄-吕布"），服务端本来就
                 # 不支持扫荡，不是失败，跳过就好，不计入 rejected
                 report.add(realm, m, "skipped", "不支持一键扫荡（BOSS 副本）")
-                log.info("跳过不可扫荡副本 %s(%s)", m.label, m.id)
+                log.debug("跳过不可扫荡副本 %s(%s)", m.label, m.id)
                 continue
             except ApiError as e:
                 report.add(realm, m, "rejected", str(e))
@@ -292,4 +293,6 @@ class SweepTask(Task):
                 continue
             fresh.clear()
             report.add(realm, m, "swept", f"{m.remaining} 次，难度id={diff}", res)
-            log.info("扫荡完成 %s(%s) %d 次", m.label, m.id, m.remaining)
+            log.debug("扫荡完成 %s(%s) %d 次", m.label, m.id, m.remaining)
+        swept = sum(1 for e in report.entries if e.realm == realm and e.status == "swept")
+        log.info("界域 %s：扫荡 %d/%d 个副本", realm, swept, len(work))

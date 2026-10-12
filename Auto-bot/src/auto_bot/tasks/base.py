@@ -25,6 +25,8 @@ class TaskResult:
 class Task(ABC):
     #: 任务唯一名称，CLI 和 runner 用它来查找任务
     name: str = ""
+    #: 控制台进度里显示的短标题（中文）；不写就用 name
+    label: str = ""
     #: 给人看的说明
     description: str = ""
 
