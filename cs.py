@@ -5,15 +5,15 @@ import requests
 
 HOST = "game12.firetheword.cn"
 URL_TEMPLATE = "https://" + HOST + "/game/fight/master/limit/{id}"
-START_ID = 332900003123   # 起始 id
+START_ID = 332900010007  # 起始 id
 MAX_LOOPS = 0             # 0 = 无限循环
-INTERVAL = 0.5            # 每次请求间隔（秒）
+INTERVAL = 0.4            # 每次请求间隔（秒）
 TIMEOUT = 10
 RETRY_INTERVAL = 3        # 网络错误后重试等待（秒）
 
 HEADERS = {
     "version": "345",
-    "ticket": "TGT-5d0fe8dceb8434d69194bda010743a55.apestar.com",
+    "ticket": "TGT-cbc1da25e1430686dc96f4b1ef196151.apestar.com",
     "auth": "0" * 256,  # 如与抓包不一致，请替换为抓包中的完整 auth 值
     "api_version": "1",
     "os": "ios",
