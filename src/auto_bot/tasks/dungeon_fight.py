@@ -20,11 +20,16 @@
   - 单个副本的接口错误（等级不够、次数用完等）只记录、不中断其它副本；
     会话过期向上抛，由 task_runner 重登后整体重跑（安全：进度来自服务端）
 
-难度：`dungeon-fight` 默认使用 `max`：每个小副本从服务端难度表的最高档开始。
-本次战斗连续失败超过 10 次后降低一档，重新获取当前副本的 fight_id 再继续；
-仍然失败就继续逐档降低，直到最低档。最低档没有更低难度后继续按概率重试，
-不把“连续失败”误判成副本通关。显式指定 `auto` 时则按副本已通关档位固定起步，
-显式指定整数/`none` 时保持原来的固定难度行为。结束时会尽力恢复到运行前的难度。
+难度：`dungeon-fight` 默认使用 `max`：每个大副本开打前，把难度切到服务端难度表里
+的最高档，之后战斗期间不再切换。某个小副本在该难度下连续战败超过 max_losses 次，
+判定打不过，记为"未通关"并跳过，继续下一个。`auto`（按副本已通关档位）会按难度分组，
+一组一组地切；整数/`none` 保持固定难度/不切换。结束时会尽力恢复到运行前的难度。
+
+并发：难度和界域是账号级的服务端全局状态，所以只在"同一难度"的一组副本内并发：
+  大副本（串行）-> 难度分组（串行，组间才切难度）-> 组内小副本（最多 concurrency 个同时打）
+同一个小副本内部仍是严格串行（第 n+1 阶要等第 n 阶打赢）。concurrency=1 时行为与
+改动前一致。某个 worker 遇到会话过期时，取消同组其它 worker 并向上抛，由 task_runner
+重登后整体重跑（安全：进度来自服务端）。
 """
 
 from __future__ import annotations
@@ -113,6 +118,7 @@ class DungeonFightTask(SweepTask):
         plan: SweepPlan | None = None,
         *,
         max_losses: int = MAX_CONSECUTIVE_LOSSES,
+        concurrency: int = 1,
         pause: float = DEFAULT_PAUSE,
         sleep: SleepFn = asyncio.sleep,
         rng: random.Random | None = None,
@@ -120,6 +126,7 @@ class DungeonFightTask(SweepTask):
     ) -> None:
         super().__init__(plan, pause=pause, sleep=sleep, rng=rng)
         self.max_losses = max_losses
+        self.concurrency = max(1, concurrency)
         self._progress = progress
 
     def _emit(self, message: str) -> None:
@@ -184,78 +191,120 @@ class DungeonFightTask(SweepTask):
         seen.update(subs)
 
         for pid in plan.parents:
-            for realm in subs:
-                await self._run_parent_realm(client, realm, pid, report)
+            await self._run_parent(client, pid, subs, report)
 
-    async def _run_parent_realm(
-        self, client: GameClient, realm: int, parent_id: int, report: SweepReport
+    async def _run_parent(
+        self, client: GameClient, parent_id: int, subs: list[int], report: SweepReport
     ) -> None:
-        """战斗一个“子界域 x 大副本”组合中的全部小副本。"""
+        """战斗一个大副本在所有子界域下的全部小副本。
+
+        先把这个大副本在各子界域下的小副本列出来，按难度分组；组与组之间串行
+        （切难度是账号级全局操作），同一组内最多 `concurrency` 个小副本同时打。
+        """
         plan = self.plan
-        maps = await self._do(dungeon_service.list_maps, client, parent_id, realm)
-        work: list[tuple[MapInfo, int | None]] = []
-        for m in maps:
-            reason = self._skip_reason(m)
-            if reason:
-                report.add(realm, m, "skipped", reason)
-            else:
-                work.append((m, self._difficulty_for(m)))
+        work: list[tuple[int, MapInfo, int | None]] = []
+        for realm in subs:
+            maps = await self._do(dungeon_service.list_maps, client, parent_id, realm)
+            for m in maps:
+                reason = self._skip_reason(m)
+                if reason:
+                    report.add(realm, m, "skipped", reason)
+                else:
+                    work.append((realm, m, self._difficulty_for(m)))
         if not work:
-            log.info("界域%s 大副本%s: 无可战斗的副本", realm, parent_id)
+            log.info("大副本%s: 无可战斗的副本", parent_id)
             return
 
-        # 同难度放一起减少切换；高难度先打（sort 稳定，同难度保持列表顺序）
-        work.sort(key=lambda w: -(w[1] or 0))
+        # 高难度先打（sort 稳定，同难度保持列表顺序）；max/整数/none 都只有一组
+        work.sort(key=lambda w: -(w[2] or 0))
 
         if plan.dry_run:
-            for m, diff in work:
+            for realm, m, diff in work:
                 report.add(realm, m, "would_fight", f"大副本{parent_id} 难度id={diff}")
             return
 
-        self._emit(f"界域{realm} 大副本{parent_id}: {len(work)} 个副本待战斗")
-        for m, diff in work:
-            try:
-                if diff is not None and diff != self._cur_diff:
-                    await self._do(dungeon_service.set_difficulty, client, diff)
-                    self._cur_diff = diff
-                out = await self._fight_map(client, realm, m, diff)
-            except SessionExpiredError:
-                raise
-            except ApiError as e:
-                report.add(realm, m, "rejected", str(e))
-                log.warning("战斗出错 %s(%s), 大副本%s: %s", m.label, m.id, parent_id, e)
-                continue
-            report.add(realm, m, out.status, out.note, out.to_result(m.id))
-            self._emit(f"界域{realm} {m.label}({m.id}): {out.note}")
+        groups: dict[int | None, list[tuple[int, MapInfo]]] = {}
+        for realm, m, diff in work:
+            groups.setdefault(diff, []).append((realm, m))
 
-    async def _fight_map(
+        for diff, items in groups.items():
+            if diff is not None and diff != self._cur_diff:
+                try:
+                    await self._do(dungeon_service.set_difficulty, client, diff)
+                except SessionExpiredError:
+                    raise
+                except ApiError as e:
+                    # 难度切不过去（比如还没解锁）：这一组都没法打，记下来继续下一组
+                    for realm, m in items:
+                        report.add(realm, m, "rejected", f"切换难度 {diff} 失败: {e}")
+                    log.warning("大副本%s 切换难度 %s 失败，跳过 %d 个副本: %s", parent_id, diff, len(items), e)
+                    continue
+                self._cur_diff = diff
+            self._emit(
+                f"大副本{parent_id} 难度={diff}: {len(items)} 个副本待战斗"
+                + (f"（并发 {self.concurrency}）" if self.concurrency > 1 else "")
+            )
+            await self._fight_group(client, parent_id, items, report)
+
+    async def _fight_group(
         self,
         client: GameClient,
+        parent_id: int,
+        items: list[tuple[int, MapInfo]],
+        report: SweepReport,
+    ) -> None:
+        """同一难度的一组小副本，最多 concurrency 个同时打。
+
+        Semaphore 是先进先出的，所以 concurrency=1 时顺序与列表一致。任何一个
+        worker 抛出异常（会话过期等）都会取消其余 worker 再向上抛。
+        """
+        sem = asyncio.Semaphore(self.concurrency)
+
+        async def worker(realm: int, m: MapInfo) -> None:
+            async with sem:
+                await self._fight_one(client, parent_id, realm, m, report)
+
+        tasks = [asyncio.ensure_future(worker(realm, m)) for realm, m in items]
+        try:
+            await asyncio.gather(*tasks)
+        except BaseException:
+            for t in tasks:
+                t.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            raise
+
+    async def _fight_one(
+        self,
+        client: GameClient,
+        parent_id: int,
         realm: int,
         m: MapInfo,
-        difficulty: int | None = None,
-    ) -> _MapOutcome:
-        """把一个小副本一场场打到通关，并按需要逐档降低难度。
+        report: SweepReport,
+    ) -> None:
+        try:
+            out = await self._fight_map(client, realm, m)
+        except SessionExpiredError:
+            raise
+        except ApiError as e:
+            report.add(realm, m, "rejected", str(e))
+            log.warning("战斗出错 %s(%s), 大副本%s: %s", m.label, m.id, parent_id, e)
+            return
+        report.add(realm, m, out.status, out.note, out.to_result(m.id))
+        self._emit(f"界域{realm} {m.label}({m.id}): {out.note}")
 
-        `max` 模式从最高难度开始：连续失败 11 次后降一档；每次降档都重新
-        查询 `now/master/{map_id}`，因为不同难度对应的实际 fight_id 不同。
-        降到最低档后继续重试，不再因为连续战败直接放弃。非 `max` 模式保持
-        旧行为：连续失败超过 `max_losses` 次则停止。
+    async def _fight_map(
+        self, client: GameClient, realm: int, m: MapInfo
+    ) -> _MapOutcome:
+        """把一个小副本一场场打到通关。
+
+        不切难度（由调用方在开打前切好）。同一阶连续战败超过 `max_losses` 次
+        就判定这个难度下打不过，放弃这个副本（status=rejected，列在"未通关"里）。
         """
         out = _MapOutcome("cleared")
         losses = stalls = fights = 0
         last_win_id: int | None = None
-        current_diff = difficulty
-        downgrade_enabled = self.plan.difficulty == "max"
 
         while True:
-            if current_diff is not None and current_diff != self._cur_diff:
-                await self._do(dungeon_service.set_difficulty, client, current_diff)
-                self._cur_diff = current_diff
-                self._emit(
-                    f"界域{realm} {m.label}({m.id}): 当前难度={current_diff}"
-                )
-
             fight_id = await self._do(dungeon_service.next_master, client, m.id)
             if fight_id is None:  # 服务端说通关成功
                 break
@@ -273,9 +322,7 @@ class DungeonFightTask(SweepTask):
                     f"打赢后仍停在 fight_id={fight_id}，进度不前进，已停止",
                 )
 
-            res = await self._do(
-                dungeon_service.fight_master, client, m.id, fight_id
-            )
+            res = await self._do(dungeon_service.fight_master, client, m.id, fight_id)
             fights += 1
             out.gold += res.gold
             out.experience += res.experience
@@ -289,35 +336,12 @@ class DungeonFightTask(SweepTask):
                 self._emit(f"界域{realm} {m.label}({m.id}): 第 {out.wins} 场 ✓")
                 continue
 
-            # win=false：正常概率性战斗失败。
+            # win=false：正常概率性战斗失败，重打；连续太多次就认为打不过，跳过。
             losses += 1
-            if downgrade_enabled and losses > self.max_losses:
-                lower = self._table.lower(current_diff) if current_diff is not None else None
-                if lower is not None:
-                    old = current_diff
-                    current_diff = lower.id
-                    losses = 0
-                    stalls = 0
-                    last_win_id = None
-                    self._emit(
-                        f"界域{realm} {m.label}({m.id}): 连续失败 {self.max_losses + 1} 次，"
-                        f"从难度 {old} 降至 {lower.id}，重新获取当前阶 fight_id"
-                    )
-                    continue
-
-                # 已经最低难度：和 boss 命令一样继续重试，
-                # 不因为概率性失败直接判定副本无法通关。
-                self._emit(
-                    f"界域{realm} {m.label}({m.id}): 已在最低难度 {current_diff}，"
-                    f"连续失败 {self.max_losses + 1} 次，继续重试"
-                )
-                losses = 0
-                continue
-
-            if not downgrade_enabled and losses > self.max_losses:
+            if losses > self.max_losses:
                 return self._stopped(
                     out,
-                    f"第 {out.wins + 1} 场连续战败 {losses} 次，已放弃",
+                    f"第 {out.wins + 1} 场连续战败 {losses} 次，打不过，已跳过",
                 )
 
         if out.wins == 0:

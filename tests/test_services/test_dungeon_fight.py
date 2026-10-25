@@ -131,7 +131,7 @@ async def test_gives_up_after_too_many_consecutive_losses():
     c = FakeClient(floors=9, script=[True, True] + [False] * 50)
     out = await make_task(max_losses=3)._fight_map(c, 1, make_map())
     assert out.status == "rejected" and out.wins == 2
-    assert "连续战败" in out.note and "第 3 场" in out.note
+    assert "连续战败" in out.note and "第 3 场" in out.note and "已跳过" in out.note
 
 
 @pytest.mark.asyncio
@@ -170,95 +170,3 @@ def test_format_report():
     text = format_fight_report(r)
     assert "战斗通关 1 个副本" in text and "未通关 1" in text and "✗ 界域2" in text
     assert not r.ok  # rejected 让任务退出码非 0
-
-@pytest.mark.asyncio
-async def test_max_difficulty_downgrades_until_win_and_refetches_fight_id():
-    class DifficultyClient:
-        def __init__(self):
-            self.diff = 27
-            self.floor = 0
-            self.calls = []
-            self.fail_by_diff = {27: 11, 26: 11, 25: 0}
-
-        async def get(self, path):
-            self.calls.append(path)
-            if path.startswith("/game/user/info/default/"):
-                self.diff = int(path.rsplit("/", 1)[1])
-                return {"message": None, "http_code": 200}
-            if "/game/map/now/master/" in path:
-                if self.floor >= 1:
-                    return dict(CLEARED)
-                return {"id": 70000100 + self.diff}
-            if "/game/fight/master/limit/" in path:
-                diff = int(path.rsplit("/", 1)[1]) - 70000100
-                if self.fail_by_diff[diff] > 0:
-                    self.fail_by_diff[diff] -= 1
-                    return lose()
-                self.floor += 1
-                return win()
-            raise AssertionError(path)
-
-    c = DifficultyClient()
-    t = make_task(SweepPlan(difficulty="max"), max_losses=10)
-    from auto_bot.models.dungeon import Difficulty, DifficultyTable
-    t._table = DifficultyTable((
-        Difficulty(25, "5-噩梦", 5),
-        Difficulty(26, "6-天灾", 6),
-        Difficulty(27, "7-无上级", 7),
-    ))
-    t._cur_diff = 27
-
-    out = await t._fight_map(c, 1, make_map(), 27)
-
-    assert out.status == "cleared"
-    assert out.wins == 1
-    set_calls = [int(x.rsplit("/", 1)[1]) for x in c.calls if "/user/info/default/" in x]
-    assert set_calls == [26, 25]
-    fight_calls = [x for x in c.calls if "/game/fight/master/limit/" in x]
-    fight_ids = [int(x.rsplit("/", 1)[1]) for x in fight_calls]
-    assert fight_ids == [70000127] * 11 + [70000126] * 11 + [70000125]
-
-
-@pytest.mark.asyncio
-async def test_max_difficulty_keeps_retrying_at_lowest_instead_of_rejecting():
-    class DifficultyClient:
-        def __init__(self):
-            self.diff = 27
-            self.attempts = 0
-            self.cleared = False
-
-        async def get(self, path):
-            if path.startswith("/game/user/info/default/"):
-                self.diff = int(path.rsplit("/", 1)[1])
-                return {"message": None, "http_code": 200}
-            if "/game/map/now/master/" in path:
-                if self.cleared:
-                    return dict(CLEARED)
-                return {"id": 70000100 + self.diff}
-            if "/game/fight/master/limit/" in path:
-                self.attempts += 1
-                # 11 failures at 27, 11 at 26, then 2 failures at minimum, then win.
-                if self.attempts <= 11:
-                    return lose()
-                if self.attempts <= 22:
-                    return lose()
-                if self.attempts <= 24:
-                    return lose()
-                self.cleared = True
-                return win()
-            raise AssertionError(path)
-
-    c = DifficultyClient()
-    from auto_bot.models.dungeon import Difficulty, DifficultyTable
-    t = make_task(SweepPlan(difficulty="max"), max_losses=10)
-    t._table = DifficultyTable((
-        Difficulty(25, "5-噩梦", 5),
-        Difficulty(26, "6-天灾", 6),
-        Difficulty(27, "7-无上级", 7),
-    ))
-    t._cur_diff = 27
-
-    out = await t._fight_map(c, 1, make_map(), 27)
-    assert out.status == "cleared"
-    assert out.wins == 1
-    assert c.diff == 25

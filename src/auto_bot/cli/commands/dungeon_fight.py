@@ -32,10 +32,18 @@ from ._common import (
 ONLY_OPT = typer.Option(None, "--only", help="只打这些副本 id，逗号分隔（覆盖 AUTOBOT_SWEEP_ONLY）")
 DIFFICULTY_OPT = typer.Option(
     None, "--difficulty", "-d",
-    help="max（从最高难度开始，连续失败11次自动降一档）| auto（按副本已通关档位）| none（不切换）| 难度 id；"
-    "不给且未设置 AUTOBOT_SWEEP_DIFFICULTY 时默认 max",
+    help="max（每个大副本开打前切到最高难度，打不过的副本跳过）| auto（按副本已通关档位分组切换）| "
+    "none（不切换）| 难度 id；不给且未设置 AUTOBOT_SWEEP_DIFFICULTY 时默认 max",
 )
 DRY_RUN_OPT = typer.Option(False, "--dry-run", help="只列出会打哪些副本，不切换也不战斗")
+CONCURRENCY_OPT = typer.Option(
+    1,
+    "--concurrency",
+    "-c",
+    min=1,
+    max=10,
+    help="同一难度的一组副本里同时战斗的副本数，默认 1（串行）。同一副本内仍按阶串行。",
+)
 
 
 def _parse_difficulty(raw: str) -> int | str | None:
@@ -51,6 +59,7 @@ def run(
     only: str | None = ONLY_OPT,
     difficulty: str | None = DIFFICULTY_OPT,
     dry_run: bool = DRY_RUN_OPT,
+    concurrency: int = CONCURRENCY_OPT,
     user: str = USER_OPT,
     password: str = PASSWORD_OPT,
     area: int = AREA_OPT,
@@ -88,7 +97,11 @@ def run(
             echo("🔐 正在登录...")
             session = await login(client, creds)
             echo(f"✅ 登录成功 user_id={session.user_id}，开始逐个战斗通关副本")
-            task = DungeonFightTask(plan, progress=lambda message: echo(f"⚔️ {message}"))
+            task = DungeonFightTask(
+                plan,
+                concurrency=concurrency,
+                progress=lambda message: echo(f"⚔️ {message}"),
+            )
             return await run_task(
                 client, task, creds, on_event=lambda message: echo(f"🔄 {message}")
             )
