@@ -1,1 +1,0 @@
-- [Automate translation terminology](automate-translation.md) — keep “块” and “流程执行实例” consistent while preserving MTD keys and markup.
